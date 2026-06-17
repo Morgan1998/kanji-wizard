@@ -1,0 +1,78 @@
+<div class="front-card-container">
+    <div class="kanji-box-theme">
+        <svg viewBox="0 0 109 109" width="140" height="140">
+            <path id="kanji-stroke-path" d="" stroke="#0f172a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </div>
+</div>
+
+<script>
+(() => {
+    
+    class StrokeState {
+        constructor(maxStrokes) {
+            this.currentStroke = 0;
+            this.maxStrokes = maxStrokes;
+        }
+
+        increment() {
+            if (this.currentStroke < this.maxStrokes) {
+                this.currentStroke++;
+                return true;
+            }
+            return false;
+        }
+
+        getCurrent() {
+            return this.currentStroke;
+        }
+    }
+
+    class KanjiCanvas {
+        constructor(pathId) {
+            this.pathElement = document.getElementById(pathId);
+        }
+
+        updateCanvas(strokeDataArray, currentCount) {
+            if (!this.pathElement) return;
+
+            const cumulativePathString = strokeDataArray
+                .slice(0, currentCount)
+                .join(' ');
+
+            this.pathElement.setAttribute('d', cumulativePathString);
+        }
+    }
+
+    class FrontCardApp {
+        constructor() {
+            this.strokeData = [
+                "M20,40 L80,40",  
+                "M15,70 L85,70"   
+            ];
+
+            this.strokeStateManager = new StrokeState(this.strokeData.length);
+            this.kanjiCanvasManager = new KanjiCanvas('kanji-stroke-path');
+            this.tappableArea = document.querySelector('.front-card-container');
+            
+            this.init();
+        }
+
+        init() {
+            if (!this.tappableArea) return;
+            this.tappableArea.addEventListener('click', () => this.handleTap());
+        }
+
+        handleTap() {
+            const hasAdvanced = this.strokeStateManager.increment();
+            if (hasAdvanced) {
+                const currentCount = this.strokeStateManager.getCurrent();
+                this.kanjiCanvasManager.updateCanvas(this.strokeData, currentCount);
+            }
+        }
+    }
+    
+    new FrontCardApp();
+    
+})();
+</script>
