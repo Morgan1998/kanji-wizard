@@ -12,11 +12,9 @@
         let currentStroke = 0;
 
         const increment = () => {
-            if (currentStroke < maxStrokes) {
-                currentStroke++;
-                return true;
-            }
-            return false;
+            if (currentStroke >= maxStrokes) {
+                currentStroke = 0;
+            } else currentStroke++;
         };
 
         const getCurrent = () => currentStroke;
@@ -54,11 +52,9 @@
         if (!tappableArea) return;
 
         const handleTap = () => {
-            const hasAdvanced = strokeStateManager.increment();
-            if (hasAdvanced) {
-                const currentCount = strokeStateManager.getCurrent();
-                kanjiCanvasManager.updateCanvas(strokeData, currentCount);
-            }
+            strokeStateManager.increment();
+            const currentCount = strokeStateManager.getCurrent();
+            kanjiCanvasManager.updateCanvas(strokeData, currentCount);
         };
 
         tappableArea.addEventListener('click', handleTap);

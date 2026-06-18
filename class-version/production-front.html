@@ -16,11 +16,9 @@
         }
 
         increment() {
-            if (this.currentStroke < this.maxStrokes) {
-                this.currentStroke++;
-                return true;
-            }
-            return false;
+            if (this.currentStroke >= this.maxStrokes) {
+                this.currentStroke = 0;
+            } else this.currentStroke++;
         }
 
         getCurrent() {
@@ -64,12 +62,10 @@
         }
 
         handleTap() {
-            const hasAdvanced = this.strokeStateManager.increment();
-            if (hasAdvanced) {
-                const currentCount = this.strokeStateManager.getCurrent();
-                this.kanjiCanvasManager.updateCanvas(this.strokeData, currentCount);
-            }
-        }
+            this.strokeStateManager.increment();
+            const currentCount = this.strokeStateManager.getCurrent();
+            this.kanjiCanvasManager.updateCanvas(this.strokeData, currentCount);
+        } 
     }
     
     new FrontCardApp();
