@@ -13,48 +13,58 @@ html {
 /* 2. ANKI NATIVE OVERRIDES */
 .card {
     background-color: #f8fafc; 
-    margin: 0;
-    padding: 0;
     min-height: 100vh;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 #qa {
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
+    width: 100%;
+    flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 /* 3. WORKSPACE CONTAINERS */
-.front-card-container {
+.card-container {
     background-color: pink;
+    width: 100%;
     max-width: 600px;
-    min-height: 70vh;
-    max-height: 90vh;
+    height: 75vh;
     overflow-y: auto;
     padding: 20px;
-    margin: 0px;
-    box-sizing: border-box;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-radius: 10px;
 }
 
-/* 4. KANJI BOX SHELL */
-.kanji-box {
+.kanji-house {
     height: 150px;
     width: 150px;
     background: #ffffff;
     border: 2px solid #e2e8f0;
     border-radius: 16px;
-    padding: 20px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* 4. KANJI STROKES STYLING */
+
+.kanji-stroke {
+    stroke: #0f172a;
+    stroke-width: 4;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* UTILS */
+
+.hidden {
+    display: none;
 }

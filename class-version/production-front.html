@@ -1,24 +1,34 @@
-<div class="front-card-container">
-    <div class="kanji-box-theme">
-        <svg viewBox="0 0 109 109" width="140" height="140">
-            <path id="kanji-stroke-path" d="" stroke="#0f172a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+<div class="card-container">
+    <div class="kanji-house">
+        <svg id="kanji-svg" viewBox="0 0 109 109" width=100% height=100%></svg>
     </div>
 </div>
 
+<div id="kanji" class="hidden">{{kanji}}</div>
+<div id="stroke-data" class="hidden">{{stroke-data}}</div>
+
+
 <script>
 (() => {
+
+    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
+    const DOM_PARSER = new DOMParser();
     
-    class StrokeState {
+    class StrokeStateManager {
+        currentStroke = 0;
+        maxStrokes = 0;
+
         constructor(maxStrokes) {
-            this.currentStroke = 0;
             this.maxStrokes = maxStrokes;
         }
 
         increment() {
             if (this.currentStroke >= this.maxStrokes) {
                 this.currentStroke = 0;
-            } else this.currentStroke++;
+            } else {
+                this.currentStroke++;
+            }
         }
 
         getCurrent() {
@@ -26,32 +36,114 @@
         }
     }
 
-    class KanjiCanvas {
-        constructor(pathId) {
-            this.pathElement = document.getElementById(pathId);
+    class StrokeDataParser {
+        /**
+         * 
+         * @param {string} rawHtmlString 
+         * @returns {string[]} 
+         */
+        static parse(rawHtmlString) {
+            if (!rawHtmlString || rawHtmlString.trim() === '') {
+                console.warn('StrokeDataParser: Received an empty stroke-data string.');
+                return [];
+            }
+            
+            const virtualDoc = DOM_PARSER.parseFromString(rawHtmlString, 'text/html');
+
+            const pathElements = virtualDoc.querySelectorAll('path');
+
+            const strokeDataArray = [];
+
+            for (let i = 0; i < pathElements.length; i++) {
+                const dValue = pathElements[i].getAttribute('d');
+                if (dValue) {
+                    strokeDataArray.push(dValue);
+                }
+            }
+
+            return strokeDataArray;
+        }
+    }
+
+    class KanjiSvgManager {
+        svgNode = null;
+
+        constructor(svgId) {
+   
+            this.svgNode = document.getElementById(svgId);
         }
 
-        updateCanvas(strokeDataArray, currentCount) {
-            if (!this.pathElement) return;
+        updateSvg(strokeDataArray, currentCount) {
+            if (!this.svgNode) return;
 
-            const cumulativePathString = strokeDataArray
-                .slice(0, currentCount)
-                .join(' ');
+            if (currentCount === 0) {
+                this.svgNode.replaceChildren();
+                return;
+            }
 
-            this.pathElement.setAttribute('d', cumulativePathString);
+            const newStrokeIndex = currentCount - 1;
+            const newStrokeData = strokeDataArray[newStrokeIndex]; 
+
+            if (this.svgNode.children.length > newStrokeIndex) {
+                this.svgNode.replaceChildren();
+                for (let i = 0; i < newStrokeIndex; i++) {
+                    this._appendStaticStroke(strokeDataArray[i]);
+                }
+            }
+
+            const lastDrawnStroke = this.svgNode.lastElementChild;
+            if (lastDrawnStroke) {
+                lastDrawnStroke.style.transition = 'none';
+            }
+
+            this._appendAnimatedStroke(newStrokeData);
+        }
+
+        _appendStaticStroke(strokeData) {
+            const staticPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
+            staticPathNode.setAttribute('d', strokeData);
+            this._applyDefaultStyles(staticPathNode);
+            this.svgNode.append(staticPathNode);
+        }
+
+        _appendAnimatedStroke(strokeData) {
+            const animatedPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
+            animatedPathNode.setAttribute('d', strokeData);
+            this._applyDefaultStyles(animatedPathNode);
+            this.svgNode.append(animatedPathNode);
+
+            const totalLength = animatedPathNode.getTotalLength();
+            animatedPathNode.style.strokeDasharray = totalLength;
+            animatedPathNode.style.strokeDashoffset = totalLength;
+
+            requestAnimationFrame(() => {
+                animatedPathNode.style.transition = 'stroke-dashoffset 0.4s ease-in-out';
+                animatedPathNode.style.strokeDashoffset = '0';
+            });
+        }
+
+
+        _applyDefaultStyles(pathNode) {
+            pathNode.classList.add('kanji-stroke');
         }
     }
 
     class FrontCardApp {
-        constructor() {
-            this.strokeData = [
-                "M20,40 L80,40",  
-                "M15,70 L85,70"   
-            ];
+        strokeData = [];
+        strokeStateManager = null;
+        kanjiSvgManager = null;
+        tappableArea = null;
 
-            this.strokeStateManager = new StrokeState(this.strokeData.length);
-            this.kanjiCanvasManager = new KanjiCanvas('kanji-stroke-path');
-            this.tappableArea = document.querySelector('.front-card-container');
+        constructor() {
+            const strokeDataHolder = document.querySelector('#stroke-data');
+            const rawStrokeString = strokeDataHolder ? strokeDataHolder.innerHTML : '';
+
+            this.strokeDataArray = StrokeDataParser.parse(rawStrokeString);
+
+            // Re-anchored to the unified StrokeStateManager class name mapping definition
+            this.strokeStateManager = new StrokeStateManager(this.strokeDataArray.length);
+            this.kanjiSvgManager = new KanjiSvgManager('kanji-svg');
+            this.tappableArea = document.querySelector('.card-container');
             
             this.init();
         }
@@ -62,9 +154,13 @@
         }
 
         handleTap() {
+            if (this.strokeDataArray.length === 0) {
+                return;
+            }
+
             this.strokeStateManager.increment();
             const currentCount = this.strokeStateManager.getCurrent();
-            this.kanjiCanvasManager.updateCanvas(this.strokeData, currentCount);
+            this.kanjiSvgManager.updateSvg(this.strokeDataArray, currentCount);
         } 
     }
     
