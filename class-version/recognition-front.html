@@ -1,11 +1,51 @@
-<div class="front-card-container">
-    
-    <div id="front-kanji-box-shell" class="kanji-box-theme">
-        
-        <div id="front-kanji-canvas" class="kanji-display-styles">
-            {{kanji}}
-        </div>
-
+<div class="card-container">
+    <div class="kanji-house">
+        <svg id="kanji-svg" viewBox="0 0 109 109" width=100% height=100%>
+            <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
+            <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
+            <g id="svg-stroke-group"></g>
+        </svg>
     </div>
-
 </div>
+
+<div id="kanji" class="hidden">{{kanji}}</div>
+<div id="stroke-data" class="hidden">{{stroke-data}}</div>
+
+<script>
+(() => {
+
+class StrokeDataParser {
+    static parse(rawStrokeString) {
+        if (!rawStrokeString) return [];
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(rawStrokeString, 'text/html');
+        const pathsNodeList = doc.querySelectorAll('path');
+        return Array.from(pathsNodeList).map(path => path.getAttribute('d')).filter(Boolean);
+    }
+}
+
+class FrontCardApp {
+    constructor() {
+        const strokeDataHolder = document.querySelector('#stroke-data');
+        const svgStrokeGroup = document.querySelector('#svg-stroke-group');
+        
+        if (!strokeDataHolder || !svgStrokeGroup) return;
+
+        const rawStrokeString = strokeDataHolder.innerHTML;
+        const strokeDataArray = StrokeDataParser.parse(rawStrokeString);
+
+        svgStrokeGroup.replaceChildren();
+
+        strokeDataArray.forEach(strokePath => {
+            const pathNode = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathNode.setAttribute('d', strokePath);
+            pathNode.classList.add('kanji-stroke'); // Applies your master stroke CSS thickness/color
+            svgStrokeGroup.append(pathNode);
+        });
+    }
+}
+
+new FrontCardApp();
+    
+})();
+</script>

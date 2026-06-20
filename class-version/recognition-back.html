@@ -1,0 +1,261 @@
+<div class="card-container">
+    <div class="kanji-house">
+        <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
+            <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
+            <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
+            <g id="svg-stroke-group"></g>
+        </svg>
+    </div>
+
+    <div class="meaning-container unselectable">
+        <h2 id="kanji-meaning">{{meaning}}</h2>
+    </div>
+
+    <div class="readings-container">
+        <button id="kunyomi-button" class="reading-button">Kun</button>
+        <button id="onyomi-button" class="reading-button">On</button>
+    </div>
+
+
+    <div id="vocab-ledger"></div>
+ 
+
+    <footer class="deck-utility-footer">
+        <a href="" target="" class="utility-link">Report an Issue</a>
+        <a href="" target="" class="utility-link">Rate the Deck</a>
+    </footer>
+</div>
+
+<div id="kanji" class="hidden">{{kanji}}</div>
+<div id="stroke-data" class="hidden">{{stroke-data}}</div>
+<div id="vocab-data" class="hidden">{{vocab-json}}</div>
+
+
+<script>
+(() => {
+
+    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
+    const DOM_PARSER = new DOMParser();
+    
+    class VocabLedgerManager {
+        constructor(vocabDataElement, ledgerContainerElement) {
+            const rawJsonString = document.querySelector(vocabDataElement)?.textContent?.trim() || '';
+            const ledgerContainer = document.querySelector(ledgerContainerElement);
+
+            if (!rawJsonString || !ledgerContainer) {
+                return;
+            }
+
+            try {
+                const vocabArray = JSON.parse(rawJsonString);
+                this.render(vocabArray, ledgerContainer);
+            } catch (error) {
+                console.error('Failed to parse vocab-json string:', error);
+            }
+        }
+
+        render(vocabArray, ledgerContainer) {
+            ledgerContainer.replaceChildren();
+
+            vocabArray.forEach(vocab => {
+                const vocabEntryNode = document.createElement('div');
+                vocabEntryNode.classList.add('vocab-entry');
+
+                const jlptBadgeNode = document.createElement('span');
+                jlptBadgeNode.classList.add('jlpt-badge', `badge-${vocab.lvl.toLowerCase()}`);
+                jlptBadgeNode.textContent = vocab.lvl.toUpperCase();
+                vocabEntryNode.append(jlptBadgeNode);
+
+                const expressionNode = document.createElement('div');
+                expressionNode.classList.add('vocab-expression');
+
+                const rubyNode = document.createElement('ruby');
+                vocab['with-ruby'].forEach(kanjiFuriganaOkuriganaSet => {
+                    const baseText = document.createTextNode(kanjiFuriganaOkuriganaSet.k + kanjiFuriganaOkuriganaSet.o);
+                    rubyNode.append(baseText);
+
+                    if (kanjiFuriganaOkuriganaSet.f) {
+                        const rubyTextNode = document.createElement('rt');
+                        rubyTextNode.textContent = kanjiFuriganaOkuriganaSet.f;
+                        rubyNode.append(rubyTextNode);
+                    }
+                });
+
+                expressionNode.append(rubyNode);
+                vocabEntryNode.append(expressionNode);
+
+                const definitionNode = document.createElement('div');
+                definitionNode.classList.add('vocab-definition');
+                definitionNode.textContent = vocab.def;
+                vocabEntryNode.append(definitionNode);
+
+                ledgerContainer.append(vocabEntryNode);
+
+            })
+        }
+    }
+
+    class StrokeStateManager {
+        currentStroke = 0;
+        maxStrokes = 0;
+
+        constructor(maxStrokes) {
+            this.maxStrokes = maxStrokes;
+        }
+
+        increment() {
+            if (this.currentStroke >= this.maxStrokes) {
+                this.currentStroke = 0;
+            } else {
+                this.currentStroke++;
+            }
+        }
+
+        getCurrent() {
+            return this.currentStroke;
+        }
+    }
+
+    class StrokeDataParser {
+        /**
+         * 
+         * @param {string} rawHtmlString 
+         * @returns {string[]} 
+         */
+        static parse(rawHtmlString) {
+            if (!rawHtmlString || rawHtmlString.trim() === '') {
+                console.warn('StrokeDataParser: Received an empty stroke-data string.');
+                return [];
+            }
+            
+            const virtualDoc = DOM_PARSER.parseFromString(rawHtmlString, 'text/html');
+
+            const pathElements = virtualDoc.querySelectorAll('path');
+
+            const strokeDataArray = [];
+
+            for (let i = 0; i < pathElements.length; i++) {
+                const dValue = pathElements[i].getAttribute('d');
+                if (dValue) {
+                    strokeDataArray.push(dValue);
+                }
+            }
+
+            return strokeDataArray;
+        }
+    }
+
+    class KanjiSvgManager {
+        svgStrokeGroup = null;
+
+        constructor(svgStrokeGroupId) {
+   
+            this.svgStrokeGroup = document.querySelector(svgStrokeGroupId);
+        }
+
+        updateSvg(strokeDataArray, currentCount) {
+            if (!this.svgStrokeGroup) return;
+
+            if (currentCount === 0) {
+                this.svgStrokeGroup.replaceChildren();
+                return;
+            }
+
+            const newStrokeIndex = currentCount - 1;
+            const newStrokeData = strokeDataArray[newStrokeIndex]; 
+
+            if (this.svgStrokeGroup.children.length > newStrokeIndex) {
+                this.svgStrokeGroup.replaceChildren();
+                for (let i = 0; i < newStrokeIndex; i++) {
+                    this._appendStaticStroke(strokeDataArray[i]);
+                }
+            }
+
+            const lastDrawnStroke = this.svgStrokeGroup.lastElementChild;
+            if (lastDrawnStroke) {
+                lastDrawnStroke.style.transition = 'none';
+            }
+
+            this._appendAnimatedStroke(newStrokeData);
+        }
+
+        _appendStaticStroke(strokeData) {
+            const staticPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
+            staticPathNode.setAttribute('d', strokeData);
+            this._applyDefaultStyles(staticPathNode);
+            this.svgStrokeGroup.append(staticPathNode);
+        }
+
+        _appendAnimatedStroke(strokeData) {
+            const animatedPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
+            animatedPathNode.setAttribute('d', strokeData);
+            this._applyDefaultStyles(animatedPathNode);
+            this.svgStrokeGroup.append(animatedPathNode);
+
+            const totalLength = animatedPathNode.getTotalLength();
+            animatedPathNode.style.strokeDasharray = totalLength;
+            animatedPathNode.style.strokeDashoffset = totalLength;
+
+            requestAnimationFrame(() => {
+                animatedPathNode.style.transition = 'stroke-dashoffset 0.4s ease-in-out';
+                animatedPathNode.style.strokeDashoffset = '0';
+            });
+        }
+
+
+        _applyDefaultStyles(pathNode) {
+            pathNode.classList.add('kanji-stroke');
+        }
+    }
+
+    class BackCardApp {
+
+        strokeData = [];
+        strokeStateManager = null;
+        kanjiSvgManager = null;
+        tappableArea = null;
+
+        constructor() {
+
+            const strokeDataHolder = document.querySelector('#stroke-data');
+            const rawStrokeString = strokeDataHolder ? strokeDataHolder.innerHTML : '';
+            this.strokeDataArray = StrokeDataParser.parse(rawStrokeString);
+
+            this.strokeStateManager = new StrokeStateManager(this.strokeDataArray.length);
+            this.kanjiSvgManager = new KanjiSvgManager('#svg-stroke-group');
+            this.tappableArea = document.querySelector('.card-container');
+            
+            this.init();
+        }
+
+        init() {
+
+            new VocabLedgerManager('#vocab-data', '#vocab-ledger');
+
+            if (!this.tappableArea) return;
+            this.tappableArea.addEventListener('click', (event) => this.handleTap(event));
+        }
+
+        handleTap(event) {
+
+            const hitKanjiHouse = event.target.closest('.kanji-house');
+            const hitRootBackground = event.target === event.currentTarget;
+
+            if (!hitKanjiHouse && !hitRootBackground) {
+                return;
+            }
+            if (this.strokeDataArray.length === 0) {
+                return;
+            }
+
+            this.strokeStateManager.increment();
+            const currentCount = this.strokeStateManager.getCurrent();
+            this.kanjiSvgManager.updateSvg(this.strokeDataArray, currentCount);
+        } 
+    }
+    
+    new BackCardApp();
+    
+})();
+</script>

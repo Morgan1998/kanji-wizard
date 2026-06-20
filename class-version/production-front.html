@@ -1,6 +1,14 @@
 <div class="card-container">
     <div class="kanji-house">
-        <svg id="kanji-svg" viewBox="0 0 109 109" width=100% height=100%></svg>
+        <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
+            <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
+            <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
+            <g id="svg-stroke-group"></g>
+        </svg>
+    </div>
+
+    <div class="meaning-container unselectable">
+        <h2 id="kanji-meaning">{{meaning}}</h2>
     </div>
 </div>
 
@@ -66,32 +74,32 @@
     }
 
     class KanjiSvgManager {
-        svgNode = null;
+        svgStrokeGroup = null;
 
-        constructor(svgId) {
+        constructor(svgStrokeGroupId) {
    
-            this.svgNode = document.getElementById(svgId);
+            this.svgStrokeGroup = document.querySelector(svgStrokeGroupId);
         }
 
         updateSvg(strokeDataArray, currentCount) {
-            if (!this.svgNode) return;
+            if (!this.svgStrokeGroup) return;
 
             if (currentCount === 0) {
-                this.svgNode.replaceChildren();
+                this.svgStrokeGroup.replaceChildren();
                 return;
             }
 
             const newStrokeIndex = currentCount - 1;
             const newStrokeData = strokeDataArray[newStrokeIndex]; 
 
-            if (this.svgNode.children.length > newStrokeIndex) {
-                this.svgNode.replaceChildren();
+            if (this.svgStrokeGroup.children.length > newStrokeIndex) {
+                this.svgStrokeGroup.replaceChildren();
                 for (let i = 0; i < newStrokeIndex; i++) {
                     this._appendStaticStroke(strokeDataArray[i]);
                 }
             }
 
-            const lastDrawnStroke = this.svgNode.lastElementChild;
+            const lastDrawnStroke = this.svgStrokeGroup.lastElementChild;
             if (lastDrawnStroke) {
                 lastDrawnStroke.style.transition = 'none';
             }
@@ -103,14 +111,14 @@
             const staticPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
             staticPathNode.setAttribute('d', strokeData);
             this._applyDefaultStyles(staticPathNode);
-            this.svgNode.append(staticPathNode);
+            this.svgStrokeGroup.append(staticPathNode);
         }
 
         _appendAnimatedStroke(strokeData) {
             const animatedPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
             animatedPathNode.setAttribute('d', strokeData);
             this._applyDefaultStyles(animatedPathNode);
-            this.svgNode.append(animatedPathNode);
+            this.svgStrokeGroup.append(animatedPathNode);
 
             const totalLength = animatedPathNode.getTotalLength();
             animatedPathNode.style.strokeDasharray = totalLength;
@@ -142,7 +150,7 @@
 
             // Re-anchored to the unified StrokeStateManager class name mapping definition
             this.strokeStateManager = new StrokeStateManager(this.strokeDataArray.length);
-            this.kanjiSvgManager = new KanjiSvgManager('kanji-svg');
+            this.kanjiSvgManager = new KanjiSvgManager('#svg-stroke-group');
             this.tappableArea = document.querySelector('.card-container');
             
             this.init();
