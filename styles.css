@@ -31,12 +31,12 @@ html {
 /* 3. WORKSPACE CONTAINERS */
 .front-card-container {
     background-color: pink;
-    width: 100%;
+    max-width: 600px;
     min-height: 70vh;
     max-height: 90vh;
     overflow-y: auto;
     padding: 20px;
-    margin: 20px;
+    margin: 0px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -46,7 +46,9 @@ html {
 }
 
 /* 4. KANJI BOX SHELL */
-.kanji-box-theme {
+.kanji-box {
+    height: 150px;
+    width: 150px;
     background: #ffffff;
     border: 2px solid #e2e8f0;
     border-radius: 16px;
@@ -55,16 +57,4 @@ html {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-/* 5. KANJI CANVAS STYLES */
-.kanji-display-styles {
-    font-family: "Hiragino Mincho ProN", "MS Mincho", "Yu Mincho", serif;
-    font-size: 140px; 
-    color: #0f172a; 
-    line-height: 1;
-    margin: 0;
-    padding: 0;
-    user-select: none;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
