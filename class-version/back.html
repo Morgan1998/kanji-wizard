@@ -62,37 +62,78 @@
                 const vocabEntryNode = document.createElement('div');
                 vocabEntryNode.classList.add('vocab-entry');
 
+                const jlptBadgeContainerNode = document.createElement('div');
+                jlptBadgeContainerNode.classList.add('jlpt-badge-container', `badge-${vocab.lvl.toLowerCase()}-container`);
+                
                 const jlptBadgeNode = document.createElement('span');
                 jlptBadgeNode.classList.add('jlpt-badge', `badge-${vocab.lvl.toLowerCase()}`);
                 jlptBadgeNode.textContent = vocab.lvl.toUpperCase();
-                vocabEntryNode.append(jlptBadgeNode);
 
+                const vocabDefinitionSetNode = document.createElement('div');
+                vocabDefinitionSetNode.classList.add('vocab-definition-set');
+                
                 const expressionNode = document.createElement('div');
                 expressionNode.classList.add('vocab-expression');
 
-                const rubyNode = document.createElement('ruby');
                 vocab['with-ruby'].forEach(kanjiFuriganaOkuriganaSet => {
-                    const baseText = document.createTextNode(kanjiFuriganaOkuriganaSet.k + kanjiFuriganaOkuriganaSet.o);
-                    rubyNode.append(baseText);
-
-                    if (kanjiFuriganaOkuriganaSet.f) {
-                        const rubyTextNode = document.createElement('rt');
-                        rubyTextNode.textContent = kanjiFuriganaOkuriganaSet.f;
-                        rubyNode.append(rubyTextNode);
+                    if (kanjiFuriganaOkuriganaSet.k) {
+                        const rubyNode = document.createElement('ruby');
+                        rubyNode.textContent = kanjiFuriganaOkuriganaSet.k;
+                        rubyNode.style.cursor = 'pointer';
+                        if (kanjiFuriganaOkuriganaSet.f) {
+                            const rubyTextNode = document.createElement('rt');
+                            rubyTextNode.classList.add('furigana', 'is-hidden');
+                            rubyTextNode.textContent = kanjiFuriganaOkuriganaSet.f;
+                            rubyNode.append(rubyTextNode);                      
+                        }
+                        expressionNode.append(rubyNode);
+                    }
+                    if (kanjiFuriganaOkuriganaSet.o) {
+                        const okuriganaNode =  document.createTextNode(kanjiFuriganaOkuriganaSet.o);
+                        expressionNode.append(okuriganaNode);
                     }
                 });
 
-                expressionNode.append(rubyNode);
-                vocabEntryNode.append(expressionNode);
+                expressionNode.addEventListener('click', function(event) {
+                    const rubyNode = event.target.closest('ruby');
+                    if (!rubyNode) {
+                        event.stopPropagation();
+                        return;
+                    }
+
+                    event.stopPropagation();
+
+                    const rubyTextNode = rubyNode.querySelector('rt');
+
+                    if (rubyTextNode) {
+                        rubyTextNode.classList.toggle('is-hidden');
+                    }
+                });
 
                 const definitionNode = document.createElement('div');
-                definitionNode.classList.add('vocab-definition');
+                definitionNode.classList.add('vocab-definition', 'is-hidden');
                 definitionNode.textContent = vocab.def;
-                vocabEntryNode.append(definitionNode);
 
+                vocabEntryNode.addEventListener('click', function() {
+
+                    const textSelection = window.getSelection().toString();  
+
+
+                    if (!textSelection) {
+                    definitionNode.classList.toggle('is-hidden')}
+                });
+
+                definitionNode.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
+
+                vocabDefinitionSetNode.append(expressionNode);
+                vocabDefinitionSetNode.append(definitionNode);
+                jlptBadgeContainerNode.append(jlptBadgeNode);
+                vocabEntryNode.append(jlptBadgeContainerNode);
+                vocabEntryNode.append(vocabDefinitionSetNode);
                 ledgerContainer.append(vocabEntryNode);
-
-            })
+            });
         }
     }
 

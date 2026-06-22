@@ -1,4 +1,53 @@
-/* 1. RESETS */
+/*** THEMES ***/
+
+/* DEFAULT LIGHT THEME ── */
+:root {
+    --bg-page: #f8fafc;          
+    --bg-card: #ffffff;          
+    --border-card: rgba(0, 0, 0, 0.06);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    
+    --text-primary: #1a202c;
+    --text-secondary: #718096;
+    --grid-line-color: rgba(0, 0, 0, 0.12);
+    --kanji-stroke-color: black;
+    --vocab-ledger-bg: rgba(0, 0, 0, 0.03);
+}
+
+/* DARK THEME SWITCHES (System, Desktop App, & AnkiDroid Combined) ── */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-page: #0f172a;      
+        --bg-card: #1e293b;      
+        --border-card: rgba(255, 255, 255, 0.05);
+        --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+        
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --grid-line-color: rgba(255, 255, 255, 0.15);
+        --kanji-stroke-color: white;
+        --vocab-ledger-bg: rgba(255, 255, 255, 0.04);
+    }
+}
+
+html.night-mode,
+html[data-bs-theme="dark"],
+body.nightMode,
+body.night_mode,
+body.card_dark {
+    --bg-page: #0f172a;
+    --bg-card: #1e293b;
+    --border-card: rgba(255, 255, 255, 0.05);
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --grid-line-color: rgba(255, 255, 255, 0.15);
+    --kanji-stroke-color: white;
+    --vocab-ledger-bg: rgba(255, 255, 255, 0.04);
+}
+
+/*** RESETS ***/
 html {
     box-sizing: border-box;
     -webkit-text-size-adjust: 100%;
@@ -12,38 +61,51 @@ html {
     padding: 0;
 }
 
-/* 2. ANKI NATIVE OVERRIDES */
+/*** ANKI NATIVE OVERRIDES ***/
 .card {
-    background-color: #f8fafc; 
+    background-color: var(--bg-page); 
+    color: var(--text-primary);
+
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #qa {
     width: 100%;
-    flex-grow: 1;
+    
+    /* ── FORCE DYNAMIC LAYOUT EXTENSION ── */
+    min-height: 100%;            
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: flex-start; 
+    
+    padding: 40px 20px;          
+    box-sizing: border-box;
 }
 
-/* 3. WORKSPACE CONTAINERS */
+/*** WORKSPACE CONTAINERS ***/
 .card-container {
-    background-color: #1a202c;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 
-                0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card);
     width: 100%;
     max-width: 480px;
-    height: 75vh;
+    height: 90vh;
     overflow-y: auto;
     padding: 20px;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    margin: auto 0;
 }
 
 .vocab-section-container {
@@ -51,135 +113,265 @@ html {
     user-select: text;
 }
 
-/* 4. KANJI STYLING */
+/*** KANJI STYLING ***/
 
 .kanji-house {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card);
+
     height: 150px;
     width: 150px;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.kanji-house.static-mode {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#static-kanji {
-    /* Uses standard textbook fonts present on iOS, macOS, Windows, and Android devices */
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-    
-    /* Massive, clean font scale to comfortably maximize our 146px inside content zone */
-    font-size: 5.5rem; 
-    font-weight: 400;
-    color: #0f172a; /* Slate 900 color profile to perfectly match your production card stroke fill */
-    
-    /* Kill default heading layout paddings which disrupt precise vertical math */
-    margin: 0;
-    padding: 0;
-    line-height: 1; 
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .grid-line {
-    stroke: #cbd5e1;
-    stroke-width: 0.8;
+    stroke: var(--grid-line-color);
+
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
 }
 
 .kanji-stroke {
-    stroke: #0f172a;
+    stroke: var(--kanji-stroke-color);
     stroke-width: 4;
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
-/* 5. VOCAB SECTION */
+
+/*** KANJI MEANING ***/
+
+.meaning-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 16px 0 24px 0;    /* Creates balanced breathing room above and below */
+}
+
+#kanji-meaning {
+    font-size: 1.4rem;        /* Prominent sizing for immediate legibility */
+    font-weight: 600;         /* Clean, semi-bold profile */
+    line-height: 1.35;        /* Comfortable space for multi-word definitions */
+    text-align: center;
+    margin: 0;                /* Resets default browser H2 margins */
+    padding: 0 8px;           /* Mobile side safety buffer */
+    letter-spacing: -0.2px;   /* Modern, tight UI typographic feel */
+    
+    /* Dynamically scales with your theme engine */
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+/*** READINGS ***/
+
+.readings-container {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+    width: 150px; 
+}
+
+.reading-button {
+    border: 1px solid var(--border-card);
+    background-color: var(--bg-card);
+    color: var(--text-secondary);
+
+    flex: 1;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    
+    cursor: pointer;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent; 
+}
+
+/* Hover State */
+.reading-button:hover {
+    color: var(--text-primary);
+    background-color: var(--vocab-row-bg);
+}
+
+/* Active State (Applies when clicked/selected) */
+.reading-button.active {
+    color: var(--bg-card); /* Inverts text color to stand out */
+    background-color: var(--text-primary); /* Dark fill in light theme, bright fill in dark theme */
+    border-color: var(--text-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.reading-button:focus {
+    outline: none;
+}
+
+/*** VOCAB SECTION ***/
 
 #vocab-ledger {
     display: flex;
     flex-direction: column;
-    gap: 10px;            
+    
+    padding-bottom: 5px;           
     width: 100%;
-    max-width: 420px;        
+    max-width: 420px;  
+    border-radius: 6px;  
+   
 }
 
 .vocab-entry {
-    display: flex;
-    align-items: center;     
-    justify-content: flex-start;
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.05); 
-    border-radius: 6px;
-    width: 100%;             
+    display: flex;    
+    gap: 10px;
+    padding: 6px 6px;
+    width: 100%;
+
+    border-bottom: 1px solid var(--border-card);
 }
 
-/* 1. THE BADGE COMPONENT (Snug Left Side) */
+.vocab-entry:last-child {
+    border-bottom: none;
+}
+
+/* THE BADGE COMPONENT (Snug Left Side) */
 .jlpt-badge {
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: 0.9rem;
+    font-weight: 700;
     text-transform: uppercase;
-    padding: 3px 6px;
+    padding: 4px 8px;
     border-radius: 4px;
     color: #ffffff;
     text-align: center;
+    min-width: 32px;
     flex-shrink: 0; 
-    margin-right: 16px;
+}
+
+.jlpt-badge-container {
+    display: flex;
+    align-items: center;
 }
 
 /* Level Color System */
+
 .badge-n5 { background-color: #4a5568; }
 .badge-n4 { background-color: #2b6cb0; }
 .badge-n3 { background-color: #2c7a7b; }
 .badge-n2 { background-color: #dd6b20; }
 .badge-n1 { background-color: #e53e3e; }
 
-/* 2. THE EXPRESSION COMPONENT */
+/**
+.badge-n5-container { border: 2px solid #4a5568; }
+.badge-n4-container { border: 2px solid #2b6cb0; }
+.badge-n3-container { border: 2px solid #2c7a7b; }
+.badge-n2-container { border: 2px solid #dd6b20; }
+.badge-n1-container { border: 2px solid #e53e3e; }
+**/
+
+/* THE EXPRESSION COMPONENT */
+
+.vocab-definition-set {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    
+    flex-grow: 1;
+}
+
 .vocab-expression {
-    font-size: 1.25rem;
-    font-weight: 600;
-    flex-shrink: 0;          
-    margin-right: 16px; 
+    font-size: 2.4rem;
+    font-weight: 500;
+    line-height: 1.2;
+    flex-shrink: 0;
+    display: flex;      
+    align-items: flex-end;   
+
+    user-select: text;
+    -webkit-user-select: text;
+    -webkit-tap-highlight-color: transparent;  
 }
 
-/* 3. THE DEFINITION COMPONENT */
+.vocab-expression ::selection {
+    background-color: transparent;
+    color: #ff007f;              
+    text-shadow: 0 0 12px #ff007f, 0 0 4px #ffffff; 
+}
+
+.vocab-expression ::-webkit-selection {
+    background-color: transparent;
+    color: #ff007f;
+    text-shadow: 0 0 12px #ff007f, 0 0 4px #ffffff;
+}
+
+.furigana::selection {
+background-color: transparent;
+color: #fef08a;
+}
+
+.vocab-expression ruby {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.furigana {
+    font-size: 0.3em;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+/* THE DEFINITION COMPONENT */
 .vocab-definition {
-    font-size: 0.9rem;
-    color: #a0aec0;
+    font-size: 1.1rem;
+    line-height: 1;
     text-align: left;
-    flex-grow: 1; 
-    overflow: hidden;
+    padding-left: 2px;
+
+    color: var(--text-secondary)
 }
 
-.hide-furigana rt {
-    display: none;
+/*** LINKS ***/
+
+.deck-utility-footer {
+    border-top: 1px solid var(--border-card);
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 24px;              
+    padding: 16px 0;
+    margin-top: auto;       
 }
 
+.utility-link {
+    color: var(--text-secondary);
 
-/* TYPOGRAPHY */
-
-#meaning-container {
-    margin-top: 30px; 
-    text-align: center;
-    padding: 0 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
-#kanji-meaning {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #334155;
-    letter-spacing: -0.025em;
-    line-height: 1.3;
+.utility-link:hover,
+.utility-link:active {
+    color: var(--text-primary);
 }
 
-/* UTILS */
+/*** UTILS ***/
 
 .hidden {
     display: none;
+}
+
+.is-hidden {
+    visibility: hidden;
+    opacity: 0;
 }
