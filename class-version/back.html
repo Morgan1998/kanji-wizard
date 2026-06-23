@@ -11,22 +11,25 @@
         <h2 id="kanji-meaning">{{meaning}}</h2>
     </div>
 
+    <div id="readings-display" class="unselectable">Select a reading</div>
+
     <div class="readings-container">
         <button id="kunyomi-button" class="reading-button">Kun</button>
         <button id="onyomi-button" class="reading-button">On</button>
     </div>
 
-
     <div id="vocab-ledger"></div>
- 
 
     <footer class="deck-utility-footer">
-        <a href="" target="" class="utility-link">Report an Issue</a>
-        <a href="" target="" class="utility-link">Rate the Deck</a>
+        <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
+        <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
     </footer>
 </div>
 
 <div id="kanji" class="hidden">{{kanji}}</div>
+<div id="jlpt-level" class="hidden">{{jlpt-level}}</div>
+<div id="kun-data" class="hidden">{{kun-yomi}}</div>
+<div id="on-data" class="hidden">{{on-yomi}}</div>
 <div id="stroke-data" class="hidden">{{stroke-data}}</div>
 <div id="vocab-data" class="hidden">{{vocab-json}}</div>
 
@@ -37,8 +40,94 @@
     const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
     const DOM_PARSER = new DOMParser();
+
+    class LinkInstallationService {
+        targetLinkElement = null;
+
+        constructor(config) {
+            this.targetLinkElement = document.querySelector(config.linkSelector);
+
+            if (!this.targetLinkElement) {
+                return;
+            }
+
+            this.installDynamicUrl(config.baseUrl, config.params, config.openInNewTab);
+        }
+
+        installDynamicUrl(baseUrlString, parametersObject = {}, openInNewTabFlag = true) {
+            const urlParametersBuilder = new URLSearchParams();
+
+            for (const [parameterKey, parameterValue] of Object.entries(parametersObject)) {
+                const isSelectorStringFlag = parameterValue.startsWith('#') || parameterValue.startsWith('.');
+
+                const resolvedValueString = isSelectorStringFlag
+                    ? document.querySelector(parameterValue)?.textContent?.trim() || 'Unknown'
+                    : parameterValue;
+
+                urlParametersBuilder.append(parameterKey, resolvedValueString);
+            }
+
+            const hasParametersFlag = Object.keys(parametersObject).length > 0;
+            const finalizedUrlString = hasParametersFlag
+                ? `${baseUrlString}?${urlParametersBuilder.toString()}`
+                : baseUrlString;
+                
+            this.targetLinkElement.href = finalizedUrlString;
+
+            if (openInNewTabFlag) {
+                this.targetLinkElement.target = '_blank';
+            }
+        }
+    }
     
-    class VocabLedgerManager {
+    class ReadingDisplayController {
+        kunyomiButtonElement = null;
+        onyomiButtonElement = null;
+        displayElement = null;
+
+        kunyomiDataString = '';
+        onyomiDataString = '';
+
+        constructor(config) {
+            this.kunyomiButtonElement = document.querySelector(config.kunyomiButtonSelector);
+            this.onyomiButtonElement = document.querySelector(config.onyomiButtonSelector);
+            this.displayElement = document.querySelector(config.displaySelector);
+
+            this.kunyomiDataString = document.querySelector(config.kunyomiDataSelector)?.textContent?.trim() || 'No Kunyomi';
+            this.onyomiDataString = document.querySelector(config.onyomiDataSelector)?.textContent?.trim() || 'No Onyomi';
+
+            if (!this.kunyomiButtonElement || !this.onyomiButtonElement || !this.displayElement) {
+                return;
+            }
+
+            this.init();
+        }
+
+        init() {
+            this.kunyomiButtonElement.addEventListener('click', (event) => {
+                this.handleToggle(event, this.kunyomiButtonElement, this.onyomiButtonElement, this.kunyomiDataString);
+            });
+
+            this.onyomiButtonElement.addEventListener('click', (event) => {
+                this.handleToggle(event, this.onyomiButtonElement, this.kunyomiButtonElement, this.onyomiDataString);
+            });
+        }
+
+        handleToggle(event, clickedButtonElement, otherButtonElement, readingValueString) {
+            event.stopPropagation();
+
+            if (clickedButtonElement.classList.contains('active')) {
+                clickedButtonElement.classList.remove('active');
+                this.displayElement.textContent = 'Select a reading';
+            } else {
+                clickedButtonElement.classList.add('active');
+                otherButtonElement.classList.remove('active');
+                this.displayElement.textContent = readingValueString;
+            }
+        }
+    }
+    
+    class VocabLedgerService {
         constructor(vocabDataElement, ledgerContainerElement) {
             const rawJsonString = document.querySelector(vocabDataElement)?.textContent?.trim() || '';
             const ledgerContainer = document.querySelector(ledgerContainerElement);
@@ -137,7 +226,7 @@
         }
     }
 
-    class StrokeStateManager {
+    class StrokeStateController {
         currentStroke = 0;
         maxStrokes = 0;
 
@@ -187,7 +276,7 @@
         }
     }
 
-    class KanjiSvgManager {
+    class KanjiSvgController {
         svgStrokeGroup = null;
 
         constructor(svgStrokeGroupId) {
@@ -252,9 +341,9 @@
 
     class BackCardApp {
 
-        strokeData = [];
-        strokeStateManager = null;
-        kanjiSvgManager = null;
+        strokeDataArray = [];
+        strokeStateController = null;
+        kanjiSvgController = null;
         tappableArea = null;
 
         constructor() {
@@ -263,8 +352,8 @@
             const rawStrokeString = strokeDataHolder ? strokeDataHolder.innerHTML : '';
             this.strokeDataArray = StrokeDataParser.parse(rawStrokeString);
 
-            this.strokeStateManager = new StrokeStateManager(this.strokeDataArray.length);
-            this.kanjiSvgManager = new KanjiSvgManager('#svg-stroke-group');
+            this.strokeStateController = new StrokeStateController(this.strokeDataArray.length);
+            this.kanjiSvgController = new KanjiSvgController('#svg-stroke-group');
             this.tappableArea = document.querySelector('.card-container');
             
             this.init();
@@ -272,9 +361,30 @@
 
         init() {
 
-            new VocabLedgerManager('#vocab-data', '#vocab-ledger');
+            new VocabLedgerService('#vocab-data', '#vocab-ledger');
 
-            if (!this.tappableArea) return;
+            new ReadingDisplayController({
+                kunyomiButtonSelector: '#kunyomi-button',
+                onyomiButtonSelector: '#onyomi-button',
+                displaySelector: '#readings-display',
+                kunyomiDataSelector: '#kun-data',
+                onyomiDataSelector: '#on-data'
+            });
+
+            new LinkInstallationService({
+                linkSelector: '#report-issue-link',
+                baseUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeji75MTbdugBk8IiQYl4_JQyIoiYMMwil0bMiCjl1r1pjZUg/viewform',
+                openInNewTab: true,
+                params: {
+                    'usp': 'pp_url',
+                    'entry.196764883': '#kanji',
+                    'entry.870807372': '#jlpt-level'
+                }
+            });
+
+            if (!this.tappableArea) {
+                return;
+            }
             this.tappableArea.addEventListener('click', (event) => this.handleTap(event));
         }
 
@@ -290,9 +400,9 @@
                 return;
             }
 
-            this.strokeStateManager.increment();
-            const currentCount = this.strokeStateManager.getCurrent();
-            this.kanjiSvgManager.updateSvg(this.strokeDataArray, currentCount);
+            this.strokeStateController.increment();
+            const currentCount = this.strokeStateController.getCurrent();
+            this.kanjiSvgController.updateSvg(this.strokeDataArray, currentCount);
         } 
     }
     
