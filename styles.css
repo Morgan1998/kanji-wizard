@@ -257,67 +257,92 @@ html {
     stroke-linejoin: round;
 }
 
-/*** KANJI MEANING ***/
-
 .meaning-container {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin: 16px 0 24px 0;    /* Creates balanced breathing room above and below */
+    margin: 22px 0 30px 0;
 }
 
 #kanji-meaning {
-    font-size: 1.4rem;        /* Prominent sizing for immediate legibility */
-    font-weight: 600;         /* Clean, semi-bold profile */
-    line-height: 1.35;        /* Comfortable space for multi-word definitions */
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.4;
     text-align: center;
-    margin: 0;                /* Resets default browser H2 margins */
-    padding: 0 8px;           /* Mobile side safety buffer */
-    letter-spacing: -0.2px;   /* Modern, tight UI typographic feel */
-    
-    /* Dynamically scales with your theme engine */
+    margin: 0;
+    padding: 0 32px;
+    letter-spacing: 0.8px;
     color: var(--text-primary);
-    transition: color 0.2s ease;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
+    
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+#kanji-meaning::before,
+#kanji-meaning::after {
+    content: "✦";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    opacity: 0.4;
+    transition: all 0.2s ease;
+}
+
+#kanji-meaning::before {
+    left: 8px;
+}
+
+#kanji-meaning::after {
+    right: 8px;
 }
 
 /*** READINGS ***/
 
 .readings-container {
     display: flex;
-    gap: 8px;
-    margin: 12px 0;
-    width: 150px; 
+    gap: 12px;
+    margin: 16px 0;
+    width: 180px; 
 }
 
 .reading-button {
     border: 1px solid var(--border-card);
-    background-color: var(--bg-card);
+    background-color: rgba(255, 255, 255, 0.02);
     color: var(--text-secondary);
 
     flex: 1;
-    padding: 6px 12px;
+    padding: 8px 14px;
+    font-family: "Georgia", serif;
     font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-radius: 10px;
     
     cursor: pointer;
-    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-tap-highlight-color: transparent; 
 }
 
-/* Hover State */
 .reading-button:hover {
     color: var(--text-primary);
-    background-color: var(--vocab-row-bg);
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Active State (Applies when clicked/selected) */
 .reading-button.active {
-    color: var(--bg-card); /* Inverts text color to stand out */
-    background-color: var(--text-primary); /* Dark fill in light theme, bright fill in dark theme */
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.08);
     border-color: var(--text-primary);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 
+        0 0 12px rgba(255, 255, 255, 0.05),
+        inset 0 0 8px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
 }
 
 .reading-button:focus {
@@ -329,40 +354,41 @@ html {
 #vocab-ledger {
     display: flex;
     flex-direction: column;
-    
-    padding-bottom: 5px;           
+    padding-bottom: 8px;           
     width: 100%;
     max-width: 420px;  
-    border-radius: 6px;  
-   
+    border-radius: 12px;  
 }
 
 .vocab-entry {
     display: flex;
     flex-direction: column;
     align-items: center;    
-    gap: 10px;
-    padding: 6px 6px;
+    gap: 12px;
+    padding: 14px 6px;
     width: 100%;
-
-    border-bottom: 1px solid var(--border-card);
+    border-bottom: 1px solid transparent;
+    border-image: linear-gradient(to right, transparent, var(--border-card), transparent) 1;
 }
 
 .vocab-entry:last-child {
     border-bottom: none;
+    border-image: none;
 }
 
-/* THE BADGE COMPONENT (Snug Left Side) */
 .jlpt-badge {
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-family: "Georgia", serif;
+    font-size: 0.75rem;
+    font-weight: 800;
     text-transform: uppercase;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
     color: #ffffff;
     text-align: center;
-    min-width: 32px;
+    min-width: 36px;
     flex-shrink: 0; 
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .jlpt-badge-container {
@@ -370,23 +396,11 @@ html {
     align-items: center;
 }
 
-/* Level Color System */
-
-.badge-n5 { background-color: #4a5568; }
-.badge-n4 { background-color: #2b6cb0; }
-.badge-n3 { background-color: #2c7a7b; }
-.badge-n2 { background-color: #dd6b20; }
-.badge-n1 { background-color: #e53e3e; }
-
-/**
-.badge-n5-container { border: 2px solid #4a5568; }
-.badge-n4-container { border: 2px solid #2b6cb0; }
-.badge-n3-container { border: 2px solid #2c7a7b; }
-.badge-n2-container { border: 2px solid #dd6b20; }
-.badge-n1-container { border: 2px solid #e53e3e; }
-**/
-
-/* THE EXPRESSION COMPONENT */
+.badge-n5 { background: linear-gradient(135deg, #4a5568, #2d3748); }
+.badge-n4 { background: linear-gradient(135deg, #2b6cb0, #1a365d); }
+.badge-n3 { background: linear-gradient(135deg, #2c7a7b, #234e52); }
+.badge-n2 { background: linear-gradient(135deg, #dd6b20, #7b341e); }
+.badge-n1 { background: linear-gradient(135deg, #e53e3e, #742a2a); }
 
 .vocab-definition-set {
     display: flex;
@@ -394,18 +408,18 @@ html {
     align-items: center;
     width: 100%;
     cursor: pointer;
-    
     flex-grow: 1;
 }
 
 .vocab-expression {
-    font-size: 2.4rem;
-    font-weight: 500;
+    font-family: "Hiragino Mincho ProN", "MS Mincho", serif;
+    font-size: 2.5rem;
+    font-weight: 600;
     line-height: 1.2;
     flex-shrink: 0;
     display: flex;      
     align-items: flex-end;   
-
+    color: var(--text-primary);
     user-select: text;
     -webkit-user-select: text;
     -webkit-tap-highlight-color: transparent;  
@@ -424,8 +438,8 @@ html {
 }
 
 .furigana::selection {
-background-color: transparent;
-color: #fef08a;
+    background-color: transparent;
+    color: #fef08a;
 }
 
 .vocab-expression ruby {
@@ -434,23 +448,23 @@ color: #fef08a;
 }
 
 .furigana {
-    font-size: 0.3em;
-    font-weight: 400;
-    letter-spacing: 0.5px;
+    font-size: 0.35em;
+    font-weight: 500;
+    letter-spacing: 1px;
     visibility: visible;
-    opacity: 1;
+    opacity: 0.85;
     transition: opacity 0.18s ease, visibility 0.18s ease;
 }
 
-/* THE DEFINITION COMPONENT */
 .vocab-definition {
     display: flex;
     justify-content: center;
-    font-size: 1.1rem;
-    line-height: 1;
+    font-family: "Georgia", serif;
+    font-size: 1.05rem;
+    line-height: 1.4;
     width: 100%;
-
-    color: var(--text-secondary)
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
 /*** LINKS ***/
