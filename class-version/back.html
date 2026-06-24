@@ -230,6 +230,7 @@
 
         constructor(maxStrokes) {
             this.maxStrokes = maxStrokes;
+            this.currentStroke = maxStrokes;
         }
 
         increment() {
@@ -280,6 +281,16 @@
         constructor(svgStrokeGroupId) {
    
             this.svgStrokeGroup = document.querySelector(svgStrokeGroupId);
+        }
+
+        drawFullKanji(strokeDataArray) {
+            if (!this.svgStrokeGroup) {
+                return;
+            }
+            this.svgStrokeGroup.replaceChildren();
+            strokeDataArray.forEach(strokeData => {
+                this._appendStaticStroke(strokeData);
+            });
         }
 
         updateSvg(strokeDataArray, currentCount) {
@@ -384,6 +395,10 @@
                 return;
             }
             this.tappableArea.addEventListener('click', (event) => this.handleTap(event));
+
+            if (this.strokeDataArray.length > 0) {
+                this.kanjiSvgController.drawFullKanji(this.strokeDataArray);
+            }
         }
 
         handleTap(event) {
