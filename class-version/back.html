@@ -449,19 +449,25 @@
 
             const leftToolbar = document.querySelector('#kanji-toolbar-left');
             const rightToolbar = document.querySelector('#kanji-toolbar-right');
-            if (leftToolbar && rightToolbar) {
-                const leftCount = leftToolbar.childElementCount;
-                const rightCount = rightToolbar.childElementCount;
 
-                if (rightCount > leftCount) {
-                    const dimensions = rightToolbar.getBoundingClientRect();
-                    leftToolbar.style.width = `${dimensions.width}px`;
-                    leftToolbar.style.height = `${dimensions.height}px`;
-                } else if (leftCount > rightCount) {
-                    const dimensions = leftToolbar.getBoundingClientRect();
-                    rightToolbar.style.width = `${dimensions.width}px`;
-                    rightToolbar.style.height = `${dimensions.height}px`;
-                }
+            if (leftToolbar && rightToolbar) {
+                const resizeObserver = new ResizeObserver(() => {
+                    const leftCount = leftToolbar.childElementCount;
+                    const rightCount = rightToolbar.childElementCount;
+
+                    if (rightCount > leftCount) {
+                        const dimensions = rightToolbar.getBoundingClientRect();
+                        leftToolbar.style.width = `${dimensions.width}px`;
+                        leftToolbar.style.height = `${dimensions.height}px`;
+                    } else if (leftCount > rightCount) {
+                        const dimensions = leftToolbar.getBoundingClientRect();
+                        rightToolbar.style.width = `${dimensions.width}px`;
+                        rightToolbar.style.height = `${dimensions.height}px`;
+                    }
+                });
+
+                resizeObserver.observe(rightToolbar);
+                resizeObserver.observe(leftToolbar);
             }
         }
 

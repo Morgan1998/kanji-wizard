@@ -122,10 +122,11 @@ html {
     gap: 16px;                     
     margin: 12px 0;
     width: 100%;
-    max-width: 320px;              
+    max-width: 350px;              
 }
 
 .kanji-toolbar {
+    min-height: 150px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -174,22 +175,29 @@ html {
 /* THE KANJI TOOL BUTTONS */
 
 .tool-button {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;            /* Turned into circular casting seals */
+    white-space: nowrap;
+    padding: 6px 9px;
+    border-radius: 12px;            
     border: 1px solid var(--border-card);
-    background-color: var(--bg-card);
+    background-color: var(--vocab-ledger-bg);
     color: var(--text-secondary);
     
+    font-family: "Hiragino Mincho ProN", "MS Mincho", "Georgia", serif;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    
     position: relative;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    box-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0px rgba(255, 255, 255, 0.05);
+    
+    transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
