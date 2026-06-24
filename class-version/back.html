@@ -203,7 +203,7 @@
                 definitionNode.classList.add('vocab-definition', 'is-hidden');
                 definitionNode.textContent = vocab.def;
 
-                vocabEntryNode.addEventListener('click', function() {
+                vocabDefinitionSetNode.addEventListener('click', function() {
 
                     const textSelection = window.getSelection().toString();  
 
@@ -212,9 +212,7 @@
                     definitionNode.classList.toggle('is-hidden')}
                 });
 
-                definitionNode.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
+                
 
                 vocabDefinitionSetNode.append(expressionNode);
                 vocabDefinitionSetNode.append(definitionNode);
