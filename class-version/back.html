@@ -1,10 +1,17 @@
 <div class="card-container">
-    <div class="kanji-house">
-        <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
-            <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
-            <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
-            <g id="svg-stroke-group"></g>
-        </svg>
+    <div class="kanji-neighborhood">
+        <div id="kanji-toolbar-left" class="kanji-toolbar"></div>
+        <div class="kanji-house">
+            <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
+                <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
+                <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
+                <g id="svg-stroke-group"></g>
+            </svg>
+        </div>
+        <div id="kanji-toolbar-right" class="kanji-toolbar">
+            <button id="tool-fill-kanji" class="tool-button" title="Completely Draw Kanji">全描</button>
+            <button id="tool-clear-kanji" class="tool-button" title="Clear Kanji">全消</button>
+        </div>
     </div>
 
     <div class="meaning-container unselectable">
@@ -241,6 +248,14 @@
             }
         }
 
+        setToMax() {
+            this.currentStroke = this.maxStrokes;
+        }
+
+        setToZero() {
+            this.currentStroke = 0;
+        }
+
         getCurrent() {
             return this.currentStroke;
         }
@@ -291,6 +306,13 @@
             strokeDataArray.forEach(strokeData => {
                 this._appendStaticStroke(strokeData);
             });
+        }
+
+        clearKanji() {
+            if (!this.svgStrokeGroup) {
+                return;
+            }
+            this.svgStrokeGroup.replaceChildren();
         }
 
         updateSvg(strokeDataArray, currentCount) {
@@ -390,6 +412,31 @@
                     'entry.870807372': '#jlpt-level'
                 }
             });
+            
+            const fillKanjiButton = document.querySelector('#tool-fill-kanji');
+            if (fillKanjiButton) {
+                fillKanjiButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+
+                    if (this.strokeDataArray.length > 0) {
+                        this.strokeStateController.setToMax();
+                        this.kanjiSvgController.drawFullKanji(this.strokeDataArray);
+                    }
+                });
+            }
+
+            const clearKanjiButton = document.querySelector('#tool-clear-kanji');
+            if (clearKanjiButton) {
+                clearKanjiButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+
+                    if (this.strokeDataArray.length > 0) {
+                        this.strokeStateController.setToZero();
+                        this.kanjiSvgController.clearKanji();
+                    }
+                });
+            }
+
 
             if (!this.tappableArea) {
                 return;
@@ -398,6 +445,23 @@
 
             if (this.strokeDataArray.length > 0) {
                 this.kanjiSvgController.drawFullKanji(this.strokeDataArray);
+            }
+
+            const leftToolbar = document.querySelector('#kanji-toolbar-left');
+            const rightToolbar = document.querySelector('#kanji-toolbar-right');
+            if (leftToolbar && rightToolbar) {
+                const leftCount = leftToolbar.childElementCount;
+                const rightCount = rightToolbar.childElementCount;
+
+                if (rightCount > leftCount) {
+                    const dimensions = rightToolbar.getBoundingClientRect();
+                    leftToolbar.style.width = `${dimensions.width}px`;
+                    leftToolbar.style.height = `${dimensions.height}px`;
+                } else if (leftCount > rightCount) {
+                    const dimensions = leftToolbar.getBoundingClientRect();
+                    rightToolbar.style.width = `${dimensions.width}px`;
+                    rightToolbar.style.height = `${dimensions.height}px`;
+                }
             }
         }
 
