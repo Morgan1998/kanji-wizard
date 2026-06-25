@@ -18,11 +18,12 @@
         <h2 id="kanji-meaning">{{meaning}}</h2>
     </div>
 
-    <div id="readings-display" class="unselectable">Select a reading</div>
+    
 
     <div class="readings-container">
-        <button id="kunyomi-button" class="reading-button">Kun</button>
-        <button id="onyomi-button" class="reading-button">On</button>
+        <button id="kunyomi-button" class="reading-button" data-type="kun">Kun</button>
+        <div id="readings-display" class="unselectable"></div>
+        <button id="onyomi-button" class="reading-button" data-type="on">On</button>
     </div>
 
     <div id="vocab-ledger"></div>
@@ -123,32 +124,84 @@
         handleToggle(event, clickedButtonElement, otherButtonElement, readingValueString) {
             event.stopPropagation();
 
+            const vocabLedger = document.querySelector('#vocab-ledger');
+
             if (clickedButtonElement.classList.contains('active')) {
                 clickedButtonElement.classList.remove('active');
-                this.displayElement.textContent = 'Select a reading';
+                this.displayElement.classList.remove('active');
+                this.displayElement.textContent = '';
+                vocabLedger.removeAttribute('data-active-filter');
             } else {
                 clickedButtonElement.classList.add('active');
                 otherButtonElement.classList.remove('active');
+                this.displayElement.classList.add('active');
                 this.displayElement.textContent = readingValueString;
+                
+                const readingType = clickedButtonElement.dataset.type;
+                vocabLedger.setAttribute('data-active-filter', readingType);
             }
         }
     }
     
     class VocabLedgerService {
-        constructor(vocabDataElement, ledgerContainerElement) {
-            const rawJsonString = document.querySelector(vocabDataElement)?.textContent?.trim() || '';
+        constructor(vocabDataElement, ledgerContainerElement, kanjiDataElement) {
+            this.currentKanji = document.querySelector(kanjiDataElement)?.textContent?.trim() || '';
+            const rawVocabJsonString = document.querySelector(vocabDataElement)?.textContent?.trim() || '';
             const ledgerContainer = document.querySelector(ledgerContainerElement);
 
-            if (!rawJsonString || !ledgerContainer) {
+            if (!rawVocabJsonString || !ledgerContainer) {
                 return;
             }
 
+            const rawOnString = document.querySelector('#on-data')?.textContent || '';
+            const rawKunString = document.querySelector('#kun-data')?.textContent || '';
+
+            this.pureOnReadings = rawOnString
+                ? rawOnString.split(',')
+                    .map(reading => reading.trim())
+                    .filter(Boolean)
+                    // Convert every entry in the On array from Katakana to Hiragana for perfect matching!
+                    .map(katakanaString => katakanaString.replace(/[\u30a1-\u30f6]/g, match => 
+                        String.fromCharCode(match.charCodeAt(0) - 96)
+                    ))
+                : null;
+
+            this.pureKunReadings = rawKunString
+                ? rawKunString.split(',').map(reading => reading.trim().replaceAll('.', '')).filter(Boolean)
+                : null;
+
             try {
-                const vocabArray = JSON.parse(rawJsonString);
-                this.render(vocabArray, ledgerContainer);
+                const vocabArray = JSON.parse(rawVocabJsonString);
+                const cleanVocabArray = this.convertKebabToCamel(vocabArray);
+                this.render(cleanVocabArray, ledgerContainer);
             } catch (error) {
                 console.error('Failed to parse vocab-json string:', error);
             }
+        }
+
+
+        getReadingType(vocab) {
+            const targetSegment = vocab.withRuby.find(kanjiFuriganaOkuriganaSet => {
+                return kanjiFuriganaOkuriganaSet.k === this.currentKanji;
+            });
+            if (!targetSegment) {
+                return 'neither';
+            }
+
+            const furigana = targetSegment.f || '';
+            const okurigana = targetSegment.o || '';
+
+            const currentKanjiReading = `${furigana}${okurigana}` || '';
+
+            if (this.pureKunReadings && this.pureKunReadings.includes(currentKanjiReading)) {
+                return 'kun';
+            }
+
+            if (this.pureOnReadings && this.pureOnReadings.includes(currentKanjiReading)) {
+                return 'on';
+            }
+
+            return 'neither';
         }
 
         render(vocabArray, ledgerContainer) {
@@ -157,6 +210,9 @@
             vocabArray.forEach(vocab => {
                 const vocabEntryNode = document.createElement('div');
                 vocabEntryNode.classList.add('vocab-entry');
+
+                const readingType = this.getReadingType(vocab);
+                vocabEntryNode.dataset.readingType = readingType;
 
                 const jlptBadgeContainerNode = document.createElement('div');
                 jlptBadgeContainerNode.classList.add('jlpt-badge-container', `badge-${vocab.lvl.toLowerCase()}-container`);
@@ -171,7 +227,7 @@
                 const expressionNode = document.createElement('div');
                 expressionNode.classList.add('vocab-expression');
 
-                vocab['with-ruby'].forEach(kanjiFuriganaOkuriganaSet => {
+                vocab.withRuby.forEach(kanjiFuriganaOkuriganaSet => {
                     if (kanjiFuriganaOkuriganaSet.k) {
                         const rubyNode = document.createElement('ruby');
                         rubyNode.textContent = kanjiFuriganaOkuriganaSet.k;
@@ -228,6 +284,24 @@
                 vocabEntryNode.append(vocabDefinitionSetNode);
                 ledgerContainer.append(vocabEntryNode);
             });
+        }
+
+        convertKebabToCamel(data) {
+            if (Array.isArray(data)) {
+                return data.map(item => this.convertKebabToCamel(item));
+            }
+            
+            if (data !== null && typeof data === 'object') {
+                return Object.fromEntries(
+                    Object.entries(data).map(([key, value]) => {
+                        const camelKey = key.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+                        
+                        return [camelKey, this.convertKebabToCamel(value)];
+                    })
+                );
+            }
+            
+            return data;
         }
     }
 
@@ -392,7 +466,7 @@
 
         init() {
 
-            new VocabLedgerService('#vocab-data', '#vocab-ledger');
+            new VocabLedgerService('#vocab-data', '#vocab-ledger', '#kanji');
 
             new ReadingDisplayController({
                 kunyomiButtonSelector: '#kunyomi-button',
