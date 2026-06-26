@@ -91,12 +91,12 @@
     class KanjiDataUtil {
 
         static injectGeminationReadings(selector = '#on-data') {
-            const element = document.querySelector(selector);
-            if (!element || !element.textContent.trim()) {
+            const dataElement = document.querySelector(selector);
+            if (!dataElement || !dataElement.textContent.trim()) {
                 return;
             }
 
-            const readings = element.textContent.split(',').map(reading => reading.trim()).filter(Boolean);
+            const readings = dataElement.textContent.split(',').map(reading => reading.trim()).filter(Boolean);
             const updatedReadings = [...readings];
 
             readings.forEach(reading => {
@@ -108,7 +108,47 @@
                 }
             });
 
-            element.textContent = [...new Set(updatedReadings)].join(', ');
+            dataElement.textContent = [...new Set(updatedReadings)].join(', ');
+        }
+
+        static injectRendakuReadings(selector = '#on-data') {
+            const dataElement = document.querySelector(selector);
+            if (!dataElement || !dataElement.textContent.trim()) {
+                return;
+            }
+
+            const readings = dataElement.textContent.split(',').map(reading => reading.trim()).filter(Boolean);
+            const updatedReadings = [...readings];
+
+            const rendakuMap = {
+                // K -> G
+                'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
+                'カ': ['ガ'], 'キ': ['ギ'], 'ク': ['グ'], 'ケ': ['ゲ'], 'コ': ['ゴ'],
+                // S -> Z
+                'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
+                'サ': ['ザ'], 'シ': ['ジ'], 'ス': ['ズ'], 'セ': ['ゼ'], 'ソ': ['ゾ'],
+                // T -> D
+                'た': ['だ'], 'ち': ['ぢ'], 'つ': ['づ'], 'て': ['で'], 'と': ['ど'],
+                'タ': ['ダ'], 'チ': ['ヂ'], 'ツ': ['ヅ'], 'テ': ['デ'], 'ト': ['ド'],
+                // H -> B & P
+                'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ'],
+                'ハ': ['バ', 'パ'], 'ヒ': ['ビ', 'ピ'], 'フ': ['ブ', 'プ'], 'ヘ': ['ベ', 'ペ'], 'ホ': ['ボ', 'ポ']
+            };
+
+            readings.forEach(reading => {
+                const firstCharacter = reading.charAt(0);
+
+                if (rendakuMap[firstCharacter]) {
+                    const tailOfReading = reading.slice(1);
+
+                    rendakuMap[firstCharacter].forEach(voicedCharacter => {
+                        updatedReadings.push(`${voicedCharacter}${tailOfReading}`);
+                    });
+
+                }
+            });
+
+            dataElement.textContent = [...new Set(updatedReadings)].join(', ');
         }
     }
     
@@ -476,7 +516,9 @@
 
         constructor() {
 
-            KanjiDataUtil.injectGeminationReadings();
+            KanjiDataUtil.injectGeminationReadings('#on-data');
+            KanjiDataUtil.injectRendakuReadings('#on-data');
+            KanjiDataUtil.injectRendakuReadings('#kun-data');
 
             const strokeDataHolder = document.querySelector('#stroke-data');
             const rawStrokeString = strokeDataHolder ? strokeDataHolder.innerHTML : '';
