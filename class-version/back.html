@@ -87,6 +87,30 @@
             }
         }
     }
+
+    class KanjiDataUtil {
+
+        static injectGeminationReadings(selector = '#on-data') {
+            const element = document.querySelector(selector);
+            if (!element || !element.textContent.trim()) {
+                return;
+            }
+
+            const readings = element.textContent.split(',').map(reading => reading.trim()).filter(Boolean);
+            const updatedReadings = [...readings];
+
+            readings.forEach(reading => {
+                const lastCharacter = reading.slice(-1);
+                if (['つ', 'ツ', 'く', 'ク'].includes(lastCharacter)) {
+                    const stem = reading.slice(0, -1);
+                    const smallKana = ['ツ', 'ク'].includes(lastCharacter) ? 'ッ' : 'っ';
+                    updatedReadings.push(`${stem}${smallKana}`);
+                }
+            });
+
+            element.textContent = [...new Set(updatedReadings)].join(', ');
+        }
+    }
     
     class ReadingDisplayController {
         kunyomiButtonElement = null;
@@ -190,14 +214,13 @@
 
             const furigana = targetSegment.f || '';
             const okurigana = targetSegment.o || '';
+            const fullFuriganaOkuriganaReading = `${furigana}${okurigana}` || '';
 
-            const currentKanjiReading = `${furigana}${okurigana}` || '';
-
-            if (this.pureKunReadings && this.pureKunReadings.includes(currentKanjiReading)) {
+            if (this.pureKunReadings && this.pureKunReadings.includes(fullFuriganaOkuriganaReading)) {
                 return 'kun';
             }
 
-            if (this.pureOnReadings && this.pureOnReadings.includes(currentKanjiReading)) {
+            if (this.pureOnReadings && this.pureOnReadings.includes(furigana)) {
                 return 'on';
             }
 
@@ -452,6 +475,8 @@
         tappableArea = null;
 
         constructor() {
+
+            KanjiDataUtil.injectGeminationReadings();
 
             const strokeDataHolder = document.querySelector('#stroke-data');
             const rawStrokeString = strokeDataHolder ? strokeDataHolder.innerHTML : '';

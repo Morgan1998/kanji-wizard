@@ -517,6 +517,7 @@ html {
     width: 100%;
     cursor: pointer;
     flex-grow: 1;
+    -webkit-tap-highlight-color: transparent; 
 }
 
 .vocab-expression {
@@ -529,8 +530,7 @@ html {
     align-items: flex-end;   
     color: var(--text-primary);
     user-select: text;
-    -webkit-user-select: text;
-    -webkit-tap-highlight-color: transparent;  
+    -webkit-user-select: text; 
 }
 
 .vocab-expression ::selection {
