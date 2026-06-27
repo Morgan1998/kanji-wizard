@@ -18,12 +18,15 @@
         <h2 id="kanji-meaning">{{meaning}}</h2>
     </div>
 
-    
-
     <div class="readings-container">
-        <button id="kunyomi-button" class="reading-button" data-type="kun">Kun</button>
-        <div id="readings-display" class="unselectable"></div>
-        <button id="onyomi-button" class="reading-button" data-type="on">On</button>
+        <div class="irregular-column">
+            <button id="irregular-button" class="reading-button" data-type="neither">🎭</button>
+        </div>
+        <div class="core-column">
+            <button id="kunyomi-button" class="reading-button" data-type="kun">Kun</button>
+            <div id="readings-display"></div>
+            <button id="onyomi-button" class="reading-button" data-type="on">On</button>
+        </div>
     </div>
 
     <div id="vocab-ledger"></div>
@@ -90,52 +93,57 @@
 
     class KanjiDataUtil {
 
-        static injectGeminationReadings(selector = '#on-data') {
+        static purifyReadings(selector) {
             const dataElement = document.querySelector(selector);
             if (!dataElement || !dataElement.textContent.trim()) {
                 return;
             }
 
-            const readings = dataElement.textContent.split(',').map(reading => reading.trim()).filter(Boolean);
-            const updatedReadings = [...readings];
+            const readings = dataElement.textContent.split(',').map(reading => {
+                let cleaned = reading.trim().replace(/[.\s]/g, '');
+                return cleaned.replace(/[\u30a1-\u30f6]/g, match => {
+                    return String.fromCharCode(match.charCodeAt(0) - 0x60);
+                });
+            }).filter(Boolean);
 
-            readings.forEach(reading => {
+            dataElement.dataset.enhancedReadings = [...new Set(readings)].join(', ');
+        }
+
+        static injectGeminationReadings(selector = '#on-data') {
+            const dataElement = document.querySelector(selector);
+            const sourceReadings = dataElement?.dataset.enhancedReadings || dataElement?.textContent;
+            if (!sourceReadings) return;
+
+            const cleanedReadings = sourceReadings.split(',').map(reading => reading.trim()).filter(Boolean);
+            const updatedReadings = [...cleanedReadings];
+
+            cleanedReadings.forEach(reading => {
                 const lastCharacter = reading.slice(-1);
-                if (['つ', 'ツ', 'く', 'ク'].includes(lastCharacter)) {
+                if (['つ', 'く'].includes(lastCharacter)) {
                     const stem = reading.slice(0, -1);
-                    const smallKana = ['ツ', 'ク'].includes(lastCharacter) ? 'ッ' : 'っ';
-                    updatedReadings.push(`${stem}${smallKana}`);
+                    updatedReadings.push(`${stem}$っ`);
                 }
             });
 
-            dataElement.textContent = [...new Set(updatedReadings)].join(', ');
+            dataElement.dataset.enhancedReadings = [...new Set(updatedReadings)].join(', ');
         }
 
-        static injectRendakuReadings(selector = '#on-data') {
+        static injectRendakuReadings(selector) {
             const dataElement = document.querySelector(selector);
-            if (!dataElement || !dataElement.textContent.trim()) {
-                return;
-            }
+            const sourceReadings = dataElement?.dataset.enhancedReadings || dataElement?.textContent;
+            if (!sourceReadings) return;
 
-            const readings = dataElement.textContent.split(',').map(reading => reading.trim()).filter(Boolean);
-            const updatedReadings = [...readings];
+            const cleanedReadings = sourceReadings.split(',').map(reading => reading.trim()).filter(Boolean);
+            const updatedReadings = [...cleanedReadings];
 
             const rendakuMap = {
-                // K -> G
-                'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
-                'カ': ['ガ'], 'キ': ['ギ'], 'ク': ['グ'], 'ケ': ['ゲ'], 'コ': ['ゴ'],
-                // S -> Z
-                'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
-                'サ': ['ザ'], 'シ': ['ジ'], 'ス': ['ズ'], 'セ': ['ゼ'], 'ソ': ['ゾ'],
-                // T -> D
-                'た': ['だ'], 'ち': ['ぢ'], 'つ': ['づ'], 'て': ['で'], 'と': ['ど'],
-                'タ': ['ダ'], 'チ': ['ヂ'], 'ツ': ['ヅ'], 'テ': ['デ'], 'ト': ['ド'],
-                // H -> B & P
-                'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ'],
-                'ハ': ['バ', 'パ'], 'ヒ': ['ビ', 'ピ'], 'フ': ['ブ', 'プ'], 'ヘ': ['ベ', 'ペ'], 'ホ': ['ボ', 'ポ']
-            };
+                        'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
+                        'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
+                        'た': ['だ'], 'ち': ['ぢ'], 'つ': ['づ'], 'て': ['で'], 'と': ['ど'],
+                        'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
+                    };
 
-            readings.forEach(reading => {
+            cleanedReadings.forEach(reading => {
                 const firstCharacter = reading.charAt(0);
 
                 if (rendakuMap[firstCharacter]) {
@@ -148,7 +156,7 @@
                 }
             });
 
-            dataElement.textContent = [...new Set(updatedReadings)].join(', ');
+            dataElement.dataset.enhancedReadings = [...new Set(updatedReadings)].join(', ');
         }
     }
     
@@ -156,19 +164,18 @@
         kunyomiButtonElement = null;
         onyomiButtonElement = null;
         displayElement = null;
-
         kunyomiDataString = '';
         onyomiDataString = '';
 
         constructor(config) {
             this.kunyomiButtonElement = document.querySelector(config.kunyomiButtonSelector);
             this.onyomiButtonElement = document.querySelector(config.onyomiButtonSelector);
+            this.irregularButtonElement = document.querySelector(config.irregularButtonSelector);
             this.displayElement = document.querySelector(config.displaySelector);
-
             this.kunyomiDataString = document.querySelector(config.kunyomiDataSelector)?.textContent?.trim() || 'No Kunyomi';
             this.onyomiDataString = document.querySelector(config.onyomiDataSelector)?.textContent?.trim() || 'No Onyomi';
 
-            if (!this.kunyomiButtonElement || !this.onyomiButtonElement || !this.displayElement) {
+            if (!this.kunyomiButtonElement || !this.onyomiButtonElement || !this.irregularButtonElement || !this.displayElement) {
                 return;
             }
 
@@ -177,15 +184,19 @@
 
         init() {
             this.kunyomiButtonElement.addEventListener('click', (event) => {
-                this.handleToggle(event, this.kunyomiButtonElement, this.onyomiButtonElement, this.kunyomiDataString);
+                this.handleToggle(event, this.kunyomiButtonElement, this.onyomiButtonElement, this.irregularButtonElement, this.kunyomiDataString);
             });
 
             this.onyomiButtonElement.addEventListener('click', (event) => {
-                this.handleToggle(event, this.onyomiButtonElement, this.kunyomiButtonElement, this.onyomiDataString);
+                this.handleToggle(event, this.onyomiButtonElement, this.kunyomiButtonElement, this.irregularButtonElement, this.onyomiDataString);
             });
+
+            this.irregularButtonElement.addEventListener('click', (event) => {
+                this.handleToggle(event, this.irregularButtonElement, this.onyomiButtonElement, this.kunyomiButtonElement)
+            })
         }
 
-        handleToggle(event, clickedButtonElement, otherButtonElement, readingValueString) {
+        handleToggle(event, clickedButtonElement, otherButtonElementOne, otherButtonElementTwo, readingValueString = '👾') {
             event.stopPropagation();
 
             const vocabLedger = document.querySelector('#vocab-ledger');
@@ -197,7 +208,8 @@
                 vocabLedger.removeAttribute('data-active-filter');
             } else {
                 clickedButtonElement.classList.add('active');
-                otherButtonElement.classList.remove('active');
+                otherButtonElementOne.classList.remove('active');
+                otherButtonElementTwo.classList.remove('active');
                 this.displayElement.classList.add('active');
                 this.displayElement.textContent = readingValueString;
                 
@@ -208,36 +220,21 @@
     }
     
     class VocabLedgerService {
-        constructor(vocabDataElement, ledgerContainerElement, kanjiDataElement) {
-            this.currentKanji = document.querySelector(kanjiDataElement)?.textContent?.trim() || '';
-            const rawVocabJsonString = document.querySelector(vocabDataElement)?.textContent?.trim() || '';
-            const ledgerContainer = document.querySelector(ledgerContainerElement);
+        constructor(config) {
+            this.currentKanji = document.querySelector(config.kanjiDataElement)?.textContent?.trim() || '';
+            this.ledgerContainer = document.querySelector(config.ledgerContainerElement);
+            this.enhancedKunReadings = config.enhancedKunReadings;
+            this.enhancedOnReadings = config.enhancedOnReadings;
 
-            if (!rawVocabJsonString || !ledgerContainer) {
+            const rawVocabJsonString = document.querySelector(config.vocabDataElement)?.textContent?.trim() || '';
+            if (!rawVocabJsonString || !this.ledgerContainer) {
                 return;
             }
 
-            const rawOnString = document.querySelector('#on-data')?.textContent || '';
-            const rawKunString = document.querySelector('#kun-data')?.textContent || '';
-
-            this.pureOnReadings = rawOnString
-                ? rawOnString.split(',')
-                    .map(reading => reading.trim())
-                    .filter(Boolean)
-                    // Convert every entry in the On array from Katakana to Hiragana for perfect matching!
-                    .map(katakanaString => katakanaString.replace(/[\u30a1-\u30f6]/g, match => 
-                        String.fromCharCode(match.charCodeAt(0) - 96)
-                    ))
-                : null;
-
-            this.pureKunReadings = rawKunString
-                ? rawKunString.split(',').map(reading => reading.trim().replaceAll('.', '')).filter(Boolean)
-                : null;
-
             try {
                 const vocabArray = JSON.parse(rawVocabJsonString);
-                const cleanVocabArray = this.convertKebabToCamel(vocabArray);
-                this.render(cleanVocabArray, ledgerContainer);
+                const cleanedVocabArray = this.convertKebabToCamel(vocabArray);
+                this.render(cleanedVocabArray);
             } catch (error) {
                 console.error('Failed to parse vocab-json string:', error);
             }
@@ -256,18 +253,19 @@
             const okurigana = targetSegment.o || '';
             const fullFuriganaOkuriganaReading = `${furigana}${okurigana}` || '';
 
-            if (this.pureKunReadings && this.pureKunReadings.includes(fullFuriganaOkuriganaReading)) {
+            if (this.enhancedKunReadings && this.enhancedKunReadings.includes(fullFuriganaOkuriganaReading)) {
                 return 'kun';
             }
 
-            if (this.pureOnReadings && this.pureOnReadings.includes(furigana)) {
+            if (this.enhancedOnReadings && this.enhancedOnReadings.includes(furigana)) {
                 return 'on';
             }
 
             return 'neither';
         }
 
-        render(vocabArray, ledgerContainer) {
+        render(vocabArray) {
+            const ledgerContainer = this.ledgerContainer;
             ledgerContainer.replaceChildren();
 
             vocabArray.forEach(vocab => {
@@ -516,9 +514,25 @@
 
         constructor() {
 
+            KanjiDataUtil.purifyReadings('#on-data');
+            KanjiDataUtil.purifyReadings('#kun-data');
             KanjiDataUtil.injectGeminationReadings('#on-data');
             KanjiDataUtil.injectRendakuReadings('#on-data');
             KanjiDataUtil.injectRendakuReadings('#kun-data');
+            const onElement = document.querySelector('#on-data');
+            const kunElement = document.querySelector('#kun-data');
+            this.rawOnReadings = onElement?.textContent
+                ? onElement.textContent.split(', ')
+                : []
+            this.rawKunReadings = kunElement?.textContent
+                ? kunElement.textContent.split(', ')
+                : []
+            this.enhancedOnReadings = onElement?.dataset.enhancedReadings
+                ? onElement.dataset.enhancedReadings.split(', ')
+                : [];
+            this.enhancedKunReadings = kunElement?.dataset.enhancedReadings
+                ? kunElement.dataset.enhancedReadings.split(', ')
+                : [];
 
             const strokeDataHolder = document.querySelector('#stroke-data');
             const rawStrokeString = strokeDataHolder ? strokeDataHolder.innerHTML : '';
@@ -533,11 +547,18 @@
 
         init() {
 
-            new VocabLedgerService('#vocab-data', '#vocab-ledger', '#kanji');
+            new VocabLedgerService({
+                vocabDataElement: '#vocab-data',
+                ledgerContainerElement: '#vocab-ledger',
+                kanjiDataElement: '#kanji',
+                enhancedKunReadings: this.enhancedKunReadings,
+                enhancedOnReadings: this.enhancedOnReadings,
+            });
 
             new ReadingDisplayController({
                 kunyomiButtonSelector: '#kunyomi-button',
                 onyomiButtonSelector: '#onyomi-button',
+                irregularButtonSelector: '#irregular-button',
                 displaySelector: '#readings-display',
                 kunyomiDataSelector: '#kun-data',
                 onyomiDataSelector: '#on-data'

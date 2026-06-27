@@ -3,7 +3,12 @@
 /* DEFAULT LIGHT THEME ── */
 :root {
     --bg-page: #f8fafc;          
-    --bg-card: #ffffff;          
+    --bg-card: #ffffff;
+    --bg-orb: rgba(255, 255, 255, 0.45);
+    --bg-orb-eerie: rgba(35, 30, 43, 0.95);
+    --bg-orb-active: rgba(163, 0, 0, 0.08); /* Sophisticated pale crimson blush */
+    --text-orb-idle: rgba(0, 0, 0, 0.15);
+    --text-orb-active: #a30000; /* Crisp crimson for active text */     
     --border-card: rgba(0, 0, 0, 0.06);
     --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     
@@ -18,7 +23,11 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-page: #0f172a;      
-        --bg-card: #1e293b;      
+        --bg-card: #1e293b;    
+        --bg-orb:        rgba(10, 12, 16, 0.95);
+        --bg-orb-active: #00191b5d;
+        --text-orb-idle: rgba(255, 255, 255, 0.15);
+        --text-orb-active: rgba(255, 255, 255, 0.85);
         --border-card: rgba(255, 255, 255, 0.05);
         --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
         
@@ -37,6 +46,10 @@ body.night_mode,
 body.card_dark {
     --bg-page: #0f172a;
     --bg-card: #1e293b;
+    --bg-orb:        rgba(10, 12, 16, 0.95);
+    --bg-orb-active: #000a0a79;
+    --text-orb-idle: rgba(255, 255, 255, 0.15);
+    --text-orb-active: rgba(255, 255, 255, 0.85);
     --border-card: rgba(255, 255, 255, 0.05);
     --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
     
@@ -59,6 +72,7 @@ html {
     box-sizing: inherit;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /*** ANKI NATIVE OVERRIDES ***/
@@ -90,22 +104,35 @@ html {
 
 /*** WORKSPACE CONTAINERS ***/
 .card-container {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
-    border: 1px solid var(--border-card);
-    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
     width: 100%;
     max-width: 480px;
     height: 90vh;
     overflow-y: auto;
     padding: 20px;
     border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     margin: auto 0;
+
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 480px) {
+    .card-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .card-container::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 .vocab-section-container {
@@ -198,7 +225,6 @@ html {
         inset 0 1px 0px rgba(255, 255, 255, 0.05);
     
     transition: all 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .tool-button:focus {
@@ -301,48 +327,111 @@ html {
 }
 
 /*** READINGS ***/
-
 .readings-container {
     display: flex;
-    gap: 12px;
-    margin: 16px 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+    
+    position: fixed;
+    left: 50%;
+    top: 70%;
+    transform: translateY(-50%);
+    margin-left: 130px;
+    z-index: 999;
 }
 
-.reading-button {
+@media (max-width: 480px) {
+    .readings-container {
+        /* Center the orb horizontally on small screens */
+        left: 50%;
+        margin-left: 0;
+        transform: translate(-50%, -50%);
+        top: 78%; 
+    }
+}
+
+.irregular-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.core-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.readings-container .reading-button {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid var(--border-card);
-    background-color: rgba(255, 255, 255, 0.02);
+    text-align: center;
+    width: max-content;
+    
+    border: 0;
+    border-style: none;
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    text-shadow: none;
+    text-decoration: none;
+    outline: none;
+    
     color: var(--text-secondary);
-
-    flex: 1;
-    padding: 8px 14px;
+    padding: 1px 2px;
+    margin: 0px;
     font-family: "Georgia", serif;
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 1px;
-    border-radius: 10px;
-    
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    -webkit-tap-highlight-color: transparent; 
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
+    
+    transition: color 0.2s ease, text-shadow 0.2s ease;
 }
 
-.reading-button.active {
+.readings-container .reading-button:hover {
+    background: transparent;
+    background-color: transparent;
+    box-shadow: none;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.35); 
+}
+
+#kunyomi-button {
+    z-index: 1;
+}
+
+#irregular-button {
+    z-index: 1;
+}
+
+#onyomi-button {
+    z-index: 1;
+}
+
+.readings-container .reading-button.active {
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
     color: var(--text-primary);
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: var(--text-primary);
-    box-shadow: 
-        0 0 12px rgba(255, 255, 255, 0.05),
-        inset 0 0 8px rgba(255, 255, 255, 0.1);
-    text-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
 }
 
-.reading-button:focus {
+.readings-container .reading-button:focus,
+.readings-container .reading-button:focus-visible,
+.readings-container .reading-button:active {
     outline: none;
+    background: transparent;
+    background-color: transparent;
+    box-shadow: none;
 }
 
 /* CRYSTAL BALL READING DISPLAY */
@@ -353,24 +442,26 @@ html {
     justify-content: center;
     align-items: center;
     
-    width: 84px;
-    height: 84px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     flex-shrink: 0;
-    margin: 0 6px;
-    padding: 8px; 
     box-sizing: border-box;
+    padding: 8px; 
     
     font-family: "Georgia", serif;
     font-size: clamp(0.75rem, 2.5vw, 1.05rem); 
     line-height: 1.2;
     font-weight: 700;
-    text-align: center;
-    word-break: break-word; 
+    text-align: center; 
+    white-space: nowrap;
     overflow: hidden;
-    color: rgba(255, 255, 255, 0.15);
+    text-overflow: ellipsis;
+    color: var(--text-orb-idle);
     
-    background: rgba(15, 15, 15, 0.6);
+    background: linear-gradient(135deg, var(--bg-orb), var(--bg-orb-eerie));
+    background-size: 200% 200%;
+    animation: eerieMist 6s ease-in-out infinite alternate;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 
         inset 0 4px 12px rgba(0, 0, 0, 0.5),
@@ -378,6 +469,25 @@ html {
         
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
+    z-index: 2;
+}
+
+@keyframes eerieMist {
+    0% {
+        background-position: 0% 50%;
+        box-shadow: 
+            0 0 15px rgba(0, 0, 0, 0.6),
+            inset 0 4px 12px rgba(0, 0, 0, 0.6),
+            inset 0 -2px 6px rgba(255, 255, 255, 0.01);
+    }
+    100% {
+        background-position: 100% 50%;
+        /* The outer shadow breathes out slightly, adding a faint violet-dark aura */
+        box-shadow: 
+            0 0 22px rgba(23, 18, 31, 0.8),
+            inset 0 6px 16px rgba(0, 0, 0, 0.7),
+            inset 0 -2px 8px rgba(35, 30, 43, 0.2);
+    }
 }
 
 /* --- THE HARDWARE-ACCELERATED INFINITE ENGINE --- */
@@ -410,17 +520,15 @@ html {
 
 /* --- ACTIVE STATE TRIGGER --- */
 #readings-display.active {
-    color: var(--text-primary);
+    color: var(--text-orb-active);
     border-color: rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.02);
-    box-shadow: 
-        0 0 20px rgba(255, 255, 255, 0.04),
-        inset 0 0 12px rgba(255, 255, 255, 0.06);
+    background: var(--bg-orb-active);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.04), inset 0 0 12px rgba(255, 255, 255, 0.06);
+    animation: none;
 }
 
 #readings-display.active::before {
     opacity: 1;
-    /* Dropped speed significantly to 12s for a very gentle, slow mystical rise */
     animation: streamTransformUp 12s linear infinite; 
 }
 
@@ -439,11 +547,6 @@ html {
     }
 }
 
-.reading-button:hover {
-    color: var(--text-primary);
-    border-color: rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.05);
-}
 
 
 /*** VOCAB SECTION ***/
@@ -469,14 +572,12 @@ html {
     transition: opacity 0.3s ease, filter 0.3s ease;
 }
 
-#vocab-ledger[data-active-filter="on"] .vocab-entry:not([data-reading-type="on"]) {
+#vocab-ledger[data-active-filter="on"] .vocab-entry:not([data-reading-type="on"]),
+#vocab-ledger[data-active-filter="kun"] .vocab-entry:not([data-reading-type="kun"]),
+#vocab-ledger[data-active-filter="neither"] .vocab-entry:not([data-reading-type="neither"]) {
     opacity: 0.25;
     filter: grayscale(40%);
-}
-
-#vocab-ledger[data-active-filter="kun"] .vocab-entry:not([data-reading-type="kun"]) {
-    opacity: 0.25;
-    filter: grayscale(40%);
+    pointer-events: none;
 }
 
 .vocab-entry:last-child {
@@ -517,7 +618,6 @@ html {
     width: 100%;
     cursor: pointer;
     flex-grow: 1;
-    -webkit-tap-highlight-color: transparent; 
 }
 
 .vocab-expression {
@@ -596,7 +696,6 @@ html {
     text-decoration: none;
     letter-spacing: 0.3px;
     transition: color 0.15s ease;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .utility-link:hover,
