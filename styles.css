@@ -513,6 +513,7 @@ html {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    margin-left: 30px;
 }
 
 .hat-vector {
@@ -549,9 +550,8 @@ html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: 80%;
     cursor: pointer;
-    flex-grow: 1;
 }
 
 .vocab-expression {
