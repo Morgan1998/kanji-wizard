@@ -655,9 +655,26 @@
                 resizeObserver.observe(rightToolbar);
                 resizeObserver.observe(leftToolbar);
             }
-
+            
             this.setupThemeToggle();
         }
+
+        handleTap(event) {
+
+            const hitKanjiHouse = event.target.closest('.kanji-house');
+            const hitRootBackground = event.target === event.currentTarget;
+
+            if (!hitKanjiHouse && !hitRootBackground) {
+                return;
+            }
+            if (this.strokeDataArray.length === 0) {
+                return;
+            }
+
+            this.strokeStateController.increment();
+            const currentCount = this.strokeStateController.getCurrent();
+            this.kanjiSvgController.updateSvg(this.strokeDataArray, currentCount);
+        } 
 
         setupThemeToggle() {
             this.themeButton = document.querySelector('#toggle-theme-button');
@@ -709,23 +726,6 @@
                 }
             });
         }
-
-        handleTap(event) {
-
-            const hitKanjiHouse = event.target.closest('.kanji-house');
-            const hitRootBackground = event.target === event.currentTarget;
-
-            if (!hitKanjiHouse && !hitRootBackground) {
-                return;
-            }
-            if (this.strokeDataArray.length === 0) {
-                return;
-            }
-
-            this.strokeStateController.increment();
-            const currentCount = this.strokeStateController.getCurrent();
-            this.kanjiSvgController.updateSvg(this.strokeDataArray, currentCount);
-        } 
     }
     
     new BackCardApp();

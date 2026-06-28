@@ -7,6 +7,11 @@
                 <g id="svg-stroke-group"></g>
             </svg>
         </div>
+        <footer class="deck-utility-footer">
+            <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
+            <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
+            <button id="toggle-theme-button" aria-label="Toggle theme"></button>
+        </footer>
     </div>
 </div>
 
@@ -43,6 +48,63 @@ class FrontCardApp {
             pathNode.setAttribute('d', strokePath);
             pathNode.classList.add('kanji-stroke'); // Applies your master stroke CSS thickness/color
             svgStrokeGroup.append(pathNode);
+        });
+
+        this.init();
+    }
+
+    init() {
+        this.setupThemeToggle();
+    }
+
+    setupThemeToggle() {
+        this.themeButton = document.querySelector('#toggle-theme-button');
+        if (!this.themeButton) return;
+
+        const hasSystemNightThemeOn = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const hasAnkiNightThemeOn = () => {
+                return document.documentElement.classList.contains('night-mode') ||
+                    document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
+                    document.body.classList.contains('nightMode') ||
+                    document.body.classList.contains('night_mode') ||
+                    document.body.classList.contains('card_dark') ||
+                    document.documentElement.classList.contains('user-night-mode');
+            };
+
+        const savedTheme = localStorage.getItem('kanji-wizard-theme');
+
+        let isDark;
+        if (savedTheme !== null) {
+            isDark = savedTheme === 'dark';
+        } else {
+            isDark = hasSystemNightThemeOn() || hasAnkiNightThemeOn();
+        }
+
+        if (isDark) {
+            document.documentElement.classList.add('user-night-mode');
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+            this.themeButton.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('user-night-mode', 'night-mode');
+            document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
+            document.documentElement.removeAttribute('data-bs-theme');
+            this.themeButton.setAttribute('data-theme', 'light');
+        }
+
+        this.themeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isNightThemeNow = document.documentElement.classList.toggle('user-night-mode');
+            if (isNightThemeNow) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                this.themeButton.setAttribute('data-theme', 'dark');
+                localStorage.setItem('kanji-wizard-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-bs-theme');
+                document.documentElement.classList.remove('night-mode');
+                document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
+                this.themeButton.setAttribute('data-theme', 'light');
+                localStorage.setItem('kanji-wizard-theme', 'light');
+            }
         });
     }
 }
