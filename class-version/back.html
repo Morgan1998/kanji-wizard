@@ -1,40 +1,43 @@
-<div class="card-container">
-    <div class="kanji-neighborhood">
-        <div id="kanji-toolbar-left" class="kanji-toolbar"></div>
-        <div class="kanji-house">
-            <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
-                <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
-                <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
-                <g id="svg-stroke-group"></g>
-            </svg>
+
+<div class="deck-workspace">
+    <div class="card-container">
+        <div class="kanji-neighborhood">
+            <div id="kanji-toolbar-left" class="kanji-toolbar"></div>
+            <div class="kanji-house">
+                <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
+                    <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
+                    <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
+                    <g id="svg-stroke-group"></g>
+                </svg>
+            </div>
+            <div id="kanji-toolbar-right" class="kanji-toolbar">
+                <button id="tool-fill-kanji" class="tool-button" title="Completely Draw Kanji">全描</button>
+                <button id="tool-clear-kanji" class="tool-button" title="Clear Kanji">全消</button>
+            </div>
         </div>
-        <div id="kanji-toolbar-right" class="kanji-toolbar">
-            <button id="tool-fill-kanji" class="tool-button" title="Completely Draw Kanji">全描</button>
-            <button id="tool-clear-kanji" class="tool-button" title="Clear Kanji">全消</button>
+
+        <div class="meaning-container unselectable">
+            <h2 id="kanji-meaning">{{meaning}}</h2>
         </div>
+
+        <div class="readings-container">
+            <div class="kun-container">
+                <button id="kunyomi-button" class="reading-button" data-type="kun">Kun</button>
+                <div id="kun-readings-display"></div>
+            </div>
+            <div class="on-container">
+                <div id="on-readings-display"></div>
+                <button id="onyomi-button" class="reading-button" data-type="on">On</button>
+            </div>
+        </div>
+
+        <div id="vocab-ledger"></div>
+
+        <footer class="deck-utility-footer">
+            <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
+            <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
+        </footer>
     </div>
-
-    <div class="meaning-container unselectable">
-        <h2 id="kanji-meaning">{{meaning}}</h2>
-    </div>
-
-    <div class="readings-container">
-        <div class="irregular-column">
-            <button id="irregular-button" class="reading-button" data-type="neither">🎭</button>
-        </div>
-        <div class="core-column">
-            <button id="kunyomi-button" class="reading-button" data-type="kun">Kun</button>
-            <div id="readings-display"></div>
-            <button id="onyomi-button" class="reading-button" data-type="on">On</button>
-        </div>
-    </div>
-
-    <div id="vocab-ledger"></div>
-
-    <footer class="deck-utility-footer">
-        <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
-        <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
-    </footer>
 </div>
 
 <div id="kanji" class="hidden">{{kanji}}</div>

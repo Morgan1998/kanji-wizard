@@ -3,12 +3,7 @@
 /* DEFAULT LIGHT THEME ── */
 :root {
     --bg-page: #f8fafc;          
-    --bg-card: #ffffff;
-    --bg-orb: rgba(255, 255, 255, 0.45);
-    --bg-orb-eerie: rgba(35, 30, 43, 0.95);
-    --bg-orb-active: rgba(163, 0, 0, 0.08); /* Sophisticated pale crimson blush */
-    --text-orb-idle: rgba(0, 0, 0, 0.15);
-    --text-orb-active: #a30000; /* Crisp crimson for active text */     
+    --bg-card: #ffffff;   
     --border-card: rgba(0, 0, 0, 0.06);
     --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     
@@ -17,6 +12,15 @@
     --grid-line-color: rgba(0, 0, 0, 0.12);
     --kanji-stroke-color: black;
     --vocab-ledger-bg: rgba(0, 0, 0, 0.03);
+
+    --bg-orb: rgba(255, 255, 255, 0.45);
+    --bg-orb-eerie: rgba(35, 30, 43, 0.95);
+    --bg-orb-active: rgba(163, 0, 0, 0.08); /* Sophisticated pale crimson blush */
+    --text-orb-idle: rgba(0, 0, 0, 0.15);
+    --text-orb-active: #300000; /* Crisp crimson for active text */  
+    --border-orb-active: rgba(15, 0, 0, 0.966);
+    --orb-shadow-idle: 0 8px 24px rgba(0, 0, 0, 0.06), inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -4px 10px rgba(0, 0, 0, 0.03);
+    --orb-shadow-active: 0 10px 25px rgba(163, 0, 0, 0.08), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 8px rgba(163, 0, 0, 0.04);
 }
 
 /* DARK THEME SWITCHES (System, Desktop App, & AnkiDroid Combined) ── */
@@ -28,6 +32,10 @@
         --bg-orb-active: #00191b5d;
         --text-orb-idle: rgba(255, 255, 255, 0.15);
         --text-orb-active: rgba(255, 255, 255, 0.85);
+        --border-orb-active: rgba(255, 255, 255, 0.336);
+        --orb-shadow-idle: 0 0 15px rgba(0, 0, 0, 0.6), inset 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 -2px 6px rgba(255, 255, 255, 0.01);
+        --orb-shadow-active: 0 0 25px rgba(255, 179, 179, 0.267), inset 0 4px 14px rgba(0, 0, 0, 0.7), inset 0 -2px 6px rgba(255, 0, 0, 0.05);
+
         --border-card: rgba(255, 255, 255, 0.05);
         --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
         
@@ -50,6 +58,10 @@ body.card_dark {
     --bg-orb-active: #000a0a79;
     --text-orb-idle: rgba(255, 255, 255, 0.15);
     --text-orb-active: rgba(255, 255, 255, 0.85);
+    --border-orb-active: rgba(255, 255, 255, 0.336);
+    --orb-shadow-idle: 0 0 15px rgba(0, 0, 0, 0.6), inset 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 -2px 6px rgba(255, 255, 255, 0.01);
+    --orb-shadow-active: 0 0 25px rgba(255, 179, 179, 0.295), inset 0 4px 14px rgba(0, 0, 0, 0.7), inset 0 -2px 6px rgba(255, 0, 0, 0.05);
+
     --border-card: rgba(255, 255, 255, 0.05);
     --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
     
@@ -77,32 +89,37 @@ html {
 
 /*** ANKI NATIVE OVERRIDES ***/
 .card {
-    background-color: var(--bg-page); 
-    color: var(--text-primary);
-
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
+
+    min-height: 100vh;
     margin: 0;
     padding: 0;
+
+    background-color: var(--bg-page); 
+    color: var(--text-primary);
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #qa {
-    width: 100%;
-    
-    /* ── FORCE DYNAMIC LAYOUT EXTENSION ── */
-    min-height: 100%;            
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start; 
-    
+
+    width: 100%;
+    min-height: 100%;            
     padding: 40px 20px;          
-    box-sizing: border-box;
 }
 
 /*** WORKSPACE CONTAINERS ***/
+.deck-workspace {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+}
+
 .card-container {
     display: flex;
     flex-direction: column;
@@ -110,13 +127,11 @@ html {
     align-items: center;
 
     width: 100%;
-    max-width: 480px;
-    height: 90vh;
+    height: 100%;
     overflow-y: auto;
-    padding: 20px;
+    padding: 5px;
     border-radius: 10px;
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    margin: auto 0;
 
     background-color: var(--bg-card);
     color: var(--text-primary);
@@ -128,16 +143,12 @@ html {
     .card-container {
         -ms-overflow-style: none;
         scrollbar-width: none;
+        max-width: 480px;
     }
 
     .card-container::-webkit-scrollbar {
         display: none;
     }
-}
-
-.vocab-section-container {
-    -webkit-user-select: text;
-    user-select: text;
 }
 
 /*** KANJI NEIGHBORHOOD ***/
@@ -146,20 +157,28 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;                     
-    margin: 12px 0;
+    gap: 16px;   
+
+    margin: 5px 0;
     width: 100%;
     max-width: 350px;              
 }
 
 .kanji-toolbar {
-    min-height: 150px;
+    visibility: hidden;
+
+
+
+
     display: flex;
     flex-direction: column;
+
+    min-height: 150px;
     gap: 8px;
     padding: 6px;
     justify-content: center;
-    border-radius: 30px;           /* Elegant, elongated wand/scroll profile */
+    border-radius: 30px;
+
     background-color: var(--vocab-ledger-bg);
     border: 1px solid var(--border-card);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -202,24 +221,23 @@ html {
 /* THE KANJI TOOL BUTTONS */
 
 .tool-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     white-space: nowrap;
     padding: 6px 9px;
-    border-radius: 12px;            
+    border-radius: 12px;        
+    position: relative;
+
     border: 1px solid var(--border-card);
     background-color: var(--vocab-ledger-bg);
     color: var(--text-secondary);
-    
     font-family: "Hiragino Mincho ProN", "MS Mincho", "Georgia", serif;
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.5px;
-    
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    
     box-shadow: 
         0 1px 2px rgba(0, 0, 0, 0.05),
         inset 0 1px 0px rgba(255, 255, 255, 0.05);
@@ -333,22 +351,24 @@ html {
     align-items: center;
     justify-content: flex-start;
     gap: 2px;
-    
-    position: fixed;
-    left: 50%;
-    top: 70%;
-    transform: translateY(-50%);
-    margin-left: 130px;
     z-index: 999;
+    
+    position: absolute;
+    left: 0;
+    top: 50%;
+    
+    /* Change -110% to a positive value or 0 to bring it over the card */
+    transform: translate(20px, -50%);
+    
+    width: max-content; 
+    height: min-content;
 }
 
 @media (max-width: 480px) {
     .readings-container {
-        /* Center the orb horizontally on small screens */
-        left: 50%;
-        margin-left: 0;
-        transform: translate(-50%, -50%);
-        top: 78%; 
+        left: 12px;
+        top: 85%;
+        transform: translateY(-50%) scale(0.85);
     }
 }
 
@@ -454,7 +474,6 @@ html {
     line-height: 1.2;
     font-weight: 700;
     text-align: center; 
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--text-orb-idle);
@@ -475,14 +494,12 @@ html {
 @keyframes eerieMist {
     0% {
         background-position: 0% 50%;
-        box-shadow: 
-            0 0 15px rgba(0, 0, 0, 0.6),
-            inset 0 4px 12px rgba(0, 0, 0, 0.6),
-            inset 0 -2px 6px rgba(255, 255, 255, 0.01);
+        /* Pulls directly from the theme's default idle shadow */
+        box-shadow: var(--orb-shadow-idle);
     }
     100% {
         background-position: 100% 50%;
-        /* The outer shadow breathes out slightly, adding a faint violet-dark aura */
+        /* Keep the slight shift for the pulse, or swap to var directly if preferred */
         box-shadow: 
             0 0 22px rgba(23, 18, 31, 0.8),
             inset 0 6px 16px rgba(0, 0, 0, 0.7),
@@ -520,10 +537,11 @@ html {
 
 /* --- ACTIVE STATE TRIGGER --- */
 #readings-display.active {
-    color: var(--text-orb-active);
-    border-color: rgba(255, 255, 255, 0.25);
     background: var(--bg-orb-active);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.04), inset 0 0 12px rgba(255, 255, 255, 0.06);
+    color: var(--text-orb-active);
+    border-color: var(--border-orb-active);
+    box-shadow: var(--orb-shadow-active);
+    
     animation: none;
 }
 
