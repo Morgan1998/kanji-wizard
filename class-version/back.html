@@ -18,10 +18,14 @@
         <div class="readings-container">
             <div class="kun-container">
                 <button id="kunyomi-button" class="reading-button" data-type="kun">Kun</button>
-                <div id="kun-readings-display"></div>
+                <div class="readings-glow-wrapper">
+                    <div id="kun-readings-display" class="readings-display">{{kun-yomi}}</div>
+                </div>
             </div>
             <div class="on-container">
-                <div id="on-readings-display"></div>
+                <div class="readings-glow-wrapper">
+                    <div id="on-readings-display" class="readings-display">{{on-yomi}}</div>
+                </div>
                 <button id="onyomi-button" class="reading-button" data-type="on">On</button>
             </div>
         </div>
@@ -31,6 +35,7 @@
         <footer class="deck-utility-footer">
             <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
             <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
+            <button id="toggle-theme-button" aria-label="Toggle theme"></button>
         </footer>
     </div>
 </div>
@@ -119,7 +124,7 @@
                 const lastCharacter = reading.slice(-1);
                 if (['つ', 'く'].includes(lastCharacter)) {
                     const stem = reading.slice(0, -1);
-                    updatedReadings.push(`${stem}$っ`);
+                    updatedReadings.push(`${stem}っ`);
                 }
             });
 
@@ -161,7 +166,8 @@
     class ReadingDisplayController {
         kunyomiButtonElement = null;
         onyomiButtonElement = null;
-        displayElement = null;
+        onDisplayElement = null;
+        kunDisplaySelector = null;
         kunyomiDataString = '';
         onyomiDataString = '';
 
@@ -169,50 +175,61 @@
             this.kunyomiButtonElement = document.querySelector(config.kunyomiButtonSelector);
             this.onyomiButtonElement = document.querySelector(config.onyomiButtonSelector);
             this.irregularButtonElement = document.querySelector(config.irregularButtonSelector);
-            this.displayElement = document.querySelector(config.displaySelector);
+            this.onDisplayElement = document.querySelector(config.onDisplaySelector);
+            this.kunDisplayElement = document.querySelector(config.kunDisplaySelector);
             this.kunyomiDataString = document.querySelector(config.kunyomiDataSelector)?.textContent?.trim() || 'No Kunyomi';
             this.onyomiDataString = document.querySelector(config.onyomiDataSelector)?.textContent?.trim() || 'No Onyomi';
 
-            if (!this.kunyomiButtonElement || !this.onyomiButtonElement || !this.irregularButtonElement || !this.displayElement) {
-                return;
-            }
+            if (!this.kunyomiButtonElement || !this.onyomiButtonElement || !this.onDisplayElement || !this.kunDisplayElement) return;
 
             this.init();
         }
 
         init() {
             this.kunyomiButtonElement.addEventListener('click', (event) => {
-                this.handleToggle(event, this.kunyomiButtonElement, this.onyomiButtonElement, this.irregularButtonElement, this.kunyomiDataString);
+                this.handleToggle(event, this.kunyomiButtonElement, this.onyomiButtonElement, this.kunyomiDataString);
             });
 
             this.onyomiButtonElement.addEventListener('click', (event) => {
-                this.handleToggle(event, this.onyomiButtonElement, this.kunyomiButtonElement, this.irregularButtonElement, this.onyomiDataString);
+                this.handleToggle(event, this.onyomiButtonElement, this.kunyomiButtonElement, this.onyomiDataString);
             });
-
-            this.irregularButtonElement.addEventListener('click', (event) => {
-                this.handleToggle(event, this.irregularButtonElement, this.onyomiButtonElement, this.kunyomiButtonElement)
-            })
         }
 
-        handleToggle(event, clickedButtonElement, otherButtonElementOne, otherButtonElementTwo, readingValueString = '👾') {
+        handleToggle(event, clickedButtonElement, otherButtonElement, readingValueString) {
             event.stopPropagation();
 
             const vocabLedger = document.querySelector('#vocab-ledger');
 
-            if (clickedButtonElement.classList.contains('active')) {
-                clickedButtonElement.classList.remove('active');
-                this.displayElement.classList.remove('active');
-                this.displayElement.textContent = '';
-                vocabLedger.removeAttribute('data-active-filter');
-            } else {
-                clickedButtonElement.classList.add('active');
-                otherButtonElementOne.classList.remove('active');
-                otherButtonElementTwo.classList.remove('active');
-                this.displayElement.classList.add('active');
-                this.displayElement.textContent = readingValueString;
-                
-                const readingType = clickedButtonElement.dataset.type;
-                vocabLedger.setAttribute('data-active-filter', readingType);
+            if (clickedButtonElement === this.onyomiButtonElement) {
+                if (clickedButtonElement.classList.contains('active')) {
+                    clickedButtonElement.classList.remove('active');
+                    this.onDisplayElement.classList.remove('active');
+                    vocabLedger.removeAttribute('data-active-filter');
+                } else {
+                    clickedButtonElement.classList.add('active');
+                    otherButtonElement.classList.remove('active');
+                    this.onDisplayElement.classList.add('active');
+                    this.kunDisplayElement.classList.remove('active');
+                    
+                    const readingType = clickedButtonElement.dataset.type;
+                    vocabLedger.setAttribute('data-active-filter', readingType);
+                }
+            }
+
+            if (clickedButtonElement === this.kunyomiButtonElement) {
+                if (clickedButtonElement.classList.contains('active')) {
+                    clickedButtonElement.classList.remove('active');
+                    this.kunDisplayElement.classList.remove('active');
+                    vocabLedger.removeAttribute('data-active-filter');
+                } else {
+                    clickedButtonElement.classList.add('active');
+                    otherButtonElement.classList.remove('active');
+                    this.kunDisplayElement.classList.add('active');
+                    this.onDisplayElement.classList.remove('active');
+                    
+                    const readingType = clickedButtonElement.dataset.type;
+                    vocabLedger.setAttribute('data-active-filter', readingType);
+                }
             }
         }
     }
@@ -243,9 +260,7 @@
             const targetSegment = vocab.withRuby.find(kanjiFuriganaOkuriganaSet => {
                 return kanjiFuriganaOkuriganaSet.k === this.currentKanji;
             });
-            if (!targetSegment) {
-                return 'neither';
-            }
+            if (!targetSegment) return 'neither';
 
             const furigana = targetSegment.f || '';
             const okurigana = targetSegment.o || '';
@@ -258,6 +273,7 @@
             if (this.enhancedOnReadings && this.enhancedOnReadings.includes(furigana)) {
                 return 'on';
             }
+
 
             return 'neither';
         }
@@ -275,10 +291,22 @@
 
                 const jlptBadgeContainerNode = document.createElement('div');
                 jlptBadgeContainerNode.classList.add('jlpt-badge-container', `badge-${vocab.lvl.toLowerCase()}-container`);
+
+                const svgNS = 'http://www.w3.org/2000/svg';
+                const hatSvg = document.createElementNS(svgNS, 'svg');
+                hatSvg.classList.add('hat-vector');
+                hatSvg.setAttribute('viewBox', '0 0 100 100');
                 
+                const hatPath = document.createElementNS(svgNS, 'path');
+                hatPath.setAttribute("d", "m25.87549,50c-0.19455,0 -0.23499,0.37562 -1.75097,0.77821c-0.18804,0.04993 -0.58366,0.19455 -0.97276,0.38911c-0.3891,0.19455 -0.9856,0.3653 -1.36187,0.58366c-0.60671,0.35209 -1.14909,0.79833 -1.36187,0.97276c-0.54247,0.44472 -1.33624,0.83436 -2.14008,1.16732c-0.5684,0.23544 -1.1295,0.47635 -1.94552,0.77821c-0.75233,0.27831 -1.36689,0.32677 -1.75097,0.3891c-0.60728,0.09855 -0.91312,0.47837 -1.16731,0.58366c-0.17974,0.07445 -0.61985,0.13474 -0.97276,0.3891c-0.2232,0.16088 -0.58366,0.19455 -0.77821,0.38911c-0.19455,0.19455 -0.64064,0.05698 -0.77821,0.19455c-0.13757,0.13757 -0.05698,0.25154 -0.19455,0.38911c-0.13757,0.13757 0.05698,0.25154 0.19455,0.38911c0.13757,0.13757 0.55501,0.22823 0.77821,0.3891c0.35292,0.25437 0.82283,0.06459 1.55642,0.38911c0.6415,0.28378 1.36187,0.3891 2.14008,0.58366c0.77821,0.19455 1.73303,0.48565 2.52918,0.58366c0.77238,0.09508 1.94553,0.19455 2.72374,0.38911c0.77821,0.19455 1.96739,0.30098 2.91829,0.58366c1.00426,0.29854 1.96254,0.73812 2.91829,1.16732c0.79371,0.35643 1.9714,0.69446 2.72373,0.97276c0.81602,0.30186 1.9714,0.69446 2.72374,0.97276c0.81602,0.30186 1.51861,0.6709 2.33463,0.97276c0.75233,0.27831 1.193,0.3415 1.94553,0.77821c0.60671,0.35209 1.16731,0.58366 1.55642,0.97276c0.38911,0.38911 0.97276,0.58366 1.55642,0.97276c0.58366,0.38911 1.04514,0.65858 1.75097,1.16732c0.66961,0.48263 1.37289,0.95672 1.94553,1.36186c0.79411,0.56184 1.34906,0.80628 1.75097,0.97276c0.5684,0.23544 1.36187,0.3891 1.94553,0.58366c0.58366,0.19455 1.17485,0.10107 1.75097,0.19456c0.60728,0.09855 1.14937,0.29109 1.94553,0.38911c0.77238,0.09509 1.36187,0 2.14008,0c0.77821,0 1.54361,-0.02808 1.94553,-0.19456c0.56839,-0.23544 0.97276,-0.38911 1.55642,-0.58366c0.58366,-0.19455 1.16732,-0.38911 1.55642,-0.58366c0.38911,-0.19456 0.97779,-0.52132 1.36187,-0.58366c0.60728,-0.09855 0.96572,-0.6062 1.55642,-0.77821c0.77017,-0.22427 1.1983,-0.5079 1.75097,-0.77821c0.63014,-0.30819 1.40057,-0.68723 1.94552,-0.97276c0.86166,-0.45147 1.40305,-0.7226 1.94553,-1.16732c0.42555,-0.34887 0.79105,-0.75441 1.16732,-0.97276c0.6067,-0.35208 0.98802,-0.54277 1.55642,-0.77821c0.40192,-0.16648 0.75516,-0.42613 1.36186,-0.77821c0.37627,-0.21835 0.97276,-0.3891 1.36187,-0.58366c0.38911,-0.19455 0.79105,-0.3653 1.16732,-0.58366c0.6067,-0.35209 1.03307,-0.45476 1.55642,-0.77821c0.23405,-0.14465 0.97276,-0.38911 1.55642,-0.58366c0.58366,-0.19455 0.9808,-0.16483 1.75097,-0.3891c0.59069,-0.17201 1.36187,-0.38911 1.94553,-0.38911c0.58366,0 0.95995,-0.22263 1.36187,-0.3891c0.5684,-0.23544 0.94913,-0.29056 1.55642,-0.38911c0.57612,-0.09349 1.36187,0 2.33463,0c0.97276,0 2.14008,0 3.11284,0c0.77821,0 1.61566,0.10326 2.33463,-0.19455c0.50838,-0.21058 0.70375,-0.59846 0.77821,-0.77821c0.10529,-0.25419 0.38911,-0.3891 0.38911,-0.58366c0,-0.38911 -0.08939,-0.59407 0,-0.97276c0.09995,-0.4234 0.19455,-0.77821 0.19455,-1.36187c0,-0.38911 0,-0.97276 0,-1.75097c0,-0.58366 -0.42612,-1.33882 -0.77821,-1.94553c-0.21835,-0.37627 -0.52384,-1.00895 -0.77821,-1.36187c-0.32175,-0.44641 -0.64143,-0.89763 -1.16731,-1.36187c-0.32613,-0.28791 -0.68847,-0.70164 -1.16732,-0.97276c-0.69804,-0.39522 -1.37583,-0.52359 -2.33463,-0.77821c-1.18924,-0.31582 -2.14008,-0.58366 -3.11284,-0.58366c-0.77821,0 -1.75098,0 -2.52918,0c-0.58366,0 -1.17315,-0.09508 -1.94553,0c-0.79615,0.09801 -1.56116,0.29325 -2.52918,0.3891c-0.9872,0.09775 -2.14008,0.19455 -3.11285,0.19455c-0.97276,0 -1.94553,0 -2.72373,0c-0.58366,0 -1.17485,0.09349 -1.75098,0c-0.60728,-0.09855 -0.94971,-0.23157 -1.55642,-0.58366c-0.37626,-0.21835 -0.85428,-0.53881 -1.55642,-0.97276c-0.52335,-0.32344 -1.00978,-0.56061 -1.36187,-1.16732c-0.21836,-0.37627 -0.6062,-0.77117 -0.77821,-1.36187c-0.22428,-0.77017 -0.48565,-1.34393 -0.58366,-2.14008c-0.04754,-0.38619 -0.06045,-0.98838 -0.19455,-1.55642c-0.09995,-0.4234 -0.0699,-1.17736 -0.19455,-1.94553c-0.09855,-0.60728 -0.38911,-1.16732 -0.38911,-1.75097c0,-0.58366 -0.09946,-1.17315 -0.19455,-1.94553c-0.09801,-0.79615 -0.12324,-1.17168 -0.19455,-1.75097c-0.09801,-0.79615 -0.29056,-1.33824 -0.38911,-1.94552c-0.09349,-0.57612 -0.02254,-1.16028 -0.19455,-1.75097c-0.22427,-0.77017 -0.22329,-1.35086 -0.58366,-2.33463c-0.21161,-0.57769 -0.29055,-1.14369 -0.3891,-1.75097c-0.06233,-0.38408 0,-0.97276 0,-1.36187c0,-0.58366 -0.13409,-1.18293 0,-1.75097c0.09995,-0.42339 0.4999,-0.99864 0.77821,-1.75097c0.15093,-0.40801 0.24445,-0.93327 0.3891,-1.16731c0.32345,-0.52334 0.16339,-1.16983 0.19455,-1.36187c0.09855,-0.60729 0.19455,-0.77821 0.19455,-0.97276c0,-0.3891 -0.05964,-0.67292 0.19455,-0.77821c0.17974,-0.07445 0.19455,-0.19455 0.3891,-0.19455c0.19455,0 0.38911,0 0.58366,0.19455c0.19455,0.19455 0.19455,0.3891 0.58366,0.58366c0.3891,0.19455 0.69922,0.68346 1.16731,0.97276c0.52335,0.32345 1.14427,0.62068 1.75098,0.97276c0.37627,0.21836 0.97276,0.38911 1.36186,0.58366c0.38911,0.19455 0.60871,0.21997 1.16732,0.3891c0.67137,0.20327 0.9808,0.55394 1.75097,0.77821c0.59069,0.17201 1.35484,0.41165 1.94553,0.58366c0.77017,0.22428 1.54198,0.68046 2.52918,0.77821c0.58082,0.05751 1.56371,0.27025 2.52918,0.3891c0.79615,0.09801 1.34393,0.2911 2.14008,0.3891c0.57928,0.07131 0.97276,0 1.36186,0c0.38911,0 0.97276,0 1.36187,0c0.38911,0 0.80727,-0.09227 0.97276,-0.19455c0.37006,-0.22871 0.38911,-0.58366 0.38911,-0.77821c0,-0.38911 0.16914,-0.80326 0,-1.36187c-0.20328,-0.67137 -0.50791,-1.1983 -0.77821,-1.75097c-0.3082,-0.63014 -1.00978,-0.94971 -1.36187,-1.55642c-0.43671,-0.75253 -1.01394,-1.30625 -1.55642,-1.75097c-0.63833,-0.5233 -0.91809,-1.03311 -1.55642,-1.55642c-0.54247,-0.44472 -1.0604,-0.86585 -1.55642,-1.36187c-0.49601,-0.49601 -1.14426,-0.81523 -1.75097,-1.16732c-0.75253,-0.43671 -1.17536,-0.74849 -1.94553,-0.97276c-0.59069,-0.17201 -1.44204,-0.38298 -2.14008,-0.77821c-0.47884,-0.27112 -1.00894,-0.52384 -1.36186,-0.77821c-0.44641,-0.32175 -0.75517,-0.62068 -1.36187,-0.97276c-0.37627,-0.21836 -0.97276,-0.3891 -1.55642,-0.58366c-0.58366,-0.19455 -1.12083,-0.47002 -1.75098,-0.77821c-0.55267,-0.2703 -1.18257,-0.34822 -1.75097,-0.58366c-0.80384,-0.33296 -1.33824,-0.67966 -1.94553,-0.77821c-0.57612,-0.09349 -1.37191,-0.26445 -2.14008,-0.38911c-0.60728,-0.09855 -1.34393,-0.29109 -2.14008,-0.38911c-0.57928,-0.07131 -1.17169,0.07131 -1.75097,0c-0.79615,-0.09801 -1.36187,-0.19455 -2.14008,-0.19455c-0.77821,0 -1.75097,0 -2.52918,0c-0.77821,0 -1.75534,0.12324 -2.33463,0.19455c-0.79615,0.09801 -1.32758,0.48371 -1.75097,0.58366c-0.56804,0.1341 -1.00895,0.13474 -1.36187,0.38911c-0.2232,0.16088 -0.5965,0.3653 -0.97276,0.58366c-0.60671,0.35209 -1.16732,0.58366 -1.55642,0.97276c-0.3891,0.3891 -0.89763,0.64144 -1.36187,1.16732c-0.28791,0.32613 -0.45646,0.91546 -0.77821,1.36187c-0.25437,0.35292 -0.50709,1.07757 -0.77821,1.55642c-0.39522,0.69804 -0.40768,1.55201 -0.58366,2.33463c-0.21764,0.96786 -0.23328,2.15264 -0.3891,3.11284c-0.1971,1.21457 -0.88501,2.493 -1.16732,3.50195c-0.31888,1.13964 -0.48565,2.12214 -0.58366,2.91829c-0.11885,0.96548 -0.096,1.72734 -0.19455,2.33463c-0.12466,0.76816 -0.18843,1.44204 -0.58366,2.14008c-0.27112,0.47885 -0.92516,1.193 -1.36187,1.94553c-0.35209,0.60671 -0.73733,1.37713 -0.97276,1.94552c-0.33296,0.80384 -0.48565,1.53848 -0.58366,2.33463c-0.09509,0.77238 -0.10106,1.56396 -0.19455,2.14008c-0.09855,0.60728 -0.22263,0.95995 -0.3891,1.36187c-0.23544,0.5684 -0.62389,1.13087 -0.97276,1.55642c-0.44473,0.54248 -0.66457,0.92628 -0.97276,1.55642c-0.2703,0.55267 -0.3891,0.97276 -0.58366,1.36187c-0.19455,0.3891 -0.48371,0.74392 -0.58366,1.16732c-0.0894,0.37869 -0.19455,0.58366 -0.19455,0.77821c0,0.3891 -0.17852,0.46437 -0.3891,0.97276c-0.07445,0.17974 -0.19455,0.3891 -0.19455,0.58366c0,0.19455 -0.19455,0.3891 -0.19455,0.58366c0,0.38911 -0.0946,0.74392 -0.19455,1.16732c-0.0894,0.37869 0,0.58366 0,0.77821c0,0.19455 -0.05698,0.25154 -0.19455,0.38911c-0.13757,0.13757 -0.01481,0.31465 -0.19455,0.3891c-0.2542,0.10529 -0.3891,0.19455 -0.58366,0.38911c-0.19455,0.19455 -0.41872,0.04565 -0.77821,0.19455c-0.2542,0.10529 -0.3891,0.19455 -0.58366,0.38911c-0.19455,0.19455 -0.47837,0.13491 -0.58366,0.38911c-0.07445,0.17974 -0.28382,0.52401 -0.3891,0.77821c-0.07445,0.17974 0,0.3891 0,0.58366l0,0.19455l-0.19455,0l0,0.19455");
+
                 const jlptBadgeNode = document.createElement('span');
                 jlptBadgeNode.classList.add('jlpt-badge', `badge-${vocab.lvl.toLowerCase()}`);
                 jlptBadgeNode.textContent = vocab.lvl.toUpperCase();
+
+                hatSvg.append(hatPath);
+                jlptBadgeContainerNode.append(hatSvg);
+                jlptBadgeContainerNode.append(jlptBadgeNode);
 
                 const vocabDefinitionSetNode = document.createElement('div');
                 vocabDefinitionSetNode.classList.add('vocab-definition-set');
@@ -338,7 +366,6 @@
 
                 vocabDefinitionSetNode.append(expressionNode);
                 vocabDefinitionSetNode.append(definitionNode);
-                jlptBadgeContainerNode.append(jlptBadgeNode);
                 vocabEntryNode.append(jlptBadgeContainerNode);
                 vocabEntryNode.append(vocabDefinitionSetNode);
                 ledgerContainer.append(vocabEntryNode);
@@ -557,7 +584,8 @@
                 kunyomiButtonSelector: '#kunyomi-button',
                 onyomiButtonSelector: '#onyomi-button',
                 irregularButtonSelector: '#irregular-button',
-                displaySelector: '#readings-display',
+                onDisplaySelector: '#on-readings-display',
+                kunDisplaySelector: '#kun-readings-display',
                 kunyomiDataSelector: '#kun-data',
                 onyomiDataSelector: '#on-data'
             });
@@ -629,6 +657,38 @@
                 resizeObserver.observe(rightToolbar);
                 resizeObserver.observe(leftToolbar);
             }
+
+            this.setupThemeToggle();
+        }
+
+        setupThemeToggle() {
+            this.themeButton = document.querySelector('#toggle-theme-button');
+            if (!this.themeButton) return;
+
+            const hasSystemNightThemeOn = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const hasAnkiNightThemeOn = () => {
+                    return document.documentElement.classList.contains('night-mode') ||
+                        document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
+                        document.body.classList.contains('nightMode') ||
+                        document.body.classList.contains('night_mode') ||
+                        document.body.classList.contains('card_dark') ||
+                        document.documentElement.classList.contains('user-night-mode');
+                };
+
+            this.themeButton.textContent = hasSystemNightThemeOn() || hasAnkiNightThemeOn() ? '☀️' : '🌙';
+
+            this.themeButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isNightThemeNow = document.documentElement.classList.toggle('user-night-mode');
+                if (isNightThemeNow) {
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-bs-theme');
+                    document.documentElement.classList.remove('night-mode');
+                    document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
+                }
+                this.themeButton.textContent = isNightThemeNow ? '☀️' : '🌙';
+            });
         }
 
         handleTap(event) {
