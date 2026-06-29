@@ -11,7 +11,13 @@
     --text-secondary: #2f385a;
     --grid-line-color: rgba(0, 0, 0, 0.12);
     --kanji-stroke-color: black;
-    --vocab-ledger-bg: rgba(0, 0, 0, 0.03);
+    
+
+    /* --- VOCAB LEDGER --- */
+    --bg-vocab-ledger: #f1f3f5;
+    --text-vocab-main: #1a1a1a;
+    --text-vocab-muted: #64748b;
+    --border-vocab-row: #e2e8f0;
 
     /* --- IDLE STATE --- */
     --bg-orb:                 rgba(26, 24, 30, 0.95);    
@@ -41,6 +47,12 @@
         --grid-line-color: rgba(255, 255, 255, 0.15);
         --kanji-stroke-color: white;
         --vocab-ledger-bg: rgba(255, 255, 255, 0.04);
+
+        /* --- VOCAB LEDGER --- */
+        --bg-vocab-ledger: #1e1e24;
+        --text-vocab-main: #f8fafc;
+        --text-vocab-muted: #94a3b8;
+        --border-vocab-row: #334155;
 
         /* --- IDLE STATE --- */
         --bg-orb:                 rgba(20, 16, 28, 0.96);
@@ -74,15 +86,25 @@ body.card_dark {
     --kanji-stroke-color: white;
     --vocab-ledger-bg: rgba(255, 255, 255, 0.04);
 
-    --bg-orb:        rgba(10, 12, 16, 0.95);
-    --bg-orb-active: #00191b5d;
-    --text-orb-idle: rgba(255, 255, 255, 0.15);
-    --text-orb-active: rgba(255, 255, 255, 0.85);
-    --border-orb-active: rgba(255, 255, 255, 0.336);
-    --orb-shadow-idle: 0 0 15px rgba(0, 0, 0, 0.6), inset 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 -2px 6px rgba(255, 255, 255, 0.01);
-    --orb-shadow-active: 0 0 16px rgba(187, 134, 252, 0.12), 0 0 6px rgba(187, 134, 252, 0.08);
-    --orb-drop-shadow-idle: 0 0 10px rgba(187, 134, 252, 0.15);
-    --orb-drop-shadow-active: 0 0 16px rgba(187, 134, 252, 0.35);
+    /* --- VOCAB LEDGER --- */
+    --bg-vocab-ledger: #1e1e24;
+    --text-vocab-main: #f8fafc;
+    --text-vocab-muted: #94a3b8;
+    --border-vocab-row: #334155;
+
+    /* --- IDLE STATE --- */
+    --bg-orb:                 rgba(20, 16, 28, 0.96);
+    --bg-orb-eerie:           rgba(36, 28, 50, 0.96);
+    --text-orb-idle:          #9af085;                   /* Solidified for light mode */
+    --orb-shadow-idle:        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    --orb-drop-shadow-idle:   0 0 10px rgba(74, 20, 140, 0.18);
+
+    /* --- ACTIVE STATE --- */
+    --bg-orb-active:          rgba(15, 2, 36, 0.98); 
+    --text-orb-active:        #e6d3ff;  
+    --border-orb-active:      rgba(168, 85, 247, 0.3);
+    --orb-shadow-active:      inset 0 4px 8px rgba(0, 0, 0, 0.6);
+    --orb-drop-shadow-active: 0 0 16px rgba(168, 85, 247, 0.45);
 }   
 
 /*** RESETS ***/
@@ -179,6 +201,7 @@ html {
 
 /* KANJI HOUSE */
 .kanji-house {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -354,11 +377,27 @@ html {
 /* READING DISPLAY */
 
 .readings-glow-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* Sits cleanly above the SVG (z-index: 1) */
+    
+    /* Center the reading text inside the house box */
     display: flex;
-    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    
+    /* Hide them by default */
+    opacity: 0;
+    pointer-events: none; /* Allows clicks to pass through when hidden */
+    transition: opacity 0.25s ease; /* Smooth fade animation */
+}
 
-    filter: drop-shadow(var(--orb-drop-shadow-idle));
-    transition: filter 0.4s ease;
+.readings-glow-wrapper.active {
+    opacity: 1;
+    pointer-events: auto; /* Reactivates interactions when visible */
 }
 
 
@@ -471,41 +510,71 @@ html {
 
 /*** VOCAB SECTION ***/
 
-#vocab-ledger {
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 8px;           
+/* --- NEW GLOBAL SECTION WRAPPER --- */
+#vocab-section {
     width: 100%;
-    max-width: 420px;  
-    border-radius: 12px;  
+    padding: 16px;
+    box-sizing: border-box;
+    /* This makes it a great spot for parent layouts or future spacing controls */
 }
 
+/* --- VOCABULARY LEDGER CONTAINER --- */
+#vocab-ledger {
+    background-color: var(--bg-vocab-ledger);
+    border-radius: 12px;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    transition: background-color 0.3s ease;
+
+    /* --- THE SCROLL ENGINE --- */
+    max-height: 70vh;         /* Sets the boundary limit. Adjust this pixel height as you like! */
+    overflow-y: auto;          /* 'auto' only shows the scrollbar if the content actually overflows */
+    scrollbar-gutter: stable;  /* Prevents layout shift when content grows long */
+}
+
+/* OPTIONAL: Sleek custom scrollbars to match your premium card design */
+#vocab-ledger::-webkit-scrollbar {
+    width: 8px;
+}
+
+#vocab-ledger::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+#vocab-ledger::-webkit-scrollbar-thumb {
+    background-color: var(--text-vocab-muted);
+    border-radius: 20px;
+    border: 2px solid var(--bg-vocab-ledger); /* Creates a nice padding effect around the track */
+}
+
+#vocabulary-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-vocab-main);
+    margin-bottom: 16px;
+    padding-left: 4px;
+}
+
+/* --- LEDGER ENTRIES (ROWS) --- */
 .vocab-entry {
     display: flex;
-    flex-direction: row;
-    align-items: center;    
-    gap: 12px;
-    padding: 14px 6px;
-    width: 100%;
-    border-bottom: 1px solid transparent;
-    border-image: linear-gradient(to right, transparent, var(--border-card), transparent) 1;
-    transition: opacity 0.3s ease, filter 0.3s ease;
+    align-items: center;
+    padding: 16px 4px;
+    border-bottom: 1px solid var(--border-vocab-row);
+    transition: border-color 0.3s ease;
 }
 
-#vocab-ledger[data-active-filter="on"] .vocab-entry:not([data-reading-type="on"]),
-#vocab-ledger[data-active-filter="kun"] .vocab-entry:not([data-reading-type="kun"]),
-#vocab-ledger[data-active-filter="neither"] .vocab-entry:not([data-reading-type="neither"]) {
-    opacity: 0.25;
-    filter: grayscale(40%);
-    pointer-events: none;
-}
-
+/* Remove the bottom border on the very last row */
 .vocab-entry:last-child {
     border-bottom: none;
-    border-image: none;
 }
 
-.jlpt-badge-container {
+/* --- THE BADGE & SVG CONTAINER --- */
+.badge-container {
     position: relative;
     width: 54px;
     height: 54px;
@@ -513,6 +582,7 @@ html {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    margin-right: 20px;
 }
 
 .hat-vector {
@@ -524,7 +594,7 @@ html {
     z-index: 1;
 }
 
-.jlpt-badge {
+.badge {
     position: relative;
     z-index: 2;
     font-family: "Georgia", serif;
@@ -537,75 +607,110 @@ html {
     margin-top: 4px;
 }
 
-.badge-n5-container .hat-vector path { fill: #1fa3bf; }
-.badge-n4-container .hat-vector path { fill: #a4c936; }
-.badge-n3-container .hat-vector path { fill: #f6aa00; }
-.badge-n2-container .hat-vector path { fill: #ea5514; }
-.badge-n1-container .hat-vector path { fill: #dc001c; }
+/* Badge Vector Color Mapping */
+.badge-container-n5 .hat-vector path { fill: #1fa3bf; }
+.badge-container-n4 .hat-vector path { fill: #a4c936; }
+.badge-container-n3 .hat-vector path { fill: #f6aa00; }
+.badge-container-n2 .hat-vector path { fill: #ea5514; }
+.badge-container-n1 .hat-vector path { fill: #dc001c; }
 
-
-
-.vocab-definition-set {
+/* --- TEXT CONTENT WRAPPER --- */
+.vocab {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 80%;
-    cursor: pointer;
+    gap: 2px;
 }
 
-.vocab-expression {
-    font-family: "Hiragino Mincho ProN", "MS Mincho", serif;
-    font-size: 2.5rem;
-    font-weight: 600;
+.vocab-japanese {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-vocab-main);
     line-height: 1.2;
-    flex-shrink: 0;
-    display: flex;      
-    align-items: flex-end;   
-    color: var(--text-primary);
-    user-select: text;
-    -webkit-user-select: text; 
 }
 
-.vocab-expression ::selection {
-    background-color: transparent;
-    color: #ff007f;              
-    text-shadow: 0 0 12px #ff007f, 0 0 4px #ffffff; 
+.vocab-japanese ruby rt.furigana {
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: var(--text-vocab-muted);
+    letter-spacing: 2px;
+    padding-bottom: 4px;
 }
 
-.vocab-expression ::-webkit-selection {
-    background-color: transparent;
-    color: #ff007f;
-    text-shadow: 0 0 12px #ff007f, 0 0 4px #ffffff;
+.vocab-english {
+    font-size: 0.9rem;
+    color: var(--text-vocab-muted);
+    font-weight: 400;
 }
 
-.furigana::selection {
-    background-color: transparent;
-    color: #fef08a;
-}
-
-.vocab-expression ruby {
-    font-family: inherit;
-    cursor: pointer;
-}
-
-.furigana {
-    font-size: 0.35em;
-    font-weight: 500;
-    letter-spacing: 1px;
-    visibility: visible;
-    opacity: 0.85;
-    transition: opacity 0.18s ease, visibility 0.18s ease;
-}
-
-.vocab-definition {
+/* --- THE PROGRESSION ROW CONTAINER --- */
+.gem-slots {
+    position: absolute;
+    bottom: -4px; /* Suspends the row beautifully just below the main badge circle */
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    justify-content: center;
-    font-family: "Georgia", serif;
-    font-size: 1.05rem;
-    line-height: 1.4;
-    width: 100%;
-    color: var(--text-secondary);
-    font-style: italic;
+    gap: 3px; /* Clean, tight spacing between the 5 sockets */
+    z-index: 3; /* Floating above the background elements safely */
+}
+
+/* --- THE BASE EMPTY SOCKET (PIT) --- */
+.slot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #cbd5e1; /* Soft empty pit gray for Day Mode */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Night Mode adjustment for empty sockets */
+:root.user-night-mode .slot {
+    background-color: #334155; /* Deep dark empty track pit */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* --- THE GEM IGNITION RULES --- */
+
+/* Slot 1: Ignited by N5, N4, N3, N2, N1 */
+.badge-container-n5 .slot-1, 
+.badge-container-n4 .slot-1, 
+.badge-container-n3 .slot-1, 
+.badge-container-n2 .slot-1, 
+.badge-container-n1 .slot-1 {
+    background: radial-gradient(circle at 30% 30%, #e0f7fa, #1fa3bf);
+    box-shadow: 0 1px 3px rgba(31, 163, 191, 0.6);
+}
+
+/* Slot 2: Ignited by N4, N3, N2, N1 */
+.badge-container-n4 .slot-2, 
+.badge-container-n3 .slot-2, 
+.badge-container-n2 .slot-2, 
+.badge-container-n1 .slot-2 {
+    background: radial-gradient(circle at 30% 30%, #f1f8e9, #a4c936);
+    box-shadow: 0 1px 3px rgba(164, 201, 54, 0.6);
+}
+
+/* Slot 3: Ignited by N3, N2, N1 */
+.badge-container-n3 .slot-3, 
+.badge-container-n2 .slot-3, 
+.badge-container-n1 .slot-3 {
+    background: radial-gradient(circle at 30% 30%, #fff8e1, #f6aa00);
+    box-shadow: 0 1px 3px rgba(246, 170, 0, 0.6);
+}
+
+/* Slot 4: Ignited by N2, N1 */
+.badge-container-n2 .slot-4, 
+.badge-container-n1 .slot-4 {
+    background: radial-gradient(circle at 30% 30%, #fbe9e7, #ea5514);
+    box-shadow: 0 1px 3px rgba(234, 85, 20, 0.6);
+}
+
+/* Slot 5: Ignited ONLY by N1 */
+.badge-container-n1 .slot-5 {
+    background: radial-gradient(circle at 30% 30%, #ffebee, #dc001c);
+    box-shadow: 0 1px 3px rgba(220, 0, 28, 0.6);
 }
 
 /*** UTILITY FOOTER ***/
