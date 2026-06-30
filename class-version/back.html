@@ -2,6 +2,7 @@
 <div class="deck-workspace">
     <div class="card-container">
         <div class="kanji-neighborhood">
+            <button id="kunyomi-button" class="reading-button" data-type="kun">⛩️Kun</button>
             <div class="kanji-house">
                 <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
                     <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
@@ -17,21 +18,16 @@
                     <div id="readings-display-on" class="readings-display"></div>
                 </div>
             </div>
+            <button id="onyomi-button" class="reading-button" data-type="on">🐉On</button>
         </div>
 
         <div class="meaning-container unselectable">
             <h2 id="kanji-meaning">{{meaning}}</h2>
         </div>
 
-        <div class="readings-container">
-            <button id="kunyomi-button" class="reading-button" data-type="kun">⛩️Kun</button>
-            <button id="onyomi-button" class="reading-button" data-type="on">On🐉</button>
-        </div>
-
         <div id="vocab-section">
-            <div id="vocab-ledger">
-                <div id="vocabulary-title">VOCABULARY</div>
-            </div>
+            <div id="vocabulary-title">VOCABULARY</div>
+            <div id="vocab-ledger"></div>
         </div>
         <footer class="deck-utility-footer">
             <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
@@ -239,13 +235,13 @@
             if (clickedButtonElement === this.onyomiButtonElement) {
                 if (clickedButtonElement.classList.contains('active')) {
                     clickedButtonElement.classList.remove('active');
-                    this.onDisplayElement.classList.remove('active');
+                    this.onDisplayWrapperElement.classList.remove('active');
                     vocabLedger.removeAttribute('data-active-filter');
                 } else {
                     clickedButtonElement.classList.add('active');
                     otherButtonElement.classList.remove('active');
-                    this.onDisplayElement.classList.add('active');
-                    this.kunDisplayElement.classList.remove('active');
+                    this.onDisplayWrapperElement.classList.add('active');
+                    this.kunDisplayWrapperElement.classList.remove('active');
                     
                     const readingType = clickedButtonElement.dataset.type;
                     vocabLedger.setAttribute('data-active-filter', readingType);
@@ -255,13 +251,13 @@
             if (clickedButtonElement === this.kunyomiButtonElement) {
                 if (clickedButtonElement.classList.contains('active')) {
                     clickedButtonElement.classList.remove('active');
-                    this.kunDisplayElement.classList.remove('active');
+                    this.kunDisplayWrapperElement.classList.remove('active');
                     vocabLedger.removeAttribute('data-active-filter');
                 } else {
                     clickedButtonElement.classList.add('active');
                     otherButtonElement.classList.remove('active');
-                    this.kunDisplayElement.classList.add('active');
-                    this.onDisplayElement.classList.remove('active');
+                    this.kunDisplayWrapperElement.classList.add('active');
+                    this.onDisplayWrapperElement.classList.remove('active');
                     
                     const readingType = clickedButtonElement.dataset.type;
                     vocabLedger.setAttribute('data-active-filter', readingType);
@@ -296,20 +292,31 @@
             const targetSegment = vocab.withRuby.find(kanjiFuriganaOkuriganaSet => {
                 return kanjiFuriganaOkuriganaSet.k === this.currentKanji;
             });
-            if (!targetSegment) return 'neither';
+
+            if (!targetSegment) {
+                return 'neither';
+            }
 
             const furigana = targetSegment.f || '';
             const okurigana = targetSegment.o || '';
-            const fullFuriganaOkuriganaReading = `${furigana}${okurigana}` || '';
 
-            if (this.enhancedKunReadings && this.enhancedKunReadings.includes(fullFuriganaOkuriganaReading)) {
+            if (okurigana.length > 0) {
+                if ((this.enhancedKunReadings.includes(furigana)) || (this.enhancedKunReadings.includes(`${furigana}${okurigana}`))) return 'kun';
+            }
+
+            const kanjiSegments = vocab.withRuby.filter(segment => {
+                return /^[\u4e00-\u9faf]+$/.test(segment.k);
+            });
+
+            if (kanjiSegments.length > 1) {
+                if (this.enhancedOnReadings.includes(furigana)) return 'on';
+
                 return 'kun';
             }
 
-            if (this.enhancedOnReadings && this.enhancedOnReadings.includes(furigana)) {
-                return 'on';
-            }
+            if (this.enhancedKunReadings.includes(furigana)) return 'kun';
 
+            if (this.enhancedOnReadings.includes(furigana)) return 'on';
 
             return 'neither';
         }
@@ -610,7 +617,7 @@
 
             this.strokeStateController = new StrokeStateController(this.strokeDataArray.length);
             this.kanjiSvgController = new KanjiSvgController('#svg-stroke-group');
-            this.tappableArea = document.querySelector('.card-container');
+            this.kanjiTappableArea = document.querySelector('.kanji-house');
             
             this.init();
         }
@@ -672,10 +679,10 @@
             }
 
 
-            if (!this.tappableArea) {
+            if (!this.kanjiTappableArea) {
                 return;
             }
-            this.tappableArea.addEventListener('click', (event) => this.handleTap(event));
+            this.kanjiTappableArea.addEventListener('click', (event) => this.handleKanjiTap(event));
 
             if (this.strokeDataArray.length > 0) {
                 this.kanjiSvgController.drawFullKanji(this.strokeDataArray);
@@ -707,14 +714,12 @@
             this.setupThemeToggle();
         }
 
-        handleTap(event) {
+        handleKanjiTap(event) {
 
-            const hitKanjiHouse = event.target.closest('.kanji-house');
-            const hitRootBackground = event.target === event.currentTarget;
-
-            if (!hitKanjiHouse && !hitRootBackground) {
+            if (event.target.closest('.readings-display-wrapper')) {
                 return;
             }
+
             if (this.strokeDataArray.length === 0) {
                 return;
             }
@@ -722,7 +727,7 @@
             this.strokeStateController.increment();
             const currentCount = this.strokeStateController.getCurrent();
             this.kanjiSvgController.updateSvg(this.strokeDataArray, currentCount);
-        } 
+        }
 
         setupThemeToggle() {
             this.themeButton = document.querySelector('#toggle-theme-button');

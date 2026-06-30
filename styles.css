@@ -2,71 +2,61 @@
 
 /* DEFAULT LIGHT THEME ── */
 :root {
-    --bg-page: #f8fafc;          
-    --bg-card: #ffffff;   
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-kanji-house: #f8fafc; /* Subtle off-white for the house area */
     --border-card: rgba(0, 0, 0, 0.06);
-    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+    /* Text & Stroke */
     --text-primary: #1a202c;
     --text-secondary: #2f385a;
     --grid-line-color: rgba(0, 0, 0, 0.12);
-    --kanji-stroke-color: black;
-    
+    --kanji-stroke-color: #000000;
 
-    /* --- VOCAB LEDGER --- */
+    /* Vocab Ledger */
     --bg-vocab-ledger: #f1f3f5;
     --text-vocab-main: #1a1a1a;
     --text-vocab-muted: #64748b;
     --border-vocab-row: #e2e8f0;
 
-    /* --- IDLE STATE --- */
-    --bg-orb:                 rgba(26, 24, 30, 0.95);    
-    --bg-orb-eerie:           rgba(38, 35, 43, 0.95);    
-    --text-orb-idle:          #827c8c;                   /* Low-key steel charcoal with a purple tint */
-    --orb-shadow-idle:        inset 0 1px 2px rgba(255, 255, 255, 0.05);
-    --orb-drop-shadow-idle:   0 0 8px rgba(0, 0, 0, 0.1);
-
-    /* --- ACTIVE STATE --- */
-    --bg-orb-active:          rgba(12, 1, 28, 0.97);     
-    --text-orb-active:        #e6d3ff;  
-    --border-orb-active:      rgba(168, 85, 247, 0.25);
-    --orb-shadow-active:      inset 0 4px 12px rgba(0, 0, 0, 0.6);
-    --orb-drop-shadow-active: 0 0 16px rgba(168, 85, 247, 0.4);
+    /* Arcane Palette (Classic) */
+    --wizard-color-1: #fdfbf7; /* Bleached Ivory Scroll Base */
+    --wizard-color-2: #1c1917; /* Charcoal Ebony Text */
+    --wizard-color-3: #e2e8f0; /* Soft Silver Filigree Framing */
+    --wizard-color-4: #881337; /* Kun-yomi: Deep Dark Rich Burgundy Red */
+    --wizard-color-5: #064e3b; /* On-yomi: Deep Dark Rich Hunter Green */
+    --wizard-color-6: #6d28d9; /* Hover: Electric Twilight Amethyst Surge */
 }
 
 /* DARK THEME SWITCHES (System, Desktop App, & AnkiDroid Combined) ── */
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg-page: #0f172a;      
-        --bg-card: #1e293b;    
-                --border-card: rgba(255, 255, 255, 0.05);
-        --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-        
+        --bg-page: #0f172a;
+        --bg-card: #1e293b;
+        --bg-kanji-house: #0f172a; /* Darker than card for contrast */
+        --border-card: rgba(255, 255, 255, 0.05);
+        --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+
+        /* Text & Stroke */
         --text-primary: #f8fafc;
         --text-secondary: #94a3b8;
         --grid-line-color: rgba(255, 255, 255, 0.15);
-        --kanji-stroke-color: white;
-        --vocab-ledger-bg: rgba(255, 255, 255, 0.04);
+        --kanji-stroke-color: #ffffff;
 
-        /* --- VOCAB LEDGER --- */
+        /* Vocab Ledger */
         --bg-vocab-ledger: #1e1e24;
         --text-vocab-main: #f8fafc;
         --text-vocab-muted: #94a3b8;
         --border-vocab-row: #334155;
 
-        /* --- IDLE STATE --- */
-        --bg-orb:                 rgba(20, 16, 28, 0.96);
-        --bg-orb-eerie:           rgba(36, 28, 50, 0.96);
-        --text-orb-idle:          #9af085;                   /* Solidified for light mode */
-        --orb-shadow-idle:        inset 0 1px 2px rgba(255, 255, 255, 0.1);
-        --orb-drop-shadow-idle:   0 0 10px rgba(74, 20, 140, 0.18);
-
-        /* --- ACTIVE STATE --- */
-        --bg-orb-active:          rgba(15, 2, 36, 0.98); 
-        --text-orb-active:        #e6d3ff;  
-        --border-orb-active:      rgba(168, 85, 247, 0.3);
-        --orb-shadow-active:      inset 0 4px 8px rgba(0, 0, 0, 0.6);
-        --orb-drop-shadow-active: 0 0 16px rgba(168, 85, 247, 0.45);
+        /* Arcane Palette (Classic) */
+        --wizard-color-1: #090b0e; /* Shadowed Obsidian Glass Base */
+        --wizard-color-2: #f3f4f6; /* Frosted Silver Linen Text */
+        --wizard-color-3: #22252a; /* Cold Cast Iron Framing */
+        --wizard-color-4: #991b1b; /* Kun-yomi: Deep Dark Rich Blood Ruby Red */
+        --wizard-color-5: #065f46; /* On-yomi: Deep Dark Rich Nocturnal Emerald Green */
+        --wizard-color-6: #8b5cf6; /* Hover: Luminous Leyline Violet Surge */
     }
 }
 
@@ -77,34 +67,29 @@ body.night_mode,
 body.card_dark {
     --bg-page: #0f172a;
     --bg-card: #1e293b;
+    --bg-kanji-house: #0f172a; /* Darker than card for contrast */
     --border-card: rgba(255, 255, 255, 0.05);
-    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-    
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+
+    /* Text & Stroke */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --grid-line-color: rgba(255, 255, 255, 0.15);
-    --kanji-stroke-color: white;
-    --vocab-ledger-bg: rgba(255, 255, 255, 0.04);
+    --kanji-stroke-color: #ffffff;
 
-    /* --- VOCAB LEDGER --- */
+    /* Vocab Ledger */
     --bg-vocab-ledger: #1e1e24;
     --text-vocab-main: #f8fafc;
     --text-vocab-muted: #94a3b8;
     --border-vocab-row: #334155;
 
-    /* --- IDLE STATE --- */
-    --bg-orb:                 rgba(20, 16, 28, 0.96);
-    --bg-orb-eerie:           rgba(36, 28, 50, 0.96);
-    --text-orb-idle:          #9af085;                   /* Solidified for light mode */
-    --orb-shadow-idle:        inset 0 1px 2px rgba(255, 255, 255, 0.1);
-    --orb-drop-shadow-idle:   0 0 10px rgba(74, 20, 140, 0.18);
-
-    /* --- ACTIVE STATE --- */
-    --bg-orb-active:          rgba(15, 2, 36, 0.98); 
-    --text-orb-active:        #e6d3ff;  
-    --border-orb-active:      rgba(168, 85, 247, 0.3);
-    --orb-shadow-active:      inset 0 4px 8px rgba(0, 0, 0, 0.6);
-    --orb-drop-shadow-active: 0 0 16px rgba(168, 85, 247, 0.45);
+    /* Arcane Palette (Classic) */
+    --wizard-color-1: #090b0e; /* Shadowed Obsidian Glass Base */
+    --wizard-color-2: #f3f4f6; /* Frosted Silver Linen Text */
+    --wizard-color-3: #22252a; /* Cold Cast Iron Framing */
+    --wizard-color-4: #991b1b; /* Kun-yomi: Deep Dark Rich Blood Ruby Red */
+    --wizard-color-5: #065f46; /* On-yomi: Deep Dark Rich Nocturnal Emerald Green */
+    --wizard-color-6: #8b5cf6; /* Hover: Luminous Leyline Violet Surge */
 }   
 
 /*** RESETS ***/
@@ -131,7 +116,7 @@ html {
     margin: 0;
     padding: 0;
 
-    background-color: var(--bg-page); 
+    background-color: var(--bg-card); 
     color: var(--text-primary);
     transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -143,8 +128,7 @@ html {
     justify-content: flex-start; 
 
     width: 100%;
-    height: 100vh;            
-    padding: 8px 5px 15px 5px;          
+    height: 100vh;                      
 }
 
 /*** WORKSPACE CONTAINERS ***/
@@ -160,18 +144,25 @@ html {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    gap: 24px;
 
     width: 100%;
     height: 100%;
-    overflow-y: auto;
-    padding: 10px;
+    padding: 15px 5px 15px 5px;
     border-radius: 10px;
-    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow-y: auto;
 
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     background-color: var(--bg-card);
     color: var(--text-primary);
-    border: 1px solid var(--border-card);
-    box-shadow: var(--shadow-card);
+
+}
+
+.kanji-neighborhood,
+.meaning-container,
+.readings-container,
+.deck-utility-footer {
+    flex: 0 0 auto;
 }
 
 @media (max-width: 480px) {
@@ -190,13 +181,11 @@ html {
 
 .kanji-neighborhood {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     gap: 16px;   
 
-    margin: 5px 0;
-    width: 100%;
-    max-width: 350px;              
+    width: 100%;           
 }
 
 /* KANJI HOUSE */
@@ -209,11 +198,12 @@ html {
     height: 150px;
     width: 150px;
 
-    background-color: var(--bg-card);
+    background-color: var(--bg-kanji-house);
     border: 1px solid var(--border-card);
     box-shadow: var(--shadow-card);
-    border-radius: 8px;
+    border-radius: 12px;
     transition: background-color 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
 }
 
 .grid-line {
@@ -235,7 +225,6 @@ html {
     justify-content: center;
     
     width: 100%;
-    margin: 22px 0 30px 0;
 }
 
 #kanji-meaning {
@@ -274,237 +263,228 @@ html {
 }
 
 /*** READINGS ***/
-.readings-container {
-    display: grid;
-    grid-template-columns: 1fr 2fr 2fr 1fr;
-    gap: 12px;
-    align-items: stretch;
- 
-    width: 100%; 
-}
 
-#onyomi-button {
-    grid-column: 4;
-    width: 100%;
-}
-
-#kunyomi-button {
-    grid-column: 1;
-    width: 100%;
-}
-
-#readings-glow-wrapper-kun {
-    grid-column: 2
-}
-
-#readings-glow-wrapper-on {
-    grid-column: 3;
-}
-
-.readings-container .reading-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+/* --- THE MINIMALIST NEEDLE & HELIX SUITE --- */
+div.kanji-neighborhood button.reading-button {
+    flex: 0 0 auto;
+    min-width: 105px;
+    height: 38px;
+    padding: 0 20px 0 28px; /* Leaner footprint */
     
-    width: max-content;
-    outline: none;
-    margin: 0px;
-    padding: 3px 3px;
+    /* Solid ledger background integration */
+    background: var(--bg-vocab-ledger);
+    border: 1px solid var(--border-card);
+    border-radius: 2px; /* Sharp, modern architectural corners */
     
-    font-family: "Georgia", serif;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-secondary);
+    
     cursor: pointer;
-
-    background-image: none;
-    background-color: transparent;
-    padding: 4px 12px;
-    border: 1px solid rgba(113, 128, 150, 0.3);
-    border-radius: 4px;
-    opacity: 0.8;
-    text-decoration: none;
-    box-shadow: none;
-    text-shadow: none;
-
-    transition: color 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
-                border-color 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
-                background-color 0.25s cubic-bezier(0.25, 1, 0.5, 1),
-                opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
-                box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1),
-                transform 0.15s ease;
+    position: relative;
+    overflow: visible; 
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-#onyomi-button,
-#kunyomi-button {
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px; 
+/* THE CARBON METALLIC NEEDLE (Ultra-Sleek Wand) */
+div.kanji-neighborhood button.reading-button::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 15%;
+    width: 2px; /* Razor thin filament profile */
+    height: 70%;
+    
+    /* Clean dual-tone: Dark matte titanium bleeding directly into dormant catalyst */
+    background: linear-gradient(to top, 
+        #1b1c1e 0%, 
+        #383a40 60%, 
+        var(--wizard-color-3) 100%
+    );
+    border-radius: 1px;
+    opacity: 0.35;
+    
+    transform-origin: center bottom;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 2;
 }
 
-.readings-container .reading-button:hover {
+/* Hover: Line responsive glow */
+div.kanji-neighborhood button.reading-button:hover::before {
+    opacity: 0.75;
+    transform: scaleY(1.02);
+}
+
+/* --- ACTIVE MINIMALIST CASTING STATES --- */
+
+/* Kun-yomi Active (Frost Filament) */
+#kunyomi-button.active {
+    color: var(--wizard-color-4);
+    border-color: var(--wizard-color-4);
+}
+#kunyomi-button.active::before {
     opacity: 1;
-    color: var(--text-primary, #ffffff);
-    border-color: rgba(168, 85, 247, 0.6);
-    background-color: rgba(168, 85, 247, 0.05);
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+    left: 11px;
+    transform: rotate(12deg); /* Sharp, precise tilt angle */
+    background: linear-gradient(to top, #1b1c1e 0%, #383a40 50%, var(--wizard-color-4) 100%);
+    box-shadow: 0 0 6px var(--wizard-color-4);
 }
 
-.readings-container .reading-button.active {
-    transform: scale(0.96);
-    background: transparent;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-    color: var(--text-primary);
-    text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+/* On-yomi Active (Scorch Filament) */
+#onyomi-button.active {
+    color: var(--wizard-color-5);
+    border-color: var(--wizard-color-5);
+}
+#onyomi-button.active::before {
+    opacity: 1;
+    left: 11px;
+    transform: rotate(12deg);
+    background: linear-gradient(to top, #1b1c1e 0%, #383a40 50%, var(--wizard-color-5) 100%);
+    box-shadow: 0 0 6px var(--wizard-color-5);
 }
 
-.readings-container .reading-button:focus,
-.readings-container .reading-button:focus-visible,
-.readings-container .reading-button:active {
-    outline: none;
-    background: transparent;
-    background-color: transparent;
-    box-shadow: none;
+/* --- THE CELESTIAL ORB (Micro Particle Node) --- */
+div.kanji-neighborhood button.reading-button::after {
+    content: "●";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    margin-top: -5px;
+    font-size: 0.45rem; /* Downsized for a modern look */
+    color: currentColor;
+    z-index: 2;
+
+    /* Instant linear snap-back retraction routing */
+    opacity: 0;
+    transform: translateX(-66px) translateY(-14px) scale(0);
+    transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.15s ease-in;
 }
+
+div.kanji-neighborhood button.reading-button.active::after {
+    opacity: 1;
+    animation: 
+        wandShootOnce 0.32s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+        sleekHighFreqLoop 1.8s ease-in-out infinite 0.32s; /* Faster cycle time */
+}
+
+/* --- STREAMLINED KINETIC TIMELINES --- */
+@keyframes wandShootOnce {
+    0% {
+        transform: translateX(-66px) translateY(-14px) scale(0);
+        filter: drop-shadow(0 0 0px currentColor);
+        opacity: 0;
+    }
+    40% {
+        transform: translateX(-66px) translateY(-14px) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(0px) translateY(3px) scale(1);
+        filter: drop-shadow(0 0 4px currentColor);
+        opacity: 1;
+    }
+}
+
+/* Sleek High-Frequency Loop: A hyper-focused, tight circular vibration */
+@keyframes sleekHighFreqLoop {
+    0%, 100% { transform: translateY(3px) translateX(0px); }
+    25% { transform: translateY(0px) translateX(-2px); }
+    50% { transform: translateY(-3px) translateX(0px); }
+    75% { transform: translateY(0px) translateX(2px); }
+}
+
+
+
+
+
 
 /* READING DISPLAY */
 
-.readings-glow-wrapper {
+.readings-display-wrapper {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2; /* Sits cleanly above the SVG (z-index: 1) */
-    
-    /* Center the reading text inside the house box */
+    z-index: 5;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Hide them by default */
+    padding: 10px;
+    box-sizing: border-box;
     opacity: 0;
-    pointer-events: none; /* Allows clicks to pass through when hidden */
-    transition: opacity 0.25s ease; /* Smooth fade animation */
+    pointer-events: none;
+    background-color: #050507;
+    background-image: 
+        radial-gradient(1px 1px at 10% 20%, #ffffff 1px, transparent 0),
+        radial-gradient(2px 2px at 30% 90%, #ffffff 1px, transparent 0),
+        radial-gradient(1px 1px at 70% 30%, #ffffff 1px, transparent 0),
+        radial-gradient(2px 2px at 90% 60%, #ffffff 1px, transparent 0),
+        radial-gradient(1px 1px at 40% 50%, #ffffff 1px, transparent 0);
+    background-size: 400px 400px;
+    animation: floatParticles 60s linear infinite;
+    transition: opacity 0.8s ease-in-out;
 }
 
-.readings-glow-wrapper.active {
-    opacity: 1;
-    pointer-events: auto; /* Reactivates interactions when visible */
+.kanji-house.is-switching .readings-display-wrapper {
+    transition: none;
 }
 
-
-.readings-glow-wrapper:has(.readings-display.active) {
-    filter: drop-shadow(var(--orb-drop-shadow-active));
+@keyframes floatParticles {
+    0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+    100% { background-position: 400px -400px, -200px -800px, 100px -600px, -400px -1000px, 200px -500px; }
 }
 
 .readings-display {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 8px;
     justify-content: center;
-    align-items: center;
+    align-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+}
 
+.readings-badge {
+    display: inline-flex;
+    white-space: nowrap;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-family: 'Cinzel', serif;
     font-size: 1rem;
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
-    padding: 3px 3px; 
-    line-height: 1;
-    
-    font-family: "Georgia", serif;
-    font-weight: 700;
-    color: var(--text-orb-idle);
-
-    background-color: var(--bg-orb);
-    background-image: linear-gradient(135deg, var(--bg-orb), var(--bg-orb-eerie));
-    background-size: 200% 200%;
-    animation: eerieMist 6s ease-in-out infinite alternate;
-
-    border: 1px solid rgba(255, 255, 255, 0.08);
-        
-    transition: color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
-    position: relative;
-    z-index: 2;
-
-    overflow: hidden;
-    mask-image: linear-gradient(to bottom, white, white);
-    -webkit-mask-image: linear-gradient(to bottom, white, white);
+    font-weight: 600;
+    background: #0a0a0c;
+    border: 1px solid #1f1f26;
+    color: #94a3b8;
+    transition: transform 0.4s ease, border-color 0.4s ease;
 }
 
-@keyframes eerieMist {
-    0% {
-        background-position: 0% 50%;
-    }
-    100% {
-        background-position: 100% 50%;
-    }
+#readings-display-wrapper-kun .readings-badge {
+    border-color: var(--wizard-color-4);
+    color: rgb(194, 194, 194);
+    box-shadow: 0 0 10px rgba(30, 58, 138, 0.3);
 }
 
-/* --- THE HARDWARE-ACCELERATED INFINITE ENGINE --- */
-.readings-display::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -30%;
-    width: 160%;
-    height: 200%; 
-    
-    background-image: 
-        /* --- TOP HALF PARTICLES (0% to 50% space) --- */
-        radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.2) 1px, transparent 2.5px),
-        radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.25) 1.5px, transparent 3px),
-        radial-gradient(circle at 45% 40%, rgba(255, 255, 255, 0.15) 1px, transparent 2.5px),
-        
-        /* --- BOTTOM HALF TWINS (50% to 100% space - exactly 50% lower) --- */
-        radial-gradient(circle at 25% 65%, rgba(255, 255, 255, 0.2) 1px, transparent 2.5px),
-        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.25) 1.5px, transparent 3px),
-        radial-gradient(circle at 45% 90%, rgba(255, 255, 255, 0.15) 1px, transparent 2.5px);
-        
-    background-size: 100% 100%;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    transform: translateY(0); 
-    transition: opacity 0.4s ease;
+#readings-display-wrapper-on .readings-badge {
+    border-color: var(--wizard-color-5);
+    color: rgb(194, 194, 194);
+    box-shadow: 0 0 10px rgba(124, 45, 18, 0.3);
 }
 
-/* --- ACTIVE STATE TRIGGER --- */
-.readings-display.active {
-    background-color: var(--bg-orb-active);
-    background-image: none;
-    color: var(--text-orb-active);
-    border-color: var(--border-orb-active);
-    transition: all 0.5s ease;
-
-    filter: drop-shadow(0 0 16px rgba(187, 134, 252, 0.4));
-}
-
-.readings-display.active::before {
+.readings-display-wrapper.active {
     opacity: 1;
-    animation: streamTransformUp 12s linear infinite; 
+    pointer-events: auto;
 }
 
-.readings-display:not(:empty) {
-    z-index: 2;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(255, 255, 255, 0.2);
-}
 
-/* --- BULLETPROOF TRANSITION KEYFRAMES --- */
-@keyframes streamTransformUp {
-    0% {
-        transform: translateY(0);
-    }
-    100% {
-        transform: translateY(-50%);
-    }
-}
+
+
+
 
 
 
@@ -512,26 +492,46 @@ html {
 
 /* --- NEW GLOBAL SECTION WRAPPER --- */
 #vocab-section {
-    width: 100%;
-    padding: 16px;
-    box-sizing: border-box;
-    /* This makes it a great spot for parent layouts or future spacing controls */
+    flex: 1 1 auto;
+    min-height: 25%;
+    width: 100%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+#vocabulary-title {
+    display: flex;
+    flex: 0 0 auto;
+
+    padding: 16px 0px 0px 24px;
+    min-width: 75%;
+    max-width: 95%;
+
+    background-color: var(--bg-vocab-ledger);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    border-bottom: 1px solid #1f1f26;
+    border-radius: 12px 12px 0px 0px;
 }
 
 /* --- VOCABULARY LEDGER CONTAINER --- */
 #vocab-ledger {
-    background-color: var(--bg-vocab-ledger);
-    border-radius: 12px;
-    padding: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    max-width: 600px;
-    margin: 0 auto;
-    transition: background-color 0.3s ease;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;  
 
-    /* --- THE SCROLL ENGINE --- */
-    max-height: 70vh;         /* Sets the boundary limit. Adjust this pixel height as you like! */
-    overflow-y: auto;          /* 'auto' only shows the scrollbar if the content actually overflows */
-    scrollbar-gutter: stable;  /* Prevents layout shift when content grows long */
+    padding: 0px 24px;
+    min-width: 75%;
+    max-width: 95%;
+    min-height: 0;
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.3s ease;
+    background-color: var(--bg-vocab-ledger);
+    border-radius: 0px 0px 12px 12px;
 }
 
 /* OPTIONAL: Sleek custom scrollbars to match your premium card design */
@@ -549,23 +549,25 @@ html {
     border: 2px solid var(--bg-vocab-ledger); /* Creates a nice padding effect around the track */
 }
 
-#vocabulary-title {
-    font-size: 0.85rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-vocab-main);
-    margin-bottom: 16px;
-    padding-left: 4px;
-}
-
 /* --- LEDGER ENTRIES (ROWS) --- */
 .vocab-entry {
     display: flex;
     align-items: center;
-    padding: 16px 4px;
+    padding: 16px 0px;
     border-bottom: 1px solid var(--border-vocab-row);
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+#vocab-ledger[data-active-filter] .vocab-entry {
+    opacity: 0.25;
+}
+
+/* 3. Force the matching reading entries to stay crisp at 1.0 opacity */
+#vocab-ledger[data-active-filter="kun"] .vocab-entry[data-reading-type="kun"],
+#vocab-ledger[data-active-filter="on"] .vocab-entry[data-reading-type="on"] {
+    opacity: 1;
+    /* Optional micro-interaction: slightly scale up the active ones */
+    transform: scale(1.01); 
 }
 
 /* Remove the bottom border on the very last row */
