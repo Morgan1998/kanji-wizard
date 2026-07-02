@@ -211,14 +211,11 @@
                                                     .filter(reading => reading.length > 0);
 
             readingsArray.forEach(reading => {
-                const badgeContainerElement = document.createElement('div');
-                const readingsBadgeSpan = document.createElement('span');
-                badgeContainerElement.classList.add('readings-badge-container')
-                readingsBadgeSpan.classList.add('readings-badge');
-                readingsBadgeSpan.textContent = reading;
+                const badge = document.createElement('span');
+                badge.classList.add('readings-badge');
+                badge.textContent = reading;
 
-                badgeContainerElement.append(readingsBadgeSpan);
-                displayElement.append(badgeContainerElement);
+                displayElement.append(badge);
             })
         }
 
