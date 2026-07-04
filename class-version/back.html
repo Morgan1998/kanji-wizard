@@ -433,6 +433,7 @@
                 
                 const vocabEntryElement = document.createElement('div');
                 vocabEntryElement.classList.add('vocab-entry');
+                vocabEntryElement.classList.add(`level-${vocab.lvl}`)
 
                 const readingType = this.getReadingType(vocab);
                 vocabEntryElement.dataset.readingType = readingType;
@@ -840,50 +841,28 @@
             this.themeButton = document.querySelector('#toggle-theme-button');
             if (!this.themeButton) return;
 
-            const hasSystemNightThemeOn = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const hasAnkiNightThemeOn = () => {
-                    return document.documentElement.classList.contains('night-mode') ||
-                        document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
-                        document.body.classList.contains('nightMode') ||
-                        document.body.classList.contains('night_mode') ||
-                        document.body.classList.contains('card_dark') ||
-                        document.documentElement.classList.contains('user-night-mode');
-                };
+            const root = document.documentElement;
 
-            const savedTheme = localStorage.getItem('kanji-wizard-theme');
+            const updateState = (isDark) => {
+                // Toggle both explicitly
+                root.classList.toggle('user-night-mode', isDark);
+                root.classList.toggle('user-day-mode', !isDark);
+                
+                this.themeButton.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                localStorage.setItem('kanji-wizard-theme', isDark ? 'dark' : 'light');
+            };
 
-            let isDark;
-            if (savedTheme !== null) {
-                isDark = savedTheme === 'dark';
-            } else {
-                isDark = hasSystemNightThemeOn() || hasAnkiNightThemeOn();
-            }
+            // Initialize based on locallySavedTheme preference or system default
+            const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
+            const userSystemSetAsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            updateState(locallySavedTheme ? locallySavedTheme === 'dark' : userSystemSetAsDark);
 
-            if (isDark) {
-                document.documentElement.classList.add('user-night-mode');
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-                this.themeButton.setAttribute('data-theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('user-night-mode', 'night-mode');
-                document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
-                document.documentElement.removeAttribute('data-bs-theme');
-                this.themeButton.setAttribute('data-theme', 'light');
-            }
-
+            // Event listener
             this.themeButton.addEventListener('click', (event) => {
                 event.stopPropagation();
-                const isNightThemeNow = document.documentElement.classList.toggle('user-night-mode');
-                if (isNightThemeNow) {
-                    document.documentElement.setAttribute('data-bs-theme', 'dark');
-                    this.themeButton.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('kanji-wizard-theme', 'dark');
-                } else {
-                    document.documentElement.removeAttribute('data-bs-theme');
-                    document.documentElement.classList.remove('night-mode');
-                    document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
-                    this.themeButton.setAttribute('data-theme', 'light');
-                    localStorage.setItem('kanji-wizard-theme', 'light');
-                }
+                // Check current state and flip it
+                const switchedToDarkMode = root.classList.contains('user-day-mode');
+                updateState(switchedToDarkMode);
             });
         }
     }

@@ -1,7 +1,7 @@
 /*** THEMES ***/
 
 /* DEFAULT LIGHT THEME ── */
-:root {
+:root, :root.user-day-mode  {
     --bg-page: #f8fafc;
     --bg-card: #ffffff;
     --bg-kanji-house: #f8fafc; 
@@ -19,6 +19,7 @@
     --text-vocab-main: #1a1a1a;
     --text-vocab-muted: #64748b;
     --border-vocab-row: #e2e8f0;
+    --reveal-bg-gradient: linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0%, transparent 100%);
 
     /* Arcane Palette (Classic) */
     --wizard-color-1: #fdfbf7; /* Bleached Ivory Scroll Base */
@@ -27,44 +28,17 @@
     --wizard-color-4: #881337; /* Kun-yomi: Deep Dark Rich Burgundy Red */
     --wizard-color-5: #064e3b; /* On-yomi: Deep Dark Rich Hunter Green */
     --wizard-color-6: #6d28d9; /* Hover: Electric Twilight Amethyst Surge */
+
+    /* Jlpt Colors */
+    --n5-color: #0284c7;
+    --n4-color: #d97706;
+    --n3-color: #7c3aed;
+    --n2-color: #059669;
+    --n1-color: #dc2626;
 }
 
 /* DARK THEME SWITCHES (System, Desktop App, & AnkiDroid Combined) ── */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-page: #0f172a;
-        --bg-card: #1e293b;
-        --bg-kanji-house: #0f172a; /* Darker than card for contrast */
-        --border-card: rgba(255, 255, 255, 0.05);
-        --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-
-        /* Text & Stroke */
-        --text-primary: #f8fafc;
-        --text-secondary: #94a3b8;
-        --grid-line-color: rgba(255, 255, 255, 0.15);
-        --kanji-stroke-color: #ffffff;
-
-        /* Vocab Ledger */
-        --bg-vocab-ledger: #1e1e24;
-        --text-vocab-main: #f8fafc;
-        --text-vocab-muted: #94a3b8;
-        --border-vocab-row: #334155;
-
-        /* Arcane Palette (Classic) */
-        --wizard-color-1: #090b0e; /* Shadowed Obsidian Glass Base */
-        --wizard-color-2: #f3f4f6; /* Frosted Silver Linen Text */
-        --wizard-color-3: #22252a; /* Cold Cast Iron Framing */
-        --wizard-color-4: #991b1b; /* Kun-yomi: Deep Dark Rich Blood Ruby Red */
-        --wizard-color-5: #065f46; /* On-yomi: Deep Dark Rich Nocturnal Emerald Green */
-        --wizard-color-6: #8b5cf6; /* Hover: Luminous Leyline Violet Surge */
-    }
-}
-
-html.night-mode,
-html[data-bs-theme="dark"],
-body.nightMode,
-body.night_mode,
-body.card_dark {
+:root.user-night-mode {
     --bg-page: #0f172a;
     --bg-card: #1e293b;
     --bg-kanji-house: #0f172a; /* Darker than card for contrast */
@@ -82,6 +56,7 @@ body.card_dark {
     --text-vocab-main: #f8fafc;
     --text-vocab-muted: #94a3b8;
     --border-vocab-row: #334155;
+    --reveal-bg-gradient: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
 
     /* Arcane Palette (Classic) */
     --wizard-color-1: #090b0e; /* Shadowed Obsidian Glass Base */
@@ -90,7 +65,20 @@ body.card_dark {
     --wizard-color-4: #991b1b; /* Kun-yomi: Deep Dark Rich Blood Ruby Red */
     --wizard-color-5: #065f46; /* On-yomi: Deep Dark Rich Nocturnal Emerald Green */
     --wizard-color-6: #8b5cf6; /* Hover: Luminous Leyline Violet Surge */
-}   
+
+    /* Jlpt Colors */
+    --n5-color: #38bdf8;
+    --n4-color: #fbbf24;
+    --n3-color: #a78bfa;
+    --n2-color: #34d399;
+    --n1-color: #f87171;
+}
+
+.level-n5 { --accent-color: var(--n5-color); }
+.level-n4 { --accent-color: var(--n4-color); }
+.level-n3 { --accent-color: var(--n3-color); }
+.level-n2 { --accent-color: var(--n2-color); }
+.level-n1 { --accent-color: var(--n1-color); }
 
 /*** RESETS ***/
 html {
@@ -616,10 +604,17 @@ transition: none;
 .hat-vector {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 50%;
     z-index: 1;
+    transition: filter 0.3s ease;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+}
+
+.badge-container:hover .hat-vector {
+    filter: drop-shadow(0 0 8px currentColor);
 }
 
 .badge {
@@ -629,18 +624,18 @@ transition: none;
     font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--text-primary);
     text-align: center;
     letter-spacing: 0.5px;
     margin-top: 4px;
 }
 
 /* Badge Vector Color Mapping */
-.badge-container-n5 .hat-vector path { fill: #1fa3bf; }
-.badge-container-n4 .hat-vector path { fill: #a4c936; }
-.badge-container-n3 .hat-vector path { fill: #f6aa00; }
-.badge-container-n2 .hat-vector path { fill: #ea5514; }
-.badge-container-n1 .hat-vector path { fill: #dc001c; }
+.badge-container-n5 .hat-vector path { fill: var(--n5-color); }
+.badge-container-n4 .hat-vector path { fill: var(--n4-color); }
+.badge-container-n3 .hat-vector path { fill: var(--n3-color); }
+.badge-container-n2 .hat-vector path { fill: var(--n2-color); }
+.badge-container-n1 .hat-vector path { fill: var(--n1-color); }
 
 /* --- TEXT CONTENT WRAPPER --- */
 .vocab {
@@ -673,74 +668,7 @@ transition: none;
     font-weight: 300;
 }
 
-/* --- THE PROGRESSION ROW CONTAINER --- */
-.gem-slots {
-    position: absolute;
-    bottom: 3px; /* Suspends the row beautifully just below the main badge circle */
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 2px; /* Clean, tight spacing between the 5 sockets */
-    z-index: 3; /* Floating above the background elements safely */
-}
 
-/* --- THE BASE EMPTY SOCKET (PIT) --- */
-.slot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background-color: #cbd5e1; /* Soft empty pit gray for Day Mode */
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.4s ease, box-shadow 0.4s ease;
-}
-
-/* Night Mode adjustment for empty sockets */
-:root.user-night-mode .slot {
-    background-color: #334155; /* Deep dark empty track pit */
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
-}
-
-/* --- THE GEM IGNITION RULES --- */
-
-/* Slot 1: Ignited by N5, N4, N3, N2, N1 */
-.badge-container-n5 .slot-1, 
-.badge-container-n4 .slot-1, 
-.badge-container-n3 .slot-1, 
-.badge-container-n2 .slot-1, 
-.badge-container-n1 .slot-1 {
-    background: radial-gradient(circle at 30% 30%, #e0f7fa, #1fa3bf);
-    box-shadow: 0 1px 3px rgba(31, 163, 191, 0.6);
-}
-
-/* Slot 2: Ignited by N4, N3, N2, N1 */
-.badge-container-n4 .slot-2, 
-.badge-container-n3 .slot-2, 
-.badge-container-n2 .slot-2, 
-.badge-container-n1 .slot-2 {
-    background: radial-gradient(circle at 30% 30%, #f1f8e9, #a4c936);
-    box-shadow: 0 1px 3px rgba(164, 201, 54, 0.6);
-}
-
-/* Slot 3: Ignited by N3, N2, N1 */
-.badge-container-n3 .slot-3, 
-.badge-container-n2 .slot-3, 
-.badge-container-n1 .slot-3 {
-    background: radial-gradient(circle at 30% 30%, #fff8e1, #f6aa00);
-    box-shadow: 0 1px 3px rgba(246, 170, 0, 0.6);
-}
-
-/* Slot 4: Ignited by N2, N1 */
-.badge-container-n2 .slot-4, 
-.badge-container-n1 .slot-4 {
-    background: radial-gradient(circle at 30% 30%, #fbe9e7, #ea5514);
-    box-shadow: 0 1px 3px rgba(234, 85, 20, 0.6);
-}
-
-/* Slot 5: Ignited ONLY by N1 */
-.badge-container-n1 .slot-5 {
-    background: radial-gradient(circle at 30% 30%, #ffebee, #dc001c);
-    box-shadow: 0 1px 3px rgba(220, 0, 28, 0.6);
-}
 
 /*** UTILITY FOOTER ***/
 
@@ -927,19 +855,44 @@ transition: none;
 
 
 .vocab-entry.active-reveal {
-    /* Gold-tinted glow */
-    background: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
-    border: 1px solid rgba(255, 215, 0, 0.5);
+    /* Existing logic */
+    background: linear-gradient(
+        90deg, 
+        color-mix(in srgb, var(--accent-color), transparent 90%), 
+        transparent 100%
+    );
+    border: 1px solid var(--accent-color);
     
-    /* A subtle 'breathing' pulse effect */
-    animation: pulse-aura 2s infinite ease-in-out;
+    /* NEW: Softened edges */
+    border-radius: 8px; 
     
-    /* Slight expansion to indicate focus */
-    transform: scale(1.01);
+    transform: scale(1.005);
+    position: relative;
 }
 
-@keyframes pulse-aura {
-    0% { box-shadow: 0 0 0px rgba(255, 215, 0, 0); }
-    50% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
-    100% { box-shadow: 0 0 0px rgba(255, 215, 0, 0); }
+/* Updated brackets to accommodate the radius */
+.vocab-entry.active-reveal::before,
+.vocab-entry.active-reveal::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid var(--accent-color);
+    border-radius: 2px; /* Slight roundness on the brackets themselves */
+}
+
+.vocab-entry.active-reveal::before {
+    top: -3px;
+    left: -3px;
+    border-right: none;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+}
+
+.vocab-entry.active-reveal::after {
+    bottom: -3px;
+    right: -3px;
+    border-top: none;
+    border-left: none;
+    border-bottom-right-radius: 8px;
 }
