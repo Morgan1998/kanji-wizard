@@ -35,6 +35,9 @@
             <button id="toggle-theme-button" aria-label="Toggle theme"></button>
         </footer>
     </div>
+    <div id="kanji-sigil" class="sigil" data-type="stroke-advancer">
+    <span class="icon"></span>
+    </div>
 </div>
 
 <div id="kanji" class="hidden">{{kanji}}</div>
@@ -51,6 +54,108 @@
     const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
     const DOM_PARSER = new DOMParser();
+
+    class SigilController {
+        sigil = null;
+        isDragging = null;
+        constructor(sigilElement, sigilType) {
+            this.sigil = document.querySelector(sigilElement);
+            this.sigilType = sigilType;
+            this.isDragging = false;
+
+            this.startXCoordinate = 0;
+            this.startYCoordinate = 0;
+            this.hasMoved = false;
+
+            this.currentIndex = 0;
+            this.init();
+        }
+
+        init() {
+            this.loadPosition();
+            this.setupListeners();
+        }
+
+        loadPosition() {
+            const xCoordinate = localStorage.getItem(`${this.sigilType}-sigil-x-coordinate`);
+            const yCoordinate = localStorage.getItem(`${this.sigilType}-sigil-y-coordinate`);
+            if (xCoordinate && yCoordinate) {
+                this.sigil.style.left = xCoordinate;
+                this.sigil.style.top = yCoordinate;
+                this.sigil.style.bottom = 'auto';
+                this.sigil.style.right = 'auto';
+            }
+        }
+
+        revealNextVocabSegment() {
+            const entries = document.querySelectorAll('.vocab-entry');
+            if (this.currentIndex >= entries.length) {
+                entries[this.currentIndex - 1].classList.remove('active-reveal');
+                return;
+            }
+
+            if (this.currentIndex > 0) {
+                entries[this.currentIndex - 1].classList.remove('active-reveal');
+            }
+            
+            const currentEntry = entries[this.currentIndex];
+
+            const allFurigana = currentEntry.querySelectorAll('.furigana');
+
+            const hiddenFurigana = Array.from(allFurigana).find(furigana => furigana.classList.contains('is-hidden'));
+
+            if (hiddenFurigana) {
+                hiddenFurigana.classList.remove('is-hidden');
+                currentEntry.classList.add('active-reveal');
+            } else {
+                const english = currentEntry.querySelector('.vocab-english');
+                if (english && english.classList.contains('is-hidden')) {
+                    english.classList.remove('is-hidden');
+                    this.currentIndex++;
+                }
+            }
+        }
+
+        setupListeners() {
+            this.sigil.addEventListener('pointerdown', (event) => {
+                this.isDragging = true;
+                this.hasMoved = false;
+                this.startXCoordinate = event.clientX;
+                this.startYCoordinate = event.clientY;
+                this.sigil.setPointerCapture(event.pointerId);
+            });
+
+            this.sigil.addEventListener('click', (event) => {
+                if (this.hasMoved) return;
+                if (this.sigilType === 'vocab') {
+                    this.revealNextVocabSegment();
+                }
+            });
+
+            window.addEventListener('pointermove', (event) => {
+                if (!this.isDragging) return;
+
+                if (Math.abs(event.clientX - this.startXCoordinate) > 5 || Math.abs(event.clientY - this.startYCoordinate) > 5) {
+                    this.hasMoved = true;
+                }
+                const xCoordinate = event.clientX - (this.sigil.offsetWidth / 2);
+                const yCoordinate = event.clientY - (this.sigil.offsetHeight / 2);
+
+                console.log(`Dragging to: ${xCoordinate}, ${yCoordinate}`);
+
+                this.sigil.style.left = xCoordinate + 'px';
+                this.sigil.style.top = yCoordinate + 'px';
+            });
+
+            window.addEventListener('pointerup', () => {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    localStorage.setItem(`${this.sigilType}-sigil-x-coordinate`, this.sigil.style.left);
+                    localStorage.setItem(`${this.sigilType}-sigil-y-coordinate`, this.sigil.style.top);
+                }
+            });
+        }
+    }
 
     class LinkInstallationService {
         targetLinkElement = null;
@@ -623,6 +728,8 @@
         }
 
         init() {
+
+            new SigilController('#kanji-sigil', 'vocab');
 
             new VocabLedgerService({
                 vocabDataElement: '#vocab-data',
