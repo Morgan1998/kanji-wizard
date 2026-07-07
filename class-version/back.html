@@ -87,6 +87,23 @@
             }
         }
 
+
+
+        updateSigilColor() {
+            const activeEntry = this.getActiveVocabEntry();
+            if (!activeEntry) return;
+
+            const style = getComputedStyle(activeEntry);
+            const color = style.getPropertyValue('--accent-color');
+
+            this.sigil.style.setProperty('--accent-color', color);
+        }
+
+        getActiveVocabEntry() {
+            return document.querySelector('.vocab-entry.active-reveal');
+        }
+
+
         revealNextVocabSegment() {
             const entries = document.querySelectorAll('.vocab-entry');
             if (this.currentIndex >= entries.length) {
@@ -129,6 +146,7 @@
                 if (this.hasMoved) return;
                 if (this.sigilType === 'vocab') {
                     this.revealNextVocabSegment();
+                    this.updateSigilColor();
                 }
             });
 
