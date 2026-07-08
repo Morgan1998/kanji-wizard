@@ -33,6 +33,7 @@
             <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
             <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
             <button id="toggle-theme-button" aria-label="Toggle theme"></button>
+            <div id="sigil-dock" class="sigil-dock"></div>
         </footer>
     </div>
     <div id="kanji-sigil" class="sigil" data-type="stroke-advancer">
@@ -70,24 +71,6 @@
             this.currentIndex = 0;
             this.init();
         }
-
-        init() {
-            this.loadPosition();
-            this.setupListeners();
-        }
-
-        loadPosition() {
-            const xCoordinate = localStorage.getItem(`${this.sigilType}-sigil-x-coordinate`);
-            const yCoordinate = localStorage.getItem(`${this.sigilType}-sigil-y-coordinate`);
-            if (xCoordinate && yCoordinate) {
-                this.sigil.style.left = xCoordinate;
-                this.sigil.style.top = yCoordinate;
-                this.sigil.style.bottom = 'auto';
-                this.sigil.style.right = 'auto';
-            }
-        }
-
-
 
         updateSigilColor() {
             const activeEntry = this.getActiveVocabEntry();
@@ -133,13 +116,136 @@
             }
         }
 
+        dockSigil() {
+            const dock = document.querySelector('#sigil-dock');
+            const workspace = document.querySelector('.deck-workspace');
+            const dockRect = dock.getBoundingClientRect();
+            const workspaceRect = workspace.getBoundingClientRect();
+            const targetX = dockRect.left - workspaceRect.left + (dockRect.width / 2) - (this.sigil.offsetWidth / 2);
+            const targetY = dockRect.top - workspaceRect.top + (dockRect.height / 2) - (this.sigil.offsetHeight / 2);
+
+            this.sigil.style.left = `${targetX}px`;
+            this.sigil.style.top = `${targetY}px`;
+
+            setTimeout(() => {
+                this.sigil.classList.add('hidden-in-dock');
+            }, 10);
+
+            localStorage.setItem(`${this.sigilType}-sigil-docked`, 'true');
+        }
+
+        undockSigil() {
+            const workspace = document.querySelector('.deck-workspace');
+            const dock = document.querySelector('#sigil-dock');
+            const dockRect = dock.getBoundingClientRect();
+            const workspaceRect = workspace.getBoundingClientRect();
+
+            this.sigil.classList.add('is-animating'); 
+            workspace.appendChild(this.sigil);
+
+            const startX = dockRect.left - workspaceRect.left;
+            const startY = dockRect.top - workspaceRect.top;
+            
+            this.sigil.style.left = `${startX}px`;
+            this.sigil.style.top = `${startY}px`;
+
+            this.sigil.offsetHeight; 
+
+            this.sigil.classList.remove('hidden-in-dock');
+            this.sigil.style.top = `${startY - 80}px`; 
+
+            localStorage.setItem(`${this.sigilType}-sigil-docked`, 'false');
+
+            setTimeout(() => this.sigil.classList.remove('is-animating'), 400);
+        }
+
+        loadPosition() {
+            const xCoordinate = localStorage.getItem(`${this.sigilType}-sigil-x-coordinate`);
+            const yCoordinate = localStorage.getItem(`${this.sigilType}-sigil-y-coordinate`);
+            if (xCoordinate && yCoordinate) {
+                this.sigil.style.left = xCoordinate;
+                this.sigil.style.top = yCoordinate;
+                this.sigil.style.bottom = 'auto';
+                this.sigil.style.right = 'auto';
+            }
+        }
+
         setupListeners() {
+            const workspace = document.querySelector('.deck-workspace');
+            const sigilDock = document.querySelector('#sigil-dock');
+
+            sigilDock.addEventListener('click', (event) => {
+                event.stopPropagation();
+                
+                if (this.sigil.classList.contains('hidden-in-dock')) {
+                    this.undockSigil(); // Spit it out
+                } else {
+                    this.dockSigil();
+                }
+            });
+
             this.sigil.addEventListener('pointerdown', (event) => {
+                this.sigil.classList.remove('is-animating');
                 this.isDragging = true;
                 this.hasMoved = false;
                 this.startXCoordinate = event.clientX;
                 this.startYCoordinate = event.clientY;
+
+                const sigilRectangle = this.sigil.getBoundingClientRect();
+                const workspaceRectangle = workspace.getBoundingClientRect();
+
+                this.grabOffsetX = event.clientX - sigilRectangle.left;
+                this.grabOffsetY = event.clientY - sigilRectangle.top;
+
                 this.sigil.setPointerCapture(event.pointerId);
+
+                const onPointerMove = (moveEvent) => {
+                    if (!this.isDragging) return;
+
+                    if (Math.abs(moveEvent.clientX - this.startXCoordinate) > 5 || Math.abs(moveEvent.clientY - this.startYCoordinate) > 5) {
+                        this.hasMoved = true;
+                    }
+
+                    requestAnimationFrame(() => {
+                        const currentWorkspaceRectangle = workspace.getBoundingClientRect();
+
+                        let newX = moveEvent.clientX - currentWorkspaceRectangle.left - this.grabOffsetX;
+                        let newY = moveEvent.clientY - currentWorkspaceRectangle.top - this.grabOffsetY;
+
+                        const maximumX = currentWorkspaceRectangle.width - this.sigil.offsetWidth;
+                        const maximumY = currentWorkspaceRectangle.height - this.sigil.offsetHeight;
+
+                        this.sigil.style.left = Math.max(0, Math.min(newX, maximumX)) + 'px';
+                        this.sigil.style.top = Math.max(0, Math.min(newY, maximumY)) + 'px';
+                    });
+                };
+
+                const onPointerUp = () => {
+                    const dock = document.querySelector('#sigil-dock');
+                    const sigilRect = this.sigil.getBoundingClientRect();
+                    const dockRect = dock.getBoundingClientRect();
+
+                    const isOverDock = !(sigilRect.right < dockRect.left || 
+                    sigilRect.left > dockRect.right || 
+                    sigilRect.bottom < dockRect.top || 
+                    sigilRect.top > dockRect.bottom);
+
+                    if (this.isDragging) {
+                        this.isDragging = false;
+                        this.sigil.classList.add('is-animating')
+                        if (isOverDock) {
+                            this.dockSigil();
+                        } else {
+                            localStorage.setItem(`${this.sigilType}-sigil-x-coordinate`, this.sigil.style.left);
+                            localStorage.setItem(`${this.sigilType}-sigil-y-coordinate`, this.sigil.style.top);
+                        }
+                    }
+                    window.removeEventListener('pointermove', onPointerMove);
+                    window.removeEventListener('pointerup', onPointerUp);
+                };
+
+                window.addEventListener('pointermove', onPointerMove);
+                window.addEventListener('pointerup', onPointerUp);
             });
 
             this.sigil.addEventListener('click', (event) => {
@@ -149,29 +255,24 @@
                     this.updateSigilColor();
                 }
             });
+        }
 
-            window.addEventListener('pointermove', (event) => {
-                if (!this.isDragging) return;
+        restoreState() {
+            const isDocked = localStorage.getItem(`${this.sigilType}-sigil-docked`) === 'true';
+            const dock = document.querySelector('#sigil-dock');
 
-                if (Math.abs(event.clientX - this.startXCoordinate) > 5 || Math.abs(event.clientY - this.startYCoordinate) > 5) {
-                    this.hasMoved = true;
-                }
-                const xCoordinate = event.clientX - (this.sigil.offsetWidth / 2);
-                const yCoordinate = event.clientY - (this.sigil.offsetHeight / 2);
+            if (isDocked && dock) {
+                this.sigil.classList.add('hidden-in-dock');
+                dock.appendChild(this.sigil);
+            } else {
+                this.loadPosition();
+            }
+        }
 
-                console.log(`Dragging to: ${xCoordinate}, ${yCoordinate}`);
-
-                this.sigil.style.left = xCoordinate + 'px';
-                this.sigil.style.top = yCoordinate + 'px';
-            });
-
-            window.addEventListener('pointerup', () => {
-                if (this.isDragging) {
-                    this.isDragging = false;
-                    localStorage.setItem(`${this.sigilType}-sigil-x-coordinate`, this.sigil.style.left);
-                    localStorage.setItem(`${this.sigilType}-sigil-y-coordinate`, this.sigil.style.top);
-                }
-            });
+        init() {
+            this.sigil.classList.add('is-animating');
+            this.restoreState();
+            this.setupListeners();
         }
     }
 

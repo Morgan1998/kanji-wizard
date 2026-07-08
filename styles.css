@@ -1,10 +1,13 @@
 /*** THEMES ***/
 
+
 /* DEFAULT LIGHT THEME ── */
-:root, :root.user-day-mode  {
+
+:root, :root.user-day-mode {
+    --bg: white;
     --bg-page: #f8fafc;
     --bg-card: #ffffff;
-    --bg-kanji-house: #f8fafc; 
+    --bg-kanji-house: #f8fafc;
     --border-card: rgba(0, 0, 0, 0.06);
     --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 
@@ -21,6 +24,8 @@
     --border-vocab-row: #e2e8f0;
     --reveal-bg-gradient: linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0%, transparent 100%);
 
+
+
     /* Arcane Palette (Classic) */
     --wizard-color-1: #fdfbf7; /* Bleached Ivory Scroll Base */
     --wizard-color-2: #1c1917; /* Charcoal Ebony Text */
@@ -29,16 +34,35 @@
     --wizard-color-5: #064e3b; /* On-yomi: Deep Dark Rich Hunter Green */
     --wizard-color-6: #6d28d9; /* Hover: Electric Twilight Amethyst Surge */
 
+
+
     /* Jlpt Colors */
     --n5-color: #0284c7;
     --n4-color: #d97706;
     --n3-color: #7c3aed;
     --n2-color: #059669;
     --n1-color: #dc2626;
-}
+
+    /* Sigil Dock */
+    --dock-bg: rgba(240, 240, 245, 0.8);
+    --dock-border: rgba(0, 0, 0, 0.1);
+    --dock-glow: #0077ff;
+    --dock-shadow: rgba(0, 0, 0, 0.1);
+    --accent-color: #0077ff;
+
+
+
+
+    /* Drawing Canvas */
+    --canvas-bg: rgba(245, 245, 245, 0.8);
+    --canvas-grid: rgba(0, 0, 0, 0.1);
+    --canvas-stroke: #333333;
+    --ink-color: #2d3436;
+} 
 
 /* DARK THEME SWITCHES (System, Desktop App, & AnkiDroid Combined) ── */
 :root.user-night-mode {
+    --bg: black;
     --bg-page: #0f172a;
     --bg-card: #1e293b;
     --bg-kanji-house: #0f172a; /* Darker than card for contrast */
@@ -72,6 +96,22 @@
     --n3-color: #a78bfa;
     --n2-color: #34d399;
     --n1-color: #f87171;
+
+        /* Sigil Dock */
+    --dock-bg: rgba(10, 10, 15, 0.8);
+    --dock-border: rgba(255, 255, 255, 0.15);
+    --dock-glow: var(--accent-color);
+    --dock-shadow: rgba(0, 0, 0, 0.5);
+    --accent-color: #00f2ff;
+
+
+
+
+    /* Drawing Canvas */
+    --canvas-bg: rgba(20, 20, 25, 0.6);
+    --canvas-grid: rgba(255, 255, 255, 0.08);
+    --canvas-stroke: #ffffff;
+    --ink-color: #ffffff;
 }
 
 .level-n5 { --accent-color: var(--n5-color); }
@@ -104,7 +144,7 @@ html {
     margin: 0;
     padding: 0;
 
-    background-color: var(--bg-card); 
+    background-color: var(--bg); 
     color: var(--text-primary);
     transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -258,7 +298,7 @@ html {
 
 /* --- THE ARCHITECTURAL LEDGER SUITE (STATIC) --- */
 div.kanji-neighborhood button.reading-button {
-    flex: 0 0 auto;
+    flex: 0, 0, auto;
     min-width: 105px;
     height: 38px;
     padding: 0 20px;
@@ -287,7 +327,8 @@ div.kanji-neighborhood button.reading-button::before {
     top: 25%;
     width: 2px;
     height: 50%;
-    background: var(--wizard-color-3);
+    /* Using a standard theme variable for the inactive state */
+    background: var(--text-secondary);
     border-radius: 1px;
     opacity: 0.3;
 }
@@ -298,12 +339,12 @@ div.kanji-neighborhood button.reading-button::after {
     position: absolute;
     right: 12px;
     font-size: 0.45rem;
-    color: transparent; /* Hidden by default */
+    color: transparent; 
 }
 
 /* --- ACTIVE STATIC STATES --- */
 
-/* Kun-yomi Active */
+/* Kun-yomi Active - Tied to Wizard Color 4 */
 #kunyomi-button.active {
     color: var(--wizard-color-4);
     border-color: var(--wizard-color-4);
@@ -313,7 +354,7 @@ div.kanji-neighborhood button.reading-button::after {
     opacity: 1;
 }
 
-/* On-yomi Active */
+/* On-yomi Active - Tied to Wizard Color 5 */
 #onyomi-button.active {
     color: var(--wizard-color-5);
     border-color: var(--wizard-color-5);
@@ -323,7 +364,7 @@ div.kanji-neighborhood button.reading-button::after {
     opacity: 1;
 }
 
-/* Active Dot Reveal */
+/* Active Dot Reveal - Inherits the color of the active button */
 div.kanji-neighborhood button.reading-button.active::after {
     color: currentColor;
 }
@@ -523,7 +564,7 @@ transition: none;
     flex: 0 0 auto;
 
     padding: 16px 0px 0px 24px;
-    width: 85%;
+    width: 95%;
 
     background-color: var(--bg-card);
     font-family: 'Cinzel', serif;
@@ -538,8 +579,8 @@ transition: none;
     scrollbar-width: thin;
     scrollbar-gutter: stable;  
 
-    padding: 0px 24px;
-    width: 85%;
+    padding: 2px 24px;
+    width: 95%;
     min-height: 0;
 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -567,10 +608,59 @@ transition: none;
 .vocab-entry {
     display: flex;
     align-items: center;
-    padding: 3px 0px;
-    transition: border-color 0.3s ease, opacity 0.2s ease, transform 0.2s ease, background-color 0.4s ease;
-    border-bottom: 2px solid var(--bg-vocab-ledger);
+    position: relative;
+    z-index: 10; 
+    overflow: hidden;
+
+    margin: 8px 0; 
+    padding: 8px;
+
+    background: color-mix(in srgb, var(--accent-color), transparent 97%);
+    color: #fff;
+    border: 1px solid color-mix(in srgb, var(--accent-color), white 20%);
+    border-bottom: 1px solid color-mix(in srgb, var(--accent-color), white 20%);
+    border-radius: 20px; 
+
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.4s ease, 
+                margin 0.4s ease,
+                border-color 0.3s ease, 
+                opacity 0.2s ease, 
+                background-color 0.4s ease;
 }
+
+
+
+
+
+.vocab-entry.active-reveal {
+  border: 1px solid var(--accent-color);
+  background: linear-gradient(90deg, rgba(var(--accent-color-rgb), 0.08) 0%, transparent 100%);
+  box-shadow: inset 2px 0 0 var(--accent-color), 0 0 20px rgba(var(--accent-color-rgb), 0.1);
+  transform: translateX(4px);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vocab-entry.active-reveal::before {
+  content: "◈";
+  position: absolute;
+  left: -18px;
+  color: var(--accent-color);
+  font-size: 0.8rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+
+
+
+
+
+
 
 #vocab-ledger[data-active-filter] .vocab-entry {
     opacity: 0.25;
@@ -583,12 +673,6 @@ transition: none;
     /* Optional micro-interaction: slightly scale up the active ones */
     transform: scale(1.01); 
 }
-
-/* Remove the bottom border on the very last row */
-.vocab-entry:last-child {
-    border-bottom: none;
-}
-
 /* --- THE BADGE & SVG CONTAINER --- */
 .badge-container {
     position: relative;
@@ -646,6 +730,7 @@ transition: none;
 }
 
 .vocab-japanese {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: baseline;
     font-size: 1.6rem;
@@ -675,6 +760,7 @@ transition: none;
 .deck-utility-footer {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 24px;  
 
     width: 100%;            
@@ -778,43 +864,55 @@ transition: none;
 
 
 
-
+/*** SIGIL ***/
 
 .sigil {
-    position: fixed;
-    top: 50px;
-    right: 50px;
-    z-index: 9999;
-    
+    position: absolute;
     width: 70px;
     height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
     cursor: grab;
     touch-action: none;
     user-select: none;
-    
-    /* Core Glass */
     background: rgba(10, 10, 15, 0.8);
     backdrop-filter: blur(8px);
-    border-radius: 50%;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform, left, top;
+    z-index: 999;
+    contain: layout;
 }
 
-/* Layer 1: The Outer Mechanical Ring */
+.sigil.is-animating {
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+                opacity 0.4s ease, 
+                left 0.4s ease-in-out, 
+                top 0.4s ease-in-out;
+}
+
+.sigil:hover {
+    transform: scale(1.15) rotate(90deg);
+}
+
+.sigil.hidden-in-dock {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg); /* Shrinks to a point and spins */
+    pointer-events: none;
+}
+
 .sigil::before {
     content: '';
     position: absolute;
     inset: -6px;
     border-radius: 50%;
     border: 2px solid transparent;
-    border-top: 2px solid #00f2ff;
-    border-bottom: 2px solid #00f2ff;
-    animation: spin-slow 30s linear infinite;
+    border-top: 2px solid var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    animation: spin-slow 40s linear infinite;
 }
 
-/* Layer 2: The Inner Stabilizer */
+
 .sigil::after {
     content: '';
     position: absolute;
@@ -824,14 +922,14 @@ transition: none;
     animation: spin-reverse 30s linear infinite;
 }
 
-/* The Core "Energy" point */
+
 .sigil-core {
     width: 20px;
     height: 20px;
     background: #00f2ff;
     border-radius: 50%;
     filter: blur(6px);
-    animation: pulse-core 20s infinite ease-in-out;
+    animation: pulse-core 30s infinite ease-in-out;
 }
 
 @keyframes spin-slow {
@@ -849,50 +947,52 @@ transition: none;
     50% { transform: scale(1.5); opacity: 1; }
 }
 
-.sigil:hover {
-    transform: scale(1.15) rotate(90deg);
-}
-
-
-.vocab-entry.active-reveal {
-    /* Existing logic */
-    background: linear-gradient(
-        90deg, 
-        color-mix(in srgb, var(--accent-color), transparent 90%), 
-        transparent 100%
-    );
-    border: 1px solid var(--accent-color);
-    
-    /* NEW: Softened edges */
-    border-radius: 8px; 
-    
-    transform: scale(1.005);
+.sigil-dock {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dock-bg);
+    backdrop-filter: blur(8px);
+    border: 2px solid var(--dock-border);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy feel */
     position: relative;
+    box-shadow: 0 0 0 0 transparent; 
 }
 
-/* Updated brackets to accommodate the radius */
-.vocab-entry.active-reveal::before,
-.vocab-entry.active-reveal::after {
+
+.sigil-dock::after {
     content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border: 2px solid var(--accent-color);
-    border-radius: 2px; /* Slight roundness on the brackets themselves */
+    width: 6px;
+    height: 6px;
+    background: var(--dock-border);
+    border-radius: 50%;
+    transition: all 0.3s;
 }
 
-.vocab-entry.active-reveal::before {
-    top: -3px;
-    left: -3px;
-    border-right: none;
-    border-bottom: none;
-    border-top-left-radius: 8px;
+
+.sigil-dock:active,
+.sigil-dock:has(.hidden-in-dock) {
+    border-color: var(--dock-accent);
+    box-shadow: 0 0 10px var(--dock-glow);
+    transform: scale(1.05);
 }
 
-.vocab-entry.active-reveal::after {
-    bottom: -3px;
-    right: -3px;
-    border-top: none;
-    border-left: none;
-    border-bottom-right-radius: 8px;
+.sigil-dock:has(.hidden-in-dock)::after {
+    background: var(--dock-accent);
+    transform: scale(2);
 }
+
+@media (hover: hover) {
+    .sigil-dock:hover {
+        border-color: var(--dock-accent);
+        box-shadow: 0 0 15px var(--dock-glow);
+        transform: scale(1.1);
+    }
+}
+
+
+
