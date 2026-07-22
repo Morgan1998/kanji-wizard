@@ -12,7 +12,7 @@ export interface KanjiEntry {
   reading: string;
   pos: string;
   frequencyRank: number;
-  definition: string;
+  definitions: string[];
   components: WordComponent[];
   radicals: string[];
   tags: string[];

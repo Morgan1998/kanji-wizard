@@ -250,6 +250,8 @@ html {
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
+
+    transition: stroke-dashoffset 0.4s ease-in-out, stroke 0.3s ease;
 }
 
 .meaning-container {
@@ -859,6 +861,7 @@ transition: none;
 .is-hidden {
     visibility: hidden;
     opacity: 0;
+    pointer-events: none;
 }
 
 
@@ -996,3 +999,57 @@ transition: none;
 
 
 
+
+
+
+
+
+
+
+
+.kanji-stroke {
+    --stroke-color: #000000;
+    stroke: var(--stroke-color);
+}
+
+.show-colors [kvg\:radical="general"] .kanji-stroke {
+    --stroke-color: #ff4757; /* Red */
+}
+
+.show-colors .element-color-1 .kanji-stroke {
+    --stroke-color: #1e90ff; /* Blue */
+}
+
+.show-colors .element-color-2 .kanji-stroke {
+    --stroke-color: #2ed573; /* Green */
+}
+
+.show-colors .element-color-3 .kanji-stroke {
+    --stroke-color: #ffa502; /* Yellow */
+}
+
+
+
+
+/* Base tool button styling */
+.kanji-tool-button {
+    background-color: #f1f2f6; /* Default gray */
+    color: #2f3542;
+    border: 1px solid #ced6e0;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover state */
+.kanji-tool-button:hover {
+    background-color: #e4e7eb;
+}
+
+/* Active/On state (No !important needed) */
+.kanji-tool-button.active {
+    background-color: #2ed573; /* Neon green to show it is active */
+    border-color: #26af5f;
+    color: #ffffff;
+}

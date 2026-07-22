@@ -15,46 +15,93 @@
     </div>
 </div>
 
-<div id="kanji" class="hidden">{{kanji}}</div>
-<div id="stroke-data" class="hidden">{{stroke-data}}</div>
+<div id="json-container" class="hidden">{{json}}</div>
 
 <script>
 (() => {
 
-class StrokeDataParser {
-    static parse(rawStrokeString) {
-        if (!rawStrokeString) return [];
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(rawStrokeString, 'text/html');
-        const pathsNodeList = doc.querySelectorAll('path');
-        return Array.from(pathsNodeList).map(path => path.getAttribute('d')).filter(Boolean);
+class DataLoader {
+    /**
+     * @param {string} 
+     */
+    constructor(elementId = 'json-container') {
+        this.elementId = elementId;
+        this.data = this.#init();
+    }
+
+    #init() {
+        const element = document.getElementById(this.elementId);
+        
+        if (!element || !element.textContent.trim()) {
+            console.error(`Kanji Wizard Error: #${this.elementId} not found or empty.`);
+            return null;
+        }
+
+        try {
+            return JSON.parse(element.textContent);
+        } catch (err) {
+            console.error("Kanji Wizard Error: Failed to parse JSON data.", err);
+            return null;
+        }
+    }
+
+    isValid() {
+        return this.data !== null;
     }
 }
 
 class FrontCardApp {
     constructor() {
-        const strokeDataHolder = document.querySelector('#stroke-data');
-        const svgStrokeGroup = document.querySelector('#svg-stroke-group');
-        
-        if (!strokeDataHolder || !svgStrokeGroup) return;
+        const loader = new DataLoader('json-container');
+        if (!loader.isValid()) {
+            console.log('JSON container not accessed properly');
+            return;
+        }
 
-        const rawStrokeString = strokeDataHolder.innerHTML;
-        const strokeDataArray = StrokeDataParser.parse(rawStrokeString);
+        this.kanjiData = loader.data;
 
-        svgStrokeGroup.replaceChildren();
-
-        strokeDataArray.forEach(strokePath => {
-            const pathNode = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            pathNode.setAttribute('d', strokePath);
-            pathNode.classList.add('kanji-stroke'); // Applies your master stroke CSS thickness/color
-            svgStrokeGroup.append(pathNode);
-        });
-
-        this.init();
+        this.#init();
     }
 
-    init() {
+    #init() {
         this.setupThemeToggle();
+        this.renderStrokes();
+    }
+
+    renderStrokes() {
+        const strokeGroup = document.getElementById('svg-stroke-group');
+        if (!strokeGroup || !this.kanjiData.svg) return;
+
+        // Helper: Recursively traverse the nested JSON
+        const traverse = (node) => {
+            // 1. Check for paths
+            if (node.path) {
+                const paths = Array.isArray(node.path) ? node.path : [node.path];
+                
+                for (const p of paths) {
+                    const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    
+                    // Use classList for clean style management
+                    pathEl.classList.add("kanji-stroke");
+                    pathEl.setAttribute("d", p.d);
+                    
+                    // Add the specific ID for potential future animation
+                    if (p.id) pathEl.id = p.id;
+                    
+                    strokeGroup.appendChild(pathEl);
+                }
+            }
+
+            // 2. Check for nested groups (g) and recurse
+            if (node.g) {
+                const groups = Array.isArray(node.g) ? node.g : [node.g];
+                for (const group of groups) {
+                    traverse(group);
+                }
+            }
+        };
+
+        traverse(this.kanjiData.svg);
     }
 
     setupThemeToggle() {
@@ -108,6 +155,7 @@ class FrontCardApp {
         });
     }
 }
+
 
 new FrontCardApp();
     

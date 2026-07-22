@@ -8,7 +8,7 @@
             </svg>
         </div>
         <div class="meaning-container unselectable">
-            <h2 id="kanji-meaning">{{meaning}}</h2>
+            <h2 id="kanji-meaning">Placeholder Meaning</h2>
         </div>
         <footer class="deck-utility-footer">
             <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
@@ -18,8 +18,7 @@
     </div>
 </div>
 
-<div id="kanji" class="hidden">{{kanji}}</div>
-<div id="stroke-data" class="hidden">{{stroke-data}}</div>
+<div id="json-container" class="hidden">{{json}}</div>
 
 
 <script>
@@ -28,6 +27,36 @@
     const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
     const DOM_PARSER = new DOMParser();
+
+    class DataLoader {
+        /**
+         * @param {string} 
+         */
+        constructor(elementId = 'json-container') {
+            this.elementId = elementId;
+            this.data = this.#init();
+        }
+
+        #init() {
+            const element = document.getElementById(this.elementId);
+            
+            if (!element || !element.textContent.trim()) {
+                console.error(`Kanji Wizard Error: #${this.elementId} not found or empty.`);
+                return null;
+            }
+
+            try {
+                return JSON.parse(element.textContent);
+            } catch (err) {
+                console.error("Kanji Wizard Error: Failed to parse JSON data.", err);
+                return null;
+            }
+        }
+
+        isValid() {
+            return this.data !== null;
+        }
+    }
     
     class StrokeStateManager {
         currentStroke = 0;
@@ -50,32 +79,34 @@
         }
     }
 
-    class StrokeDataParser {
+    class PathExtractor {
         /**
-         * 
-         * @param {string} rawHtmlString 
+         * Traverses the nested JSON SVG object and returns a flat array of 'd' strings.
+         * @param {Object} svgNode - The svg property from your JSON blob.
          * @returns {string[]} 
          */
-        static parse(rawHtmlString) {
-            if (!rawHtmlString || rawHtmlString.trim() === '') {
-                console.warn('StrokeDataParser: Received an empty stroke-data string.');
-                return [];
-            }
-            
-            const virtualDoc = DOM_PARSER.parseFromString(rawHtmlString, 'text/html');
+        static extract(svgNode) {
+            if (!svgNode) return [];
 
-            const pathElements = virtualDoc.querySelectorAll('path');
+            const paths = [];
 
-            const strokeDataArray = [];
-
-            for (let i = 0; i < pathElements.length; i++) {
-                const dValue = pathElements[i].getAttribute('d');
-                if (dValue) {
-                    strokeDataArray.push(dValue);
+            const traverse = (node) => {
+                // Collect path 'd' values if they exist
+                if (node.path) {
+                    const p = Array.isArray(node.path) ? node.path : [node.path];
+                    paths.push(...p.map(x => x.d));
                 }
-            }
+                // Recurse into groups
+                if (node.g) {
+                    const groups = Array.isArray(node.g) ? node.g : [node.g];
+                    for (const group of groups) {
+                        traverse(group);
+                    }
+                }
+            };
 
-            return strokeDataArray;
+            traverse(svgNode);
+            return paths;
         }
     }
 
@@ -149,10 +180,11 @@
         tappableArea = null;
 
         constructor() {
-            const strokeDataHolder = document.querySelector('#stroke-data');
-            const rawStrokeString = strokeDataHolder ? strokeDataHolder.innerHTML : '';
+            const loader = new DataLoader('json-container');
+            if (!loader.isValid()) return;
 
-            this.strokeDataArray = StrokeDataParser.parse(rawStrokeString);
+
+            this.strokeDataArray = PathExtractor.extract(loader.data.svg);
 
             // Re-anchored to the unified StrokeStateManager class name mapping definition
             this.strokeStateManager = new StrokeStateManager(this.strokeDataArray.length);
