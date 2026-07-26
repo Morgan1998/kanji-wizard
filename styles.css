@@ -1,8 +1,14 @@
-/*** THEMES ***/
+/* ==========================================================================
+   SECTION 1: THEMES & VARIABLE DEFINITIONS
+   ========================================================================== */
 
+@property --active-color {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+}
 
 /* DEFAULT LIGHT THEME ── */
-
 :root, :root.user-day-mode {
     --bg: white;
     --bg-page: #f8fafc;
@@ -16,6 +22,7 @@
     --text-secondary: #2f385a;
     --grid-line-color: rgba(0, 0, 0, 0.12);
     --kanji-stroke-color: #000000;
+    --accent-color: #6d28d9;
 
     /* Vocab Ledger */
     --bg-vocab-ledger: #f1f3f5;
@@ -23,8 +30,7 @@
     --text-vocab-muted: #64748b;
     --border-vocab-row: #e2e8f0;
     --reveal-bg-gradient: linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0%, transparent 100%);
-
-
+    --na-color: #64748b;
 
     /* Arcane Palette (Classic) */
     --wizard-color-1: #fdfbf7; /* Bleached Ivory Scroll Base */
@@ -33,8 +39,6 @@
     --wizard-color-4: #881337; /* Kun-yomi: Deep Dark Rich Burgundy Red */
     --wizard-color-5: #064e3b; /* On-yomi: Deep Dark Rich Hunter Green */
     --wizard-color-6: #6d28d9; /* Hover: Electric Twilight Amethyst Surge */
-
-
 
     /* Jlpt Colors */
     --n5-color: #0284c7;
@@ -48,9 +52,6 @@
     --dock-border: rgba(0, 0, 0, 0.1);
     --dock-glow: #0077ff;
     --dock-shadow: rgba(0, 0, 0, 0.1);
-    --accent-color: #0077ff;
-
-
 
 
     /* Drawing Canvas */
@@ -58,6 +59,31 @@
     --canvas-grid: rgba(0, 0, 0, 0.1);
     --canvas-stroke: #333333;
     --ink-color: #2d3436;
+
+    /* Theme Toggle Button */
+    --theme-toggle-border: #e2d5c5;
+    --theme-toggle-background: linear-gradient(135deg, #ffecb3, #ffd54f);
+    --theme-toggle-content: "🕶️";
+    --theme-toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 10px rgba(255, 213, 79, 0.2);
+    --theme-toggle-knob-background: radial-gradient(circle at 30% 30%, #ffffff, #ffb300);
+    --theme-toggle-knob-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 8px rgba(255, 179, 0, 0.6);
+    --theme-toggle-hover-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 16px rgba(255, 213, 79, 0.5);
+
+    /* Radical Toggle Button */
+    --radical-toggle-button--inactive-border: #cbd5e1;
+    --radical-toggle-button--active-border: #991b1b;
+    --radical-toggle-button-inactive-background: #f1f5f9;
+    --radical-toggle-button-active-background: linear-gradient(135deg, #e11d48, #9f1239);
+    --radical-toggle-button-inactive-hover-background: #cbd5e1;
+    --radical-toggle-button-active-hover-background: linear-gradient(135deg, #f43f5e, #be123c);
+
+    /* SVG Numbers Toggle Button */
+    --numbers-toggle-inactive-border: #cbd5e1;
+    --numbers-toggle-active-border: #0284c7;
+    --numbers-toggle-inactive-background: #f1f5f9;
+    --numbers-toggle-active-background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    --numbers-toggle-inactive-hover-background: #cbd5e1;
+    --numbers-toggle-active-hover-background: linear-gradient(135deg, #38bdf8, #0284c7);
 } 
 
 /* DARK THEME SWITCHES (System, Desktop App, & AnkiDroid Combined) ── */
@@ -74,6 +100,7 @@
     --text-secondary: #94a3b8;
     --grid-line-color: rgba(255, 255, 255, 0.15);
     --kanji-stroke-color: #ffffff;
+    --accent-color: #a78bfa;
 
     /* Vocab Ledger */
     --bg-vocab-ledger: #1e1e24;
@@ -81,6 +108,7 @@
     --text-vocab-muted: #94a3b8;
     --border-vocab-row: #334155;
     --reveal-bg-gradient: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+    --na-color: #94a3b8;
 
     /* Arcane Palette (Classic) */
     --wizard-color-1: #090b0e; /* Shadowed Obsidian Glass Base */
@@ -97,21 +125,42 @@
     --n2-color: #34d399;
     --n1-color: #f87171;
 
-        /* Sigil Dock */
+    /* Sigil Dock */
     --dock-bg: rgba(10, 10, 15, 0.8);
     --dock-border: rgba(255, 255, 255, 0.15);
     --dock-glow: var(--accent-color);
     --dock-shadow: rgba(0, 0, 0, 0.5);
-    --accent-color: #00f2ff;
-
-
-
 
     /* Drawing Canvas */
     --canvas-bg: rgba(20, 20, 25, 0.6);
     --canvas-grid: rgba(255, 255, 255, 0.08);
     --canvas-stroke: #ffffff;
     --ink-color: #ffffff;
+
+    /* Theme Toggle Button */
+    --theme-toggle-border: #512da8;
+    --theme-toggle-background: linear-gradient(135deg, #1a0b2e, #311b92);
+    --theme-toggle-content: "🦉";
+    --theme-toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 12px rgba(103, 58, 183, 0.4);
+    --theme-toggle-knob-background: radial-gradient(circle at 30% 30%, #e0f7fa, #00e5ff);
+    --theme-toggle-knob-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 229, 255, 0.8);
+    --theme-toggle-hover-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.6);
+
+    /* Radical Toggle Button */
+    --radical-toggle-button--inactive-border: #334155;
+    --radical-toggle-button--active-border: #f43f5e;
+    --radical-toggle-button-inactive-background: #0f172a;
+    --radical-toggle-button-active-background: linear-gradient(135deg, #f43f5e, #4c0519);
+    --radical-toggle-button-inactive-hover-background: #1e293b;
+    --radical-toggle-button-active-hover-background: linear-gradient(135deg, #ff1493, #4c0519);
+
+    /* SVG Numbers Toggle Button */
+    --numbers-toggle-inactive-border: #334155;
+    --numbers-toggle-active-border: #38bdf8;
+    --numbers-toggle-inactive-background: #0f172a;
+    --numbers-toggle-active-background: linear-gradient(135deg, #38bdf8, #0c4a6e);
+    --numbers-toggle-inactive-hover-background: #1e293b;
+    --numbers-toggle-active-hover-background: linear-gradient(135deg, #0ea5e9, #0369a1);
 }
 
 .level-n5 { --accent-color: var(--n5-color); }
@@ -120,7 +169,11 @@
 .level-n2 { --accent-color: var(--n2-color); }
 .level-n1 { --accent-color: var(--n1-color); }
 
-/*** RESETS ***/
+
+/* ==========================================================================
+   SECTION 2: GLOBAL RESETS & NATIVE OVERRIDES
+   ========================================================================== */
+
 html {
     box-sizing: border-box;
     -webkit-text-size-adjust: 100%;
@@ -135,15 +188,12 @@ html {
     -webkit-tap-highlight-color: transparent;
 }
 
-/*** ANKI NATIVE OVERRIDES ***/
 .card {
     display: flex;
     flex-direction: column;
-
     min-height: 100vh;
     margin: 0;
     padding: 0;
-
     background-color: var(--bg); 
     color: var(--text-primary);
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -154,12 +204,15 @@ html {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start; 
-
     width: 100%;
     height: 100vh;                      
 }
 
-/*** WORKSPACE CONTAINERS ***/
+
+/* ==========================================================================
+   SECTION 3: WORKSPACE & LAYOUT CONTAINERS
+   ========================================================================== */
+
 .deck-workspace {
     position: relative;
     width: 100%;
@@ -174,13 +227,11 @@ html {
     justify-content: flex-start;
     align-items: center;
     gap: 24px;
-
     width: 100%;
     height: 100%;
     padding: 15px 5px 15px 5px;
     border-radius: 10px;
     overflow-y: auto;
-
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     background-color: var(--bg-vocab-ledger);
     color: var(--text-primary);
@@ -209,33 +260,34 @@ html {
     }
 }
 
-/*** KANJI NEIGHBORHOOD ***/
+
+/* ==========================================================================
+   SECTION 4: KANJI HOUSE, STROKES, & VISUAL TOOLS
+   ========================================================================== */
 
 .kanji-neighborhood {
     display: flex;
-    align-items: flex-end;
+    align-items: stretch;
     justify-content: center;
+    height: 150px;
     gap: 16px;   
-
     width: 100%;           
 }
 
-/* KANJI HOUSE */
 .kanji-house {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-
     height: 150px;
     width: 150px;
-
     background-color: var(--bg-kanji-house);
     border: 1px solid var(--border-card);
     box-shadow: var(--shadow-card);
     border-radius: 12px;
     transition: background-color 0.2s ease, border-color 0.2s ease;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .grid-line {
@@ -244,63 +296,405 @@ html {
     stroke-dasharray: 4 3;
 }
 
+
+/* ==========================================================================
+   1. BASE KANJI STROKE STYLES
+   ========================================================================== */
+
 .kanji-stroke {
-    stroke: var(--kanji-stroke-color);
-    stroke-width: 4;
-    fill: none;
+    stroke: var(--kanji-stroke-color, #000000);
+    stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
-
-    transition: stroke-dashoffset 0.4s ease-in-out, stroke 0.3s ease;
+    fill: none;
+    filter: drop-shadow(0 0 0px transparent);
+    transition: stroke-dashoffset 0.4s ease-in-out, stroke 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
 }
 
-.meaning-container {
+/* ==========================================================================
+   2. KANJI CANVAS AUTO-FOCUS (X-RAY THEME)
+   ========================================================================== */
+
+.has-focus .kanji-stroke {
+    stroke: var(--kanji-stroke-color); 
+    opacity: 0.25; 
+}
+
+.has-focus .focused-component .kanji-stroke {
+    stroke: var(--accent-color); 
+    opacity: 1; 
+}
+
+.show-colors.has-focus .focused-component [kvg\:radical="general"] .kanji-stroke {
+    stroke: var(--active-color, var(--accent-color));
+    opacity: 1;
+    filter: drop-shadow(0 0 5px var(--active-color, var(--accent-color)));
+}
+
+/* ==========================================================================
+   3. DYNAMIC COMPONENT COLOR SEQUENCE
+   ========================================================================== */
+
+.show-colors .element-color-1 .kanji-stroke          { stroke: var(--n5-color); --active-color: var(--n5-color); } 
+.show-colors .element-color-2 .kanji-stroke          { stroke: var(--n4-color); --active-color: var(--n4-color); } 
+.show-colors .element-color-3 .kanji-stroke          { stroke: var(--n3-color); --active-color: var(--n3-color); } 
+.show-colors .element-color-4 .kanji-stroke          { stroke: var(--n2-color); --active-color: var(--n2-color); } 
+.show-colors .element-color-5 .kanji-stroke          { stroke: #f97316;         --active-color: #f97316; }        
+.show-colors .element-color-6 .kanji-stroke          { stroke: #ec4899;         --active-color: #ec4899; }        
+
+.show-colors [kvg\:radical="general"] .kanji-stroke,
+.highlight-radical [kvg\:radical="general"] .kanji-stroke { 
+    stroke: var(--n1-color); 
+    --active-color: var(--n1-color); 
+    stroke-width: 3.5;
+}
+
+.highlight-radical [kvg\:radical="general"] .kanji-stroke {
+    filter: drop-shadow(0 0 4px var(--n1-color));
+}
+
+/* ==========================================================================
+   4. KANJI TOOL & TREE NAVIGATION BUTTONS
+   ========================================================================== */
+
+.kanji-tools {
+    width: 30%;
+    height: 100%; 
+    max-height: 100%;
+    display: flex;
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+#kanji-tools-left {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+#kanji-tree {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+#kanji-tree-head {
     display: flex;
     justify-content: center;
-    
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+#kanji-tree-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    flex-grow: 1;
+    min-height: 0; 
+}
+
+.kanji-tool-button {
+    background-color: var(--wizard-color-1); 
+    color: var(--wizard-color-2); 
+    border: 1px solid var(--wizard-color-3); 
+    border-radius: 6px;
+    width: max-content;
+    padding: 4px 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.2s ease, 
+                border-color 0.2s ease, 
+                color 0.2s ease,
+                transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.2s ease;
+    margin: 0;
+}
+
+.kanji-tool-button:hover {
+    background-color: var(--bg-vocab-ledger); 
+    border-color: var(--wizard-color-3);
+    color: var(--wizard-color-6); 
+    transform: translateY(-1.5px); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08), 
+                0 0 10px rgba(109, 40, 217, 0.1); 
+}
+
+.kanji-tool-button.active {
+    background-color: var(--accent-color); 
+    border-color: var(--accent-color);
+    color: var(--wizard-color-1); 
+    transform: translateY(1px); 
+    box-shadow: 0 0 10px rgba(0, 119, 255, 0.3); 
+}
+
+.kanji-tree-elements {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px;
+    min-height: 38px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--wizard-color-3) transparent;
+    border: 1px solid var(--border-card);
+    border-radius: 6px;
+    background-color: var(--bg-kanji-house);
+}
+
+.kanji-tree-elements::-webkit-scrollbar {
+    height: 3px;
+}
+
+.kanji-tree-elements::-webkit-scrollbar-thumb {
+    background-color: var(--wizard-color-3);
+    border-radius: 4px;
+}
+
+.kanji-tree-placeholder {
+    font-size: 0.85rem;
+    color: var(--text-vocab-muted); 
+    font-style: italic;
+    padding: 0 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. HORIZONTAL WAYFINDING BREADCRUMBS
+   ========================================================================== */
+
+.kanji-tree-breadcrumbs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px;
+    min-height: 38px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--wizard-color-3) transparent;
+    border: 1px solid var(--border-card);
+    border-radius: 6px;
+    background-color: var(--bg-kanji-house);
+}
+
+.kanji-tree-breadcrumbs::-webkit-scrollbar {
+    height: 3px; 
+}
+
+.kanji-tree-breadcrumbs::-webkit-scrollbar-thumb {
+    background-color: var(--wizard-color-3);
+    border-radius: 4px;
+}
+
+.breadcrumb-item {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background-color: var(--bg-vocab-ledger);
+    border: 1px solid var(--wizard-color-3);
+    font-weight: 600;
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+    white-space: nowrap;
+}
+
+.breadcrumb-link {
+    cursor: pointer;
+    color: var(--accent-color); 
+}
+
+.breadcrumb-link:hover {
+    background-color: var(--wizard-color-1);
+    color: var(--wizard-color-6);
+    border-color: var(--wizard-color-6);
+    box-shadow: 0 0 8px rgba(109, 40, 217, 0.2);
+}
+
+.breadcrumb-active {
+    background-color: var(--wizard-color-1);
+    color: var(--text-primary); 
+    border-color: var(--accent-color);
+    box-shadow: 0 0 6px rgba(0, 119, 255, 0.15);
+}
+
+.breadcrumb-separator {
+    color: var(--wizard-color-6); 
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   6. ANNOTATIONS
+   ========================================================================== */
+
+#stroke-numbers-root text {
+    display: none;
+    font-family: inherit;
+    font-size: 8px;
+    font-weight: 800;
+    fill: var(--text-secondary);
+    transition: opacity 0.3s ease, fill 0.3s ease;
+}
+
+#stroke-numbers-root.show-drawn-numbers text.is-drawn {
+    display: block;
+}
+
+#stroke-numbers-root.has-focus text {
+    opacity: 0.15;
+}
+
+#stroke-numbers-root.has-focus text.focused-component {
+    opacity: 1;
+    fill: var(--accent-color);
+}
+
+#stroke-paths-root.show-colors ~ #stroke-numbers-root text {
+    fill: var(--accent-color);
+}
+
+#stroke-paths-root.show-colors ~ #stroke-numbers-root.has-focus text {
+    fill: var(--text-secondary);
+}
+
+#stroke-paths-root.show-colors ~ #stroke-numbers-root.has-focus text.focused-component {
+    fill: var(--accent-color);
+}
+
+
+/* ==========================================================================
+   SECTION 5: KANJI MEANINGS COMPONENT
+   ========================================================================== */
+
+.meaning-container {
+    padding: 0px 15px;
+    text-align: center;
     width: 100%;
 }
 
 #kanji-meaning {
-    position: relative;
-
-    line-height: 1.4;
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     margin: 0;
-    padding: 0 32px;
-    letter-spacing: 0.8px;
-    
-    font-family: "Georgia", "Times New Roman", serif;
-    font-size: 1.45rem;
+    padding: 0;
+}
+
+.meaning-pill {
+    background-color: var(--bg-vocab-ledger); 
+    border: 1px solid var(--wizard-color-3); 
+    color: var(--wizard-color-2); 
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: inline-block;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.meaning-pill.primary-pill {
+    background-color: var(--wizard-color-1); 
+    border: 1.5px solid var(--accent-color); 
+    color: var(--text-primary); 
     font-weight: 700;
-    transition: all 0.2s ease;
+    box-shadow: 0 0 10px rgba(0, 119, 255, 0.15);
 }
 
-#kanji-meaning::before,
-#kanji-meaning::after {
-    content: "✦";
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    opacity: 0.4;
-    transition: all 0.2s ease;
+.meaning-ellipsis {
+    background-color: var(--wizard-color-1); 
+    border: 1.5px dashed var(--wizard-color-6); 
+    color: var(--wizard-color-6); 
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 0 4px 0; 
+    font-size: 1rem;
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.25s ease, 
+                color 0.25s ease,
+                border-color 0.25s ease,
+                transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.25s ease;
 }
 
-#kanji-meaning::before {
-    left: 8px;
+.meaning-ellipsis:hover {
+    background-color: var(--wizard-color-6); 
+    color: var(--wizard-color-1); 
+    border-color: var(--wizard-color-6); 
+    border-style: solid;
+    transform: scale(1.12); 
+    box-shadow: 0 0 14px rgba(109, 40, 217, 0.5); 
 }
 
-#kanji-meaning::after {
-    right: 8px;
+.meaning-ellipsis.is-expanded {
+    padding: 0 0 1px 0; 
 }
 
-/*** READINGS ***/
+.additional-meanings {
+    display: inline-flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    animation: reveal-slide-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+}
 
-/* --- THE ARCHITECTURAL LEDGER SUITE (STATIC) --- */
-div.kanji-neighborhood button.reading-button {
-    flex: 0, 0, auto;
+@keyframes reveal-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.additional-meanings.is-hidden {
+    display: none;
+}
+
+.additional-meanings .meaning-pill.secondary-pill {
+    cursor: pointer; 
+}
+
+.additional-meanings .meaning-pill.secondary-pill:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    transform: scale(1.05); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+/* ==========================================================================
+   SECTION 6: KANJI READINGS COMPONENT
+   ========================================================================== */
+
+div.vocabulary-top-bar button.reading-button {
+    flex: 0 0 auto;
     min-width: 105px;
     height: 38px;
     padding: 0 20px;
@@ -321,22 +715,19 @@ div.kanji-neighborhood button.reading-button {
     transition: all 0.2s ease;
 }
 
-/* Static Filament Marker */
-div.kanji-neighborhood button.reading-button::before {
+div.vocabulary-top-bar button.reading-button::before {
     content: "";
     position: absolute;
     left: 10px;
     top: 25%;
     width: 2px;
     height: 50%;
-    /* Using a standard theme variable for the inactive state */
     background: var(--text-secondary);
     border-radius: 1px;
     opacity: 0.3;
 }
 
-/* Static Status Dot */
-div.kanji-neighborhood button.reading-button::after {
+div.vocabulary-top-bar button.reading-button::after {
     content: "●";
     position: absolute;
     right: 12px;
@@ -344,9 +735,6 @@ div.kanji-neighborhood button.reading-button::after {
     color: transparent; 
 }
 
-/* --- ACTIVE STATIC STATES --- */
-
-/* Kun-yomi Active - Tied to Wizard Color 4 */
 #kunyomi-button.active {
     color: var(--wizard-color-4);
     border-color: var(--wizard-color-4);
@@ -356,7 +744,6 @@ div.kanji-neighborhood button.reading-button::after {
     opacity: 1;
 }
 
-/* On-yomi Active - Tied to Wizard Color 5 */
 #onyomi-button.active {
     color: var(--wizard-color-5);
     border-color: var(--wizard-color-5);
@@ -366,22 +753,14 @@ div.kanji-neighborhood button.reading-button::after {
     opacity: 1;
 }
 
-/* Active Dot Reveal - Inherits the color of the active button */
-div.kanji-neighborhood button.reading-button.active::after {
+div.vocabulary-top-bar button.reading-button.active::after {
     color: currentColor;
 }
 
-/* Simple hover feedback without movement */
 div.kanji-neighborhood button.reading-button:hover {
     border-color: var(--text-secondary);
     background: rgba(255, 255, 255, 0.03);
 }
-
-
-
-
-
-/* --- READING DISPLAY --- */
 
 .readings-display-wrapper {
     position: absolute;
@@ -414,6 +793,10 @@ div.kanji-neighborhood button.reading-button:hover {
     pointer-events: auto;
 }
 
+.kanji-house.is-switching .readings-display-wrapper {
+    transition: none;
+} 
+
 @keyframes driftStardust {
     0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
     100% { background-position: 200px 200px, -200px 200px, 100px -200px, -100px -100px, 300px 100px; }
@@ -434,17 +817,13 @@ div.kanji-neighborhood button.reading-button:hover {
 }
 
 .readings-display::-webkit-scrollbar {
-    width: 4px;
+    width: 2px;
 }
 
 .readings-display::-webkit-scrollbar-thumb {
     background-color: var(--wizard-color-6);
     border-radius: 4px;
 }
-
-
-
-
 
 .readings-badge-container {
     display: flex;
@@ -460,7 +839,6 @@ div.kanji-neighborhood button.reading-button:hover {
     height: 36px;
     padding: 0 16px;
     
-    /* Dark, glass-like composite surface */
     background: #0d1117;
     border: 1px solid #30363d;
     
@@ -468,7 +846,7 @@ div.kanji-neighborhood button.reading-button:hover {
     align-items: center;
     justify-content: center;
     
-    font-family: 'JetBrains Mono', monospace; /* Tech aesthetic */
+    font-family: 'JetBrains Mono', monospace; 
     font-size: 0.7rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -477,13 +855,11 @@ div.kanji-neighborhood button.reading-button:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     
-    /* "Hardware" feel */
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Data-stream indicator line */
 .readings-badge::after {
     content: '';
     position: absolute;
@@ -496,14 +872,13 @@ div.kanji-neighborhood button.reading-button:hover {
 }
 
 #readings-display-wrapper-kun .readings-badge {
-    color: #5eead4; /* Teal-Pulse */
+    color: #5eead4; 
 }
 
 #readings-display-wrapper-on .readings-badge {
-    color: #f472b6; /* Hot-Pink Data */
+    color: #f472b6; 
 }
 
-/* Hover: The node "powers up" */
 .readings-badge:hover {
     background: #161b22;
     border-color: currentColor;
@@ -515,42 +890,10 @@ div.kanji-neighborhood button.reading-button:hover {
 }
 
 
+/* ==========================================================================
+   SECTION 7: VOCABULARY SECTION & LEDGER
+   ========================================================================== */
 
-
-
-
-
-
-
-
-.readings-display-wrapper.active {
-
-opacity: 1;
-
-pointer-events: auto;
-
-}
-
-
-
-.kanji-house.is-switching .readings-display-wrapper {
-
-transition: none;
-
-} 
-
-
-
-
-
-
-
-
-
-
-/*** VOCAB SECTION ***/
-
-/* --- NEW GLOBAL SECTION WRAPPER --- */
 #vocab-section {
     flex: 1 1 auto;
     min-height: 25%;
@@ -561,37 +904,32 @@ transition: none;
     overflow: hidden;
 }
 
-#vocabulary-title {
+#vocabulary-top-bar {
     display: flex;
+    justify-content: space-around;
+    align-items: center;
     flex: 0 0 auto;
-
-    padding: 16px 0px 0px 24px;
+    padding: 8px 0px 0px 24px;
     width: 95%;
-
     background-color: var(--bg-card);
     font-family: 'Cinzel', serif;
     font-weight: 700;
     border-radius: 12px 12px 0px 0px;
 }
 
-/* --- VOCABULARY LEDGER CONTAINER --- */
 #vocab-ledger {
-    
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-gutter: stable;  
-
     padding: 2px 24px;
     width: 95%;
     min-height: 0;
-
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     transition: background-color 0.3s ease;
     background-color: var(--bg-card);
     border-radius: 0px 0px 12px 12px;
 }
 
-/* OPTIONAL: Sleek custom scrollbars to match your premium card design */
 #vocab-ledger::-webkit-scrollbar {
     width: 3px;
 }
@@ -603,26 +941,22 @@ transition: none;
 #vocab-ledger::-webkit-scrollbar-thumb {
     background-color: var(--text-vocab-muted);
     border-radius: 20px;
-    border: 2px solid var(--bg-vocab-ledger); /* Creates a nice padding effect around the track */
+    border: 2px solid var(--bg-vocab-ledger); 
 }
 
-/* --- LEDGER ENTRIES (ROWS) --- */
 .vocab-entry {
     display: flex;
     align-items: center;
     position: relative;
     z-index: 10; 
     overflow: hidden;
-
     margin: 8px 0; 
     padding: 8px;
-
     background: color-mix(in srgb, var(--accent-color), transparent 97%);
     color: #fff;
     border: 1px solid color-mix(in srgb, var(--accent-color), white 20%);
     border-bottom: 1px solid color-mix(in srgb, var(--accent-color), white 20%);
     border-radius: 20px; 
-
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
                 box-shadow 0.4s ease, 
                 margin 0.4s ease,
@@ -631,99 +965,124 @@ transition: none;
                 background-color 0.4s ease;
 }
 
-
-
-
-
 .vocab-entry.active-reveal {
-  border: 1px solid var(--accent-color);
-  background: linear-gradient(90deg, rgba(var(--accent-color-rgb), 0.08) 0%, transparent 100%);
-  box-shadow: inset 2px 0 0 var(--accent-color), 0 0 20px rgba(var(--accent-color-rgb), 0.1);
-  transform: translateX(4px);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    border: 1px solid var(--accent-color);
+    background: linear-gradient(90deg, rgba(var(--accent-color-rgb), 0.08) 0%, transparent 100%);
+    box-shadow: inset 2px 0 0 var(--accent-color), 0 0 20px rgba(var(--accent-color-rgb), 0.1);
+    transform: translateX(4px);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vocab-entry.active-reveal::before {
-  content: "◈";
-  position: absolute;
-  left: -18px;
-  color: var(--accent-color);
-  font-size: 0.8rem;
-  animation: pulse 2s infinite;
+    content: "◈";
+    position: absolute;
+    left: -18px;
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
-
-
-
-
-
-
-
 
 #vocab-ledger[data-active-filter] .vocab-entry {
     opacity: 0.25;
 }
 
-/* 3. Force the matching reading entries to stay crisp at 1.0 opacity */
-#vocab-ledger[data-active-filter="kun"] .vocab-entry[data-reading-type="kun"],
-#vocab-ledger[data-active-filter="on"] .vocab-entry[data-reading-type="on"] {
+#vocab-ledger[data-active-filter="kun"] .vocab-entry[data-target-kanji-reading-type="kun"],
+#vocab-ledger[data-active-filter="on"] .vocab-entry[data-target-kanji-reading-type="on"] {
     opacity: 1;
-    /* Optional micro-interaction: slightly scale up the active ones */
     transform: scale(1.01); 
 }
-/* --- THE BADGE & SVG CONTAINER --- */
+
+
+
+
+
+
+
+
 .badge-container {
     position: relative;
-    width: 40px;
-    height: 40px;
-    display: inline-flex;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 20px;
+    margin-right: 18px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1.5px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color), transparent 90%), inset 0 0 8px rgba(0, 0, 0, 0.2);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badge-container:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--accent-color), transparent 50%);
 }
 
 .hat-vector {
     position: absolute;
-    top: 0;
+    top: -12px;
     left: 50%;
-    transform: translateX(-50%);
-    width: 50%;
-    height: 50%;
-    z-index: 1;
-    transition: filter 0.3s ease;
-    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
-}
-
-.badge-container:hover .hat-vector {
-    filter: drop-shadow(0 0 8px currentColor);
+    transform: translateX(-50%) rotate(-12deg);
+    width: 24px;
+    height: 24px;
+    z-index: 3;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .badge {
     position: relative;
     z-index: 2;
-    font-family: "Georgia", serif;
-    font-size: 0.75rem;
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: 0.8rem;
     font-weight: 800;
-    text-transform: uppercase;
-    color: var(--text-primary);
-    text-align: center;
-    letter-spacing: 0.5px;
-    margin-top: 4px;
+    color: var(--accent-color);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--accent-color), transparent 60%);
+    margin: 0;
 }
 
-/* Badge Vector Color Mapping */
+.frequency-span {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--text-vocab-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border-vocab-row);
+    padding: 1px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+    z-index: 4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.gem-slots {
+    display: none;
+}
+
+
+
+
+
+
+
 .badge-container-n5 .hat-vector path { fill: var(--n5-color); }
 .badge-container-n4 .hat-vector path { fill: var(--n4-color); }
 .badge-container-n3 .hat-vector path { fill: var(--n3-color); }
 .badge-container-n2 .hat-vector path { fill: var(--n2-color); }
 .badge-container-n1 .hat-vector path { fill: var(--n1-color); }
+.badge-container-na .hat-vector path { fill: #64748b; }
 
-/* --- TEXT CONTENT WRAPPER --- */
 .vocab {
     display: flex;
     flex-direction: row;
@@ -734,7 +1093,7 @@ transition: none;
 .vocab-japanese {
     flex-shrink: 0;
     display: inline-flex;
-    align-items: baseline;
+    align-self: center;
     font-size: 1.6rem;
     font-weight: 400;
     color: var(--text-vocab-main);
@@ -756,118 +1115,9 @@ transition: none;
 }
 
 
-
-/*** UTILITY FOOTER ***/
-
-.deck-utility-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 24px;  
-
-    width: 100%;            
-    padding: 16px 0;
-    margin-top: auto;     
-    
-    border-top: 1px solid var(--border-card);
-}
-
-.utility-link {
-    display: inline-flex;
-    align-items: center;
-
-    font-size: 0.7rem;
-    font-weight: 500;
-    text-decoration: none;
-    letter-spacing: 0.3px;
-
-    text-decoration: none;  
-    color: var(--text-secondary);
-    transition: color 0.20s ease;
-}
-
-
-
-
-#toggle-theme-button {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    width: 52px;
-    height: 28px;
-    padding: 0;
-    margin: 0;
-    border-radius: 99px;
-    border: 2px solid #e2d5c5;
-    background: linear-gradient(135deg, #ffecb3, #ffd54f);
-    cursor: pointer;
-    box-sizing: border-box;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 10px rgba(255, 213, 79, 0.2);
-    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-}
-
-#toggle-theme-button::after {
-    content: "✨";
-    position: absolute;
-    left: 2px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #ffffff, #ffb300);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 8px rgba(255, 179, 0, 0.6);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s ease, box-shadow 0.4s ease;
-}
-
-#toggle-theme-button[data-theme="dark"] {
-    background: linear-gradient(135deg, #1a0b2e, #311b92);
-    border-color: #512da8;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 12px rgba(103, 58, 183, 0.4);
-}
-
-#toggle-theme-button[data-theme="dark"]::after {
-    transform: translateX(24px) rotate(180deg);
-    background: radial-gradient(circle at 30% 30%, #e0f7fa, #00e5ff);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 229, 255, 0.8);
-}
-
-#toggle-theme-button:hover {
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 16px rgba(255, 213, 79, 0.5);
-}
-
-#toggle-theme-button[data-theme="dark"]:hover {
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.6);
-}
-
-
-
-
-.utility-link:hover,
-.utility-link:active {
-    color: var(--text-primary);
-    transform: scale(1.05);
-}
-
-
-/*** UTILS ***/
-
-.hidden {
-    display: none;
-}
-
-.is-hidden {
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-}
-
-
-
-
-/*** SIGIL ***/
+/* ==========================================================================
+   SECTION 8: SIGIL & DOCK COMPONENT
+   ========================================================================== */
 
 .sigil {
     position: absolute;
@@ -900,7 +1150,7 @@ transition: none;
 
 .sigil.hidden-in-dock {
     opacity: 0;
-    transform: scale(0) rotate(-180deg); /* Shrinks to a point and spins */
+    transform: scale(0) rotate(-180deg); 
     pointer-events: none;
 }
 
@@ -915,7 +1165,6 @@ transition: none;
     animation: spin-slow 40s linear infinite;
 }
 
-
 .sigil::after {
     content: '';
     position: absolute;
@@ -924,7 +1173,6 @@ transition: none;
     border: 1px dashed rgba(255, 255, 255, 0.2);
     animation: spin-reverse 30s linear infinite;
 }
-
 
 .sigil-core {
     width: 20px;
@@ -961,11 +1209,10 @@ transition: none;
     backdrop-filter: blur(8px);
     border: 2px solid var(--dock-border);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy feel */
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
     position: relative;
     box-shadow: 0 0 0 0 transparent; 
 }
-
 
 .sigil-dock::after {
     content: '';
@@ -975,7 +1222,6 @@ transition: none;
     border-radius: 50%;
     transition: all 0.3s;
 }
-
 
 .sigil-dock:active,
 .sigil-dock:has(.hidden-in-dock) {
@@ -998,58 +1244,210 @@ transition: none;
 }
 
 
+/* ==========================================================================
+   SECTION 9: UTILITY FOOTER
+   ========================================================================== */
 
-
-
-
-
-
-
-
-
-.kanji-stroke {
-    --stroke-color: #000000;
-    stroke: var(--stroke-color);
+.deck-utility-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;  
+    width: 100%;            
+    padding: 16px 0;
+    margin-top: auto;     
+    border-top: 1px solid var(--border-card);
 }
 
-.show-colors [kvg\:radical="general"] .kanji-stroke {
-    --stroke-color: #ff4757; /* Red */
+.utility-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    color: var(--text-secondary);
+    transition: color 0.20s ease;
 }
 
-.show-colors .element-color-1 .kanji-stroke {
-    --stroke-color: #1e90ff; /* Blue */
-}
-
-.show-colors .element-color-2 .kanji-stroke {
-    --stroke-color: #2ed573; /* Green */
-}
-
-.show-colors .element-color-3 .kanji-stroke {
-    --stroke-color: #ffa502; /* Yellow */
+.utility-link:hover,
+.utility-link:active {
+    color: var(--text-primary);
+    transform: scale(1.05);
 }
 
 
+/* ==========================================================================
+   SECTION 10: SLIDING TOGGLE BUTTON 
+   ========================================================================== */
 
+/* Main Template */
+.toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
 
-/* Base tool button styling */
-.kanji-tool-button {
-    background-color: #f1f2f6; /* Default gray */
-    color: #2f3542;
-    border: 1px solid #ced6e0;
-    border-radius: 4px;
-    padding: 6px 12px;
+.toggle-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+.sliding-toggle-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 52px;
+    height: 28px;
+    padding: 0;
+    margin: 0;
+    border-radius: 99px;
+    border: 2px solid var(--toggle-border);
+    background: var(--toggle-background);
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    box-sizing: border-box;
+    box-shadow: var(--toggle-shadow);
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* Hover state */
-.kanji-tool-button:hover {
-    background-color: #e4e7eb;
+.sliding-toggle-button::after {
+    content: var(--toggle-knob-content);
+    position: absolute;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    border-radius: 50%;
+    background: var(--toggle-knob-background);
+    box-shadow: var(--toggle-knob-shadow);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* Active/On state (No !important needed) */
-.kanji-tool-button.active {
-    background-color: #2ed573; /* Neon green to show it is active */
-    border-color: #26af5f;
-    color: #ffffff;
+.sliding-toggle-button.active,
+.sliding-toggle-button[data-theme="dark"] {
+    background: var(--toggle-active-background);
+    border-color: var(--toggle-active-border);
+    box-shadow: var(--toggle-active-shadow);
 }
+
+.sliding-toggle-button.active::after,
+.sliding-toggle-button[data-theme="dark"]::after {
+    content: var(--toggle-knob-active-content, var(--toggle-knob-content));
+    transform: translateX(24px) rotate(360deg);
+    background: var(--toggle-knob-active-background);
+    box-shadow: var(--toggle-knob-active-shadow);
+}
+
+.sliding-toggle-button:hover {
+    background: var(--toggle-hover-background, var(--toggle-background));
+    box-shadow: var(--toggle-hover-shadow);
+}
+
+.sliding-toggle-button:hover::after {
+    background: var(--toggle-knob-hover-background, var(--toggle-knob-background));
+    border-color: var(--toggle-knob-hover-border, transparent);
+}
+
+.sliding-toggle-button.active:hover,
+.sliding-toggle-button[data-theme="dark"]:hover {
+    background: var(--toggle-active-hover-background, var(--toggle-active-background));
+    box-shadow: var(--toggle-active-hover-shadow);
+}
+
+.sliding-toggle-button.active:hover::after,
+.sliding-toggle-button[data-theme="dark"]:hover::after {
+    background: var(--toggle-knob-active-hover-background, var(--toggle-knob-active-background));
+    box-shadow: var(--toggle-knob-active-hover-shadow);
+}
+
+/* Specific Toggle Buttons Styles */
+#toggle-theme-button {
+    --toggle-border: var(--theme-toggle-border);
+    --toggle-background: var(--theme-toggle-background);
+    --toggle-shadow: var(--theme-toggle-shadow);
+    --toggle-knob-content: var(--theme-toggle-content);
+    --toggle-knob-background: var(--theme-toggle-knob-background);
+    --toggle-knob-shadow: var(--theme-toggle-knob-shadow);
+    --toggle-active-border: var(--theme-toggle-border);
+    --toggle-active-background: var(--theme-toggle-background);
+    --toggle-active-shadow: var(--theme-toggle-shadow);
+    --toggle-knob-active-background: var(--theme-toggle-knob-background);
+    --toggle-knob-active-shadow: var(--theme-toggle-knob-shadow);
+    --toggle-hover-shadow: var(--theme-toggle-hover-shadow);
+    --toggle-active-hover-shadow: var(--theme-toggle-hover-shadow);
+}
+
+#toggle-radical-button {
+    --toggle-border: var(--radical-toggle-button--inactive-border);
+    --toggle-background: var(--radical-toggle-button-inactive-background);
+    --toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    --toggle-knob-content: "🏮";
+    --toggle-knob-background: radial-gradient(circle at 30% 30%, #ffffff, #e2e8f0);
+    --toggle-knob-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    --toggle-active-background: var(--radical-toggle-button-active-background);
+    --toggle-active-border: var(--radical-toggle-button--active-border);
+    --toggle-active-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(220, 38, 38, 0.4);
+    --toggle-knob-active-content: var(--radical-content);
+    --toggle-knob-active-background: radial-gradient(circle at 30% 30%, #ffffff, var(--n1-color));
+    --toggle-knob-active-shadow: 0 2px 6px rgba(220, 38, 38, 0.4), 0 0 12px var(--n1-color);
+    --toggle-hover-background: var(--radical-toggle-button-inactive-hover-background);
+    --toggle-hover-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 16px rgba(0, 0, 0, 0.1);
+    --toggle-knob-hover-background: radial-gradient(circle at 30% 30%, #fff1f2, #fecdd3);
+    --toggle-knob-hover-border: #f43f5e;
+    --toggle-active-hover-background: var(--radical-toggle-button-active-hover-background);
+    --toggle-active-hover-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 20px rgba(220, 38, 38, 0.6);
+    --toggle-knob-active-hover-background: radial-gradient(circle at 30% 30%, #ffffff, #f43f5e);
+    --toggle-knob-active-hover-shadow: 0 2px 8px rgba(220, 38, 38, 0.5), 0 0 14px #f43f5e;
+}
+
+#toggle-stroke-numbers-button {
+    --toggle-border: var(--numbers-toggle-inactive-border);
+    --toggle-background: var(--numbers-toggle-inactive-background);
+    --toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    --toggle-knob-content: "🔢";
+    --toggle-knob-background: radial-gradient(circle at 30% 30%, #ffffff, #e2e8f0);
+    --toggle-knob-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    --toggle-active-background: var(--numbers-toggle-active-background);
+    --toggle-active-border: var(--numbers-toggle-active-border);
+    --toggle-active-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(2, 132, 199, 0.4);
+    --toggle-knob-active-content: var(--stroke-count-content);
+    --toggle-knob-active-background: radial-gradient(circle at 30% 30%, #ffffff, #38bdf8);
+    --toggle-knob-active-shadow: 0 2px 6px rgba(2, 132, 199, 0.4), 0 0 12px #38bdf8;
+    --toggle-hover-background: var(--numbers-toggle-inactive-hover-background);
+    --toggle-hover-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 16px rgba(0, 0, 0, 0.1);
+    --toggle-knob-hover-background: radial-gradient(circle at 30% 30%, #e0f2fe, #bae6fd);
+    --toggle-knob-hover-border: #38bdf8;
+    --toggle-active-hover-background: var(--numbers-toggle-active-hover-background);
+    --toggle-active-hover-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 20px rgba(2, 132, 199, 0.6);
+    --toggle-knob-active-hover-background: radial-gradient(circle at 30% 30%, #ffffff, #0ea5e9);
+    --toggle-knob-active-hover-shadow: 0 2px 8px rgba(2, 132, 199, 0.5), 0 0 14px #0ea5e9;
+}
+
+
+
+
+/* ==========================================================================
+   SECTION 11: GLOBAL UTILITY HELPERS
+   ========================================================================== */
+
+.hidden {
+    display: none;
+}
+
+.is-hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+
+
