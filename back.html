@@ -463,8 +463,8 @@
                 return;
             }
 
-            this.globalExpandedKey = 'kanji-meaning-drawer-expanded';
             this.customMeaningKey = `kanji-custom-meaning-${this.kanji}`;
+            this.workspaceElement = document.querySelector('.deck-workspace');
 
             this.init();
         }
@@ -489,68 +489,68 @@
             this.meaningElement.appendChild(primaryPill);
 
             if (this.workingMeanings.length > 1) {
-                
-                const additionalContainer = document.createElement('span');
-                additionalContainer.classList.add('additional-meanings');
+                let drawerBackdrop = document.querySelector('.meanings-drawer-backdrop');
+                if (!drawerBackdrop && this.workspaceElement) {
+                    drawerBackdrop = document.createElement('div');
+                    drawerBackdrop.classList.add('meanings-drawer-backdrop', 'is-hidden');
 
-                const isExpandedGlobal = localStorage.getItem(this.globalExpandedKey) === 'true';
-                if (!isExpandedGlobal) {
-                    additionalContainer.classList.add('is-hidden');
-                }
+                    const drawerSheet = document.createElement('div');
+                    drawerSheet.classList.add('meanings-drawer-sheet');
 
-                this.workingMeanings.slice(1).forEach(meaning => {
-                    const pill = document.createElement('span');
-                    pill.classList.add('meaning-pill', 'secondary-pill');
-                    pill.textContent = meaning;
+                    const drawerTitle = document.createElement('div');
+                    drawerTitle.classList.add('meanings-drawer-title');
+                    drawerTitle.textContent = 'Alternative Meanings';
 
-                    pill.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        
-                        localStorage.setItem(this.customMeaningKey, meaning);
-                        this.init(); 
+                    const drawerPillsContainer = document.createElement('div');
+                    drawerPillsContainer.classList.add('meanings-drawer-pills');
+
+                    drawerSheet.appendChild(drawerTitle);
+                    drawerSheet.appendChild(drawerPillsContainer);
+                    drawerBackdrop.appendChild(drawerSheet);
+                    this.workspaceElement.appendChild(drawerBackdrop);
+
+                    drawerBackdrop.addEventListener('click', (clickEvent) => {
+                        if (clickEvent.target === drawerBackdrop) {
+                            drawerBackdrop.classList.add('is-hidden');
+                        }
                     });
-
-                    additionalContainer.appendChild(pill);
-                });
-
-                const toggleBtn = document.createElement('button');
-                toggleBtn.classList.add('meaning-ellipsis');
-                
-                if (isExpandedGlobal) {
-                    toggleBtn.classList.add('is-expanded');
-                    toggleBtn.textContent = '▲';
-                    toggleBtn.ariaLabel = 'Collapse meanings';
-                } else {
-                    toggleBtn.textContent = '...';
-                    toggleBtn.ariaLabel = 'Expand meanings';
                 }
 
-                toggleBtn.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    
-                    const isCurrentlyCollapsed = additionalContainer.classList.contains('is-hidden');
+                const drawerPillsContainer = drawerBackdrop ? drawerBackdrop.querySelector('.meanings-drawer-pills') : null;
+                if (drawerPillsContainer) {
+                    drawerPillsContainer.replaceChildren();
 
-                    if (isCurrentlyCollapsed) {
-                        additionalContainer.classList.remove('is-hidden');
-                        toggleBtn.classList.add('is-expanded');
-                        toggleBtn.textContent = '▲';
-                        toggleBtn.ariaLabel = 'Collapse meanings';
-                        localStorage.setItem(this.globalExpandedKey, 'true');
-                    } else {
-                        additionalContainer.classList.add('is-hidden');
-                        toggleBtn.classList.remove('is-expanded');
-                        toggleBtn.textContent = '...';
-                        toggleBtn.ariaLabel = 'Expand meanings';
-                        localStorage.setItem(this.globalExpandedKey, 'false');
+                    this.workingMeanings.slice(1).forEach(meaning => {
+                        const secondaryPill = document.createElement('span');
+                        secondaryPill.classList.add('meaning-pill', 'secondary-pill');
+                        secondaryPill.textContent = meaning;
+
+                        secondaryPill.addEventListener('click', (clickEvent) => {
+                            clickEvent.stopPropagation();
+                            localStorage.setItem(this.customMeaningKey, meaning);
+                            drawerBackdrop.classList.add('is-hidden');
+                            this.init();
+                        });
+
+                        drawerPillsContainer.appendChild(secondaryPill);
+                    });
+                }
+
+                const meaningExpandButton = document.createElement('button');
+                meaningExpandButton.classList.add('meaning-expand-button');
+                meaningExpandButton.textContent = (this.workingMeanings.length - 1) + '+';
+
+                meaningExpandButton.addEventListener('click', (clickEvent) => {
+                    clickEvent.stopPropagation();
+                    if (drawerBackdrop) {
+                        drawerBackdrop.classList.remove('is-hidden');
                     }
                 });
 
-                this.meaningElement.appendChild(additionalContainer);
-                this.meaningElement.appendChild(toggleBtn);
+                this.meaningElement.appendChild(meaningExpandButton);
             }
         }
     }
-
     class VocabLedgerService {
         constructor(config) {
             this.ledgerContainer = document.querySelector(config.ledgerContainerElement);
@@ -603,7 +603,7 @@
                 }
                 
                 badgeContainerElement.append(hatSvg, levelSpan, gemSlotsElement);
-                
+
                 const frequency = vocab.frequency || null;
                 if (frequency) {
                     const frequencySpan = document.createElement('span');
@@ -642,7 +642,31 @@
 
                 const vocabEnglishElement = document.createElement('div');
                 vocabEnglishElement.classList.add('vocab-english', 'is-hidden');
-                vocabEnglishElement.textContent = vocab.glosses.join(', ');
+
+                const primaryGlossSpan = document.createElement('span');
+                primaryGlossSpan.classList.add('vocab-gloss-primary');
+                primaryGlossSpan.textContent = vocab.glosses[0] || '';
+                vocabEnglishElement.appendChild(primaryGlossSpan);
+
+                if (vocab.glosses.length > 1) {
+                    const extraGlossesSpan = document.createElement('span');
+                    extraGlossesSpan.classList.add('vocab-gloss-extra', 'is-hidden');
+                    extraGlossesSpan.textContent = ', ' + vocab.glosses.slice(1).join(', ');
+
+                    const vocabGlossExpandButton = document.createElement('button');
+                    vocabGlossExpandButton.classList.add('vocab-gloss-expand-button');
+                    vocabGlossExpandButton.textContent = (vocab.glosses.length - 1) + '+';
+
+                    vocabGlossExpandButton.addEventListener('click', (clickEvent) => {
+                        clickEvent.stopPropagation();
+                        
+                        extraGlossesSpan.classList.remove('is-hidden');
+                        vocabGlossExpandButton.classList.add('is-hidden');
+                    });
+
+                    vocabEnglishElement.appendChild(extraGlossesSpan);
+                    vocabEnglishElement.appendChild(vocabGlossExpandButton);
+                }
 
                 vocabElement.addEventListener('click', () => {
                     const textSelection = window.getSelection().toString();  
@@ -878,12 +902,12 @@
             this.treeElementsContainer.replaceChildren();
 
             const headButton = document.createElement('button');
-            headButton.classList.add('kanji-tool-button', 'tree-node-button');
-            headButton.textContent = '🔍';
+                    headButton.classList.add('kanji-tool-button', 'tree-head-button');
+                    headButton.textContent = '🔍';
 
-            if (this.isTreeActive) {
-                headButton.classList.add('active');
-            }
+                    if (this.isTreeActive) {
+                        headButton.classList.add('active');
+                    }
 
             headButton.addEventListener('click', (clickEvent) => {
                 clickEvent.stopPropagation();
@@ -927,10 +951,13 @@
                 noChildrenPlaceholder.textContent = 'No sub-elements';
                 this.treeElementsContainer.appendChild(noChildrenPlaceholder);
             } else {
-                elementsToRender.forEach(treeNode => {
+                elementsToRender.forEach((treeNode, elementIndex) => {
                     const elementButton = document.createElement('button');
                     elementButton.classList.add('kanji-tool-button', 'tree-node-button');
                     elementButton.textContent = treeNode.element;
+
+                    const colorIndex = (elementIndex % 6) + 1;
+                    elementButton.classList.add(`element-color-${colorIndex}`);
 
                     elementButton.addEventListener('click', (clickEvent) => {
                         clickEvent.stopPropagation();
@@ -1113,12 +1140,6 @@
             elementsToRender.forEach(treeNode => {
                 const targetGroupElement = this.strokePathsRoot.querySelector(`[id="${treeNode.id}"]`);
                 if (targetGroupElement) {
-                    const isRadical = targetGroupElement.getAttribute('kvg:radical') === 'general';
-                    
-                    if (isRadical) {
-                        return; 
-                    }
-
                     const colorIndex = (colorIndexCounter % sequenceLength) + 1;
                     targetGroupElement.classList.add(`element-color-${colorIndex}`);
                     colorIndexCounter++;

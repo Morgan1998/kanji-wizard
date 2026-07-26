@@ -22,7 +22,7 @@
     --text-secondary: #2f385a;
     --grid-line-color: rgba(0, 0, 0, 0.12);
     --kanji-stroke-color: #000000;
-    --accent-color: #6d28d9;
+    --accent-color: #000000;
 
     /* Vocab Ledger */
     --bg-vocab-ledger: #f1f3f5;
@@ -100,7 +100,7 @@
     --text-secondary: #94a3b8;
     --grid-line-color: rgba(255, 255, 255, 0.15);
     --kanji-stroke-color: #ffffff;
-    --accent-color: #a78bfa;
+    --accent-color: #ffffff;
 
     /* Vocab Ledger */
     --bg-vocab-ledger: #1e1e24;
@@ -343,7 +343,6 @@ html {
 .show-colors .element-color-5 .kanji-stroke          { stroke: #f97316;         --active-color: #f97316; }        
 .show-colors .element-color-6 .kanji-stroke          { stroke: #ec4899;         --active-color: #ec4899; }        
 
-.show-colors [kvg\:radical="general"] .kanji-stroke,
 .highlight-radical [kvg\:radical="general"] .kanji-stroke { 
     stroke: var(--n1-color); 
     --active-color: var(--n1-color); 
@@ -357,6 +356,7 @@ html {
 /* ==========================================================================
    4. KANJI TOOL & TREE NAVIGATION BUTTONS
    ========================================================================== */
+
 
 .kanji-tools {
     width: 30%;
@@ -386,7 +386,7 @@ html {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 95%;
     margin-bottom: 8px;
     flex-shrink: 0;
 }
@@ -395,46 +395,89 @@ html {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    width: 100%;
+    width: 95%;
     flex-grow: 1;
     min-height: 0; 
 }
 
-.kanji-tool-button {
-    background-color: var(--wizard-color-1); 
-    color: var(--wizard-color-2); 
-    border: 1px solid var(--wizard-color-3); 
-    border-radius: 6px;
-    width: max-content;
-    padding: 4px 8px;
+button.kanji-tool-button {
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 24px;
+    background: var(--bg-vocab-ledger);
+    border: 1px solid var(--border-card);
+    border-radius: 2px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.7rem;
     font-weight: 600;
-    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
     cursor: pointer;
     box-shadow: var(--shadow-card);
-    transition: background-color 0.2s ease, 
-                border-color 0.2s ease, 
-                color 0.2s ease,
-                transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                box-shadow 0.2s ease;
+    transition: opacity 0.2s ease,
+                border-color 0.2s ease,
+                background-color 0.2s ease,
+                color 0.2s ease;
     margin: 0;
 }
 
-.kanji-tool-button:hover {
-    background-color: var(--bg-vocab-ledger); 
-    border-color: var(--wizard-color-3);
-    color: var(--wizard-color-6); 
-    transform: translateY(-1.5px); 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08), 
-                0 0 10px rgba(109, 40, 217, 0.1); 
+.tree-head-button {
+    width: 36px;
+    padding: 0 0 0 8px;
 }
 
-.kanji-tool-button.active {
-    background-color: var(--accent-color); 
-    border-color: var(--accent-color);
-    color: var(--wizard-color-1); 
-    transform: translateY(1px); 
-    box-shadow: 0 0 10px rgba(0, 119, 255, 0.3); 
+.tree-head-button::before {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 25%;
+    width: 2px;
+    height: 50%;
+    background: var(--text-secondary);
+    border-radius: 1px;
+    opacity: 0.3;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
 }
+
+.tree-head-button:hover {
+    border-color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.tree-head-button.active {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: var(--bg-card);
+}
+
+.tree-head-button.active::before {
+    background-color: var(--accent-color);
+    opacity: 1;
+}
+
+.tree-node-button {
+    padding: 0 10px;
+}
+
+.tree-node-button:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.tree-node-button.element-color-1:hover { border-color: var(--n5-color); color: var(--n5-color); }
+.tree-node-button.element-color-2:hover { border-color: var(--n4-color); color: var(--n4-color); }
+.tree-node-button.element-color-3:hover { border-color: var(--n3-color); color: var(--n3-color); }
+.tree-node-button.element-color-4:hover { border-color: var(--n2-color); color: var(--n2-color); }
+.tree-node-button.element-color-5:hover { border-color: #f97316; color: #f97316; }
+.tree-node-button.element-color-6:hover { border-color: #ec4899; color: #ec4899; }
+
+
 
 .kanji-tree-elements {
     display: flex;
@@ -504,7 +547,7 @@ html {
 .breadcrumb-item {
     font-size: 0.8rem;
     padding: 4px 10px;
-    border-radius: 8px;
+    border-radius: 2px;
     background-color: var(--bg-vocab-ledger);
     border: 1px solid var(--wizard-color-3);
     font-weight: 600;
@@ -523,8 +566,8 @@ html {
 
 .breadcrumb-link:hover {
     background-color: var(--wizard-color-1);
-    color: var(--wizard-color-6);
-    border-color: var(--wizard-color-6);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
     box-shadow: 0 0 8px rgba(109, 40, 217, 0.2);
 }
 
@@ -536,7 +579,7 @@ html {
 }
 
 .breadcrumb-separator {
-    color: var(--wizard-color-6); 
+    color: var(--accent-color); 
     font-weight: 700;
     font-size: 0.85rem;
 }
@@ -585,109 +628,201 @@ html {
    ========================================================================== */
 
 .meaning-container {
-    padding: 0px 15px;
-    text-align: center;
     width: 100%;
+    padding: 0 15px;
 }
 
 #kanji-meaning {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: flex-end;
+    width: 100%;
+    min-height: 42px;
+}
+
+#kanji-meaning::before {
+    content: "";
+    display: block;
+}
+
+.meaning-pill.primary-pill {
+    grid-column: 2;
+    justify-self: center;
+}
+
+button.meaning-expand-button {
+    margin: 0 0 0 10px;
+}
+
+#kanji-meaning .meaning-expand-button {
+    grid-column: 3;
+    justify-self: start;
+    margin-right: 24px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
+    position: relative;
+    height: 20px;
+    padding: 0 8px 0 14px;
+    background: var(--bg-vocab-ledger);
+    border: 1px solid var(--border-card);
+    border-radius: 2px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: opacity 0.2s ease,
+                border-color 0.2s ease,
+                background-color 0.2s ease,
+                color 0.2s ease;
+}
+
+.meaning-expand-button::before {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 25%;
+    width: 1.5px;
+    height: 50%;
+    background: var(--accent-color);
+    border-radius: 1px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.meaning-expand-button:hover {
+    background-color: var(--accent-color);
+    color: var(--wizard-color-1);
+    border-color: var(--accent-color);
+    transform: scale(1.12);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent-color) 60%, transparent);
+}
+
+.meaning-expand-button:hover::before {
+    opacity: 1;
+}
+
+.meanings-drawer-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    transition: opacity 0.3s ease, display 0.3s ease;
+    transition-behavior: allow-discrete;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.meanings-drawer-backdrop.is-hidden {
+    display: none;
+    opacity: 0;
+}
+
+.meanings-drawer-backdrop.is-hidden .meanings-drawer-sheet {
+    transform: translateY(100%);
+}
+
+.meanings-drawer-sheet {
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-card);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    transform: translateY(0);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.meanings-drawer-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.meanings-drawer-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.meanings-drawer-pills::-webkit-scrollbar {
+    display: none;
+}
+
+@starting-style {
+    .meanings-drawer-backdrop {
+        opacity: 0;
+    }
+    .meanings-drawer-backdrop .meanings-drawer-sheet {
+        transform: translateY(100%);
+    }
 }
 
 .meaning-pill {
-    background-color: var(--bg-vocab-ledger); 
-    border: 1px solid var(--wizard-color-3); 
-    color: var(--wizard-color-2); 
+    background-color: var(--bg-vocab-ledger);
+    border: 1px solid var(--wizard-color-4);
+    color: var(--wizard-color-2);
     padding: 8px 18px;
     border-radius: 20px;
     font-weight: 600;
     font-size: 0.95rem;
     display: inline-block;
     box-shadow: var(--shadow-card);
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                background-color 0.2s ease, 
+                border-color 0.2s ease, 
+                color 0.2s ease, 
+                box-shadow 0.2s ease;
 }
 
 .meaning-pill.primary-pill {
-    background-color: var(--wizard-color-1); 
-    border: 1.5px solid var(--accent-color); 
-    color: var(--text-primary); 
+    background-color: var(--wizard-color-1);
+    border: 1.5px solid var(--accent-color);
+    color: var(--text-primary);
     font-weight: 700;
-    box-shadow: 0 0 10px rgba(0, 119, 255, 0.15);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color) 15%, transparent);
 }
 
-.meaning-ellipsis {
-    background-color: var(--wizard-color-1); 
-    border: 1.5px dashed var(--wizard-color-6); 
-    color: var(--wizard-color-6); 
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+.meaning-pill.secondary-pill {
     cursor: pointer;
-    padding: 0 0 4px 0; 
-    font-size: 1rem;
-    box-shadow: var(--shadow-card);
-    transition: background-color 0.25s ease, 
-                color 0.25s ease,
-                border-color 0.25s ease,
-                transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                box-shadow 0.25s ease;
 }
 
-.meaning-ellipsis:hover {
-    background-color: var(--wizard-color-6); 
-    color: var(--wizard-color-1); 
-    border-color: var(--wizard-color-6); 
-    border-style: solid;
-    transform: scale(1.12); 
-    box-shadow: 0 0 14px rgba(109, 40, 217, 0.5); 
-}
-
-.meaning-ellipsis.is-expanded {
-    padding: 0 0 1px 0; 
-}
-
-.additional-meanings {
-    display: inline-flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    animation: reveal-slide-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
-}
-
-@keyframes reveal-slide-in {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.additional-meanings.is-hidden {
-    display: none;
-}
-
-.additional-meanings .meaning-pill.secondary-pill {
-    cursor: pointer; 
-}
-
-.additional-meanings .meaning-pill.secondary-pill:hover {
+.meaning-pill.secondary-pill:hover {
+    background-color: var(--accent-color);
     border-color: var(--accent-color);
-    color: var(--accent-color);
-    transform: scale(1.05); 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    color: var(--wizard-color-1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color) 30%, transparent);
 }
+
+
+
+
+
+
+
+
+
+
 
 
 /* ==========================================================================
@@ -950,9 +1085,9 @@ div.kanji-neighborhood button.reading-button:hover {
     align-items: center;
     position: relative;
     z-index: 10; 
-    overflow: hidden;
+    overflow: visible;
     margin: 8px 0; 
-    padding: 8px;
+    padding: 14px 8px 8px 8px;
     background: color-mix(in srgb, var(--accent-color), transparent 97%);
     color: #fff;
     border: 1px solid color-mix(in srgb, var(--accent-color), white 20%);
@@ -996,6 +1131,86 @@ div.kanji-neighborhood button.reading-button:hover {
 #vocab-ledger[data-active-filter="on"] .vocab-entry[data-target-kanji-reading-type="on"] {
     opacity: 1;
     transform: scale(1.01); 
+}
+
+.vocab-gloss-extra {
+    transition: opacity 0.2s ease, display 0.2s ease;
+    transition-behavior: allow-discrete;
+}
+
+.vocab-gloss-extra.is-hidden {
+    display: none;
+    opacity: 0;
+}
+
+@starting-style {
+    .vocab-gloss-extra {
+        opacity: 0;
+    }
+}
+
+button.vocab-gloss-expand-button {
+    margin: 0;
+}
+
+#vocab-ledger .vocab-gloss-expand-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-left: 8px;
+    height: 18px;
+    padding: 0 6px 0 12px;
+    background: var(--bg-vocab-ledger);
+    border: 1px solid var(--border-card);
+    border-radius: 2px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: opacity 0.2s ease,
+                display 0.2s ease,
+                border-color 0.2s ease,
+                background-color 0.2s ease,
+                color 0.2s ease;
+    transition-behavior: allow-discrete;
+}
+
+.vocab-gloss-expand-button::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 25%;
+    width: 1.5px;
+    height: 50%;
+    background: var(--accent-color);
+    border-radius: 1px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.vocab-gloss-expand-button:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.vocab-gloss-expand-button:hover::before {
+    opacity: 1;
+}
+
+.vocab-gloss-expand-button.is-hidden {
+    display: none;
+    opacity: 0;
+}
+
+@starting-style {
+    .vocab-gloss-expand-button {
+        opacity: 0;
+    }
 }
 
 
@@ -1114,6 +1329,8 @@ div.kanji-neighborhood button.reading-button:hover {
     color: var(--text-vocab-muted);
     font-weight: 300;
 }
+
+
 
 
 /* ==========================================================================
