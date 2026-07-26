@@ -168,6 +168,7 @@
 .level-n3 { --accent-color: var(--n3-color); }
 .level-n2 { --accent-color: var(--n2-color); }
 .level-n1 { --accent-color: var(--n1-color); }
+.level-na { --accent-color: var(--na-color); }
 
 
 /* ==========================================================================
@@ -1081,7 +1082,7 @@ div.kanji-neighborhood button.reading-button:hover {
 .badge-container-n3 .hat-vector path { fill: var(--n3-color); }
 .badge-container-n2 .hat-vector path { fill: var(--n2-color); }
 .badge-container-n1 .hat-vector path { fill: var(--n1-color); }
-.badge-container-na .hat-vector path { fill: #64748b; }
+.badge-container-na .hat-vector path { fill: var(--na-color); }
 
 .vocab {
     display: flex;
