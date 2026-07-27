@@ -8,7 +8,7 @@
                     <button id="toggle-radical-button" class="sliding-toggle-button" aria-label="Toggle Radical"></button>
                 </div>
                 <div id="stroke-numbers-toggle-wrapper" class="toggle-wrapper">
-                    <span id="stroke-numbers-toggle-label" class="toggle-label">Numbers</span>
+                    <span id="stroke-numbers-toggle-label" class="toggle-label">Stroke Numbers</span>
                     <button id="toggle-stroke-numbers-button" class="sliding-toggle-button" aria-label="Toggle Numbers"></button>
                 </div>
             </div>
@@ -551,6 +551,7 @@
             }
         }
     }
+
     class VocabLedgerService {
         constructor(config) {
             this.ledgerContainer = document.querySelector(config.ledgerContainerElement);
@@ -688,6 +689,7 @@
         constructor(config) {
             this.toggleButton = document.querySelector(config.buttonSelector);
             this.strokePathsRoot = document.querySelector(config.pathsSelector);
+            this.container = document.querySelector('.card-container') || this.strokePathsRoot;
             this.storageKey = config.storageKey || "kanji-radical-highlight-active";
 
             if (!this.toggleButton || !this.strokePathsRoot) {
@@ -700,24 +702,25 @@
         init() {
             const isHighlightActive = localStorage.getItem(this.storageKey) === "true";
 
-            const radicalGroup = this.strokePathsRoot.querySelector('[kvg\\:radical="general"]');
+            const radicalGroup = this.strokePathsRoot.querySelector('[kvg\\:radical="general"]') || 
+                                 this.strokePathsRoot.querySelector('[kvg\\:radical="tradit"]');
             const radicalCharacter = radicalGroup ? (radicalGroup.getAttribute("kvg:element") || "🏮") : "🏮";
 
             if (isHighlightActive) {
                 this.toggleButton.classList.add("active");
-                this.strokePathsRoot.classList.add("highlight-radical");
+                this.container.classList.add("highlight-radical");
                 this.toggleButton.style.setProperty("--radical-content", `"${radicalCharacter}"`);
             } else {
-                this.strokePathsRoot.classList.remove("highlight-radical");
+                this.container.classList.remove("highlight-radical");
                 this.toggleButton.style.setProperty("--radical-content", '"🏮"');
             }
 
             this.toggleButton.addEventListener("click", (clickEvent) => {
                 clickEvent.stopPropagation();
-                const wasActive = this.strokePathsRoot.classList.contains("highlight-radical");
+                const wasActive = this.container.classList.contains("highlight-radical");
                 const shouldBeActive = !wasActive;
 
-                this.strokePathsRoot.classList.toggle("highlight-radical", shouldBeActive);
+                this.container.classList.toggle("highlight-radical", shouldBeActive);
                 this.toggleButton.classList.toggle("active", shouldBeActive);
 
                 if (shouldBeActive) {
@@ -837,15 +840,18 @@
 
             const parsedTreeResult = this.#buildTreeNode(rootStrokePathsGroupNode);
 
-            return Array.isArray(parsedTreeResult) ? parsedTreeResult[0] : parsedTreeResult;
+            const baseTree = Array.isArray(parsedTreeResult) ? parsedTreeResult[0] : parsedTreeResult;
+
+            return this.consolidateParts(baseTree);
         }
 
-         static #buildTreeNode(jsonNode) {
+        static #buildTreeNode(jsonNode) {
             if (!jsonNode || typeof jsonNode !== 'object') {
                 return null;
             }
 
             const hasSemanticElement = !!jsonNode["kvg:element"];
+            const isRadical = !!jsonNode["kvg:radical"] && (jsonNode["kvg:radical"] === "general" || jsonNode["kvg:radical"] === "tradit");
 
             let collectedChildNodes = [];
             if (jsonNode.g) {
@@ -866,11 +872,53 @@
                 return {
                     id:jsonNode.id || '',
                     element: jsonNode["kvg:element"],
+                    isRadical: isRadical,
                     children: collectedChildNodes
                 };
             } else {
                 return collectedChildNodes;
             }
+        }
+
+        static consolidateParts(node) {
+            if (!node || !node.children) return node;
+
+            node.children = node.children.map(child => this.consolidateParts(child));
+
+            const mergedChildren = [];
+            const elementMap = new Map();
+
+            node.children.forEach(child => {
+                const elementName = child.element;
+                if (elementName) {
+                    if (elementMap.has(elementName)) {
+                        const existingNode = elementMap.get(elementName);
+                        existingNode.ids = (existingNode.ids || [existingNode.id]).concat(child.ids || [child.id]);
+                        existingNode.children = (existingNode.children || []).concat(child.children || []);
+                        existingNode.isRadical = existingNode.isRadical || child.isRadical;
+                    } else {
+                        child.ids = child.ids || [child.id];
+                        elementMap.set(elementName, child);
+                        mergedChildren.push(child);
+                    }
+                } else {
+                    mergedChildren.push(child);
+                }
+            });
+
+            node.children = mergedChildren;
+
+            if (node.element === "干") {
+                const tenChild = node.children.find(child => child.element === "十");
+                if (tenChild && node.ids && node.ids.length > 1) {
+                    const partTwoId = node.ids[node.ids.length - 1];
+                    if (partTwoId && !tenChild.ids.includes(partTwoId)) {
+                        tenChild.ids.push(partTwoId);
+                    }
+                }
+            }
+
+            return node;
         }
     }
 
@@ -917,6 +965,7 @@
                 }
                 this.renderNavigationState();
             });
+
             this.treeHeadContainer.appendChild(headButton);
 
             if (!this.isTreeActive) {
@@ -936,6 +985,7 @@
             }
 
             const isAtHomeLevel = this.navigationHistoryStack.length === 0;
+
             let elementsToRender = [];
 
             if (isAtHomeLevel) {
@@ -945,7 +995,9 @@
                 elementsToRender = activeNavigationNode.children || [];
             }
 
-            if (!isAtHomeLevel && elementsToRender.length === 0) {
+            const hasNoChildren = elementsToRender.length === 0;
+
+            if (hasNoChildren) {
                 const noChildrenPlaceholder = document.createElement('div');
                 noChildrenPlaceholder.classList.add('kanji-tree-placeholder');
                 noChildrenPlaceholder.textContent = 'No sub-elements';
@@ -955,6 +1007,10 @@
                     const elementButton = document.createElement('button');
                     elementButton.classList.add('kanji-tool-button', 'tree-node-button');
                     elementButton.textContent = treeNode.element;
+
+                    if (treeNode.isRadical) {
+                        elementButton.classList.add('radical-node');
+                    }
 
                     const colorIndex = (elementIndex % 6) + 1;
                     elementButton.classList.add(`element-color-${colorIndex}`);
@@ -974,10 +1030,13 @@
             if (this.kanjiSvgController) {
                 if (isAtHomeLevel) {
                     this.kanjiSvgController.focusComponent(null);
-                    this.kanjiSvgController.applyDynamicColors(this.logicalKanjiTree.children || []);
+                    const colorsToApply = (this.logicalKanjiTree.children && this.logicalKanjiTree.children.length > 0)
+                        ? this.logicalKanjiTree.children
+                        : [this.logicalKanjiTree];
+                    this.kanjiSvgController.applyDynamicColors(colorsToApply);
                 } else {
                     const activeNavigationNode = this.navigationHistoryStack[this.navigationHistoryStack.length - 1];
-                    this.kanjiSvgController.focusComponent(activeNavigationNode.id);
+                    this.kanjiSvgController.focusComponent(activeNavigationNode.ids || activeNavigationNode.id);
                     if (elementsToRender.length > 0) {
                         this.kanjiSvgController.applyDynamicColors(elementsToRender);
                     } else {
@@ -1077,7 +1136,18 @@
             this.#initializeCanvas();
 
             this.cachedPathElements = Array.from(this.strokePathsRoot.querySelectorAll('path'));
+            this.cachedPathElements.sort((pathElementA, pathElementB) => {
+                const indexA = parseInt(pathElementA.id.split('-s')[1]) || 0;
+                const indexB = parseInt(pathElementB.id.split('-s')[1]) || 0;
+                return indexA - indexB;
+            });
+
             this.cachedTextElements = Array.from(this.strokeNumbersRoot.querySelectorAll('text'));
+            this.cachedTextElements.sort((textElementA, textElementB) => {
+                const numberA = parseInt(textElementA.textContent) || 0;
+                const numberB = parseInt(textElementB.textContent) || 0;
+                return numberA - numberB;
+            });
 
             this.cachedPathElements.forEach((pathElement, elementIndex) => {
                 pathElement.style.setProperty('--stroke-index', elementIndex + 1);
@@ -1138,12 +1208,16 @@
             let colorIndexCounter = 0;
 
             elementsToRender.forEach(treeNode => {
-                const targetGroupElement = this.strokePathsRoot.querySelector(`[id="${treeNode.id}"]`);
-                if (targetGroupElement) {
-                    const colorIndex = (colorIndexCounter % sequenceLength) + 1;
-                    targetGroupElement.classList.add(`element-color-${colorIndex}`);
-                    colorIndexCounter++;
-                }
+                const idsToColor = treeNode.ids || [treeNode.id];
+                const colorIndex = (colorIndexCounter % sequenceLength) + 1;
+
+                idsToColor.forEach(id => {
+                    const targetGroupElement = this.strokePathsRoot.querySelector(`[id="${id}"]`);
+                    if (targetGroupElement) {
+                        targetGroupElement.classList.add(`element-color-${colorIndex}`);
+                    }
+                });
+                colorIndexCounter++;
             });
         }
 
@@ -1164,7 +1238,7 @@
             });
         }
 
-        focusComponent(targetGroupId) {
+        focusComponent(targetGroupIds) {
             if (!this.strokePathsRoot) return;
 
             this.strokePathsRoot.classList.remove('has-focus');
@@ -1178,28 +1252,36 @@
             const previouslyFocusedTexts = this.strokeNumbersRoot.querySelectorAll('.focused-component');
             previouslyFocusedTexts.forEach(element => element.classList.remove('focused-component'));
 
-            if (!targetGroupId) {
+            if (!targetGroupIds) {
                 return;
             }
 
-            const targetGroupElement = this.strokePathsRoot.querySelector(`[id="${targetGroupId}"]`);
-            if (targetGroupElement) {
-                this.strokePathsRoot.classList.add('has-focus');
-                if (this.strokeNumbersRoot) {
-                    this.strokeNumbersRoot.classList.add('has-focus');
-                }
-                targetGroupElement.classList.add('focused-component');
+            const idsArray = Array.isArray(targetGroupIds) ? targetGroupIds : [targetGroupIds];
+            let hasValidGroup = false;
 
-                const activePaths = targetGroupElement.querySelectorAll('path');
-                const activeIndices = new Set(Array.from(activePaths).map(pathElement => this.cachedPathElements.indexOf(pathElement) + 1));
-
-                this.cachedTextElements.forEach((textElement, elementIndex) => {
-                    const strokeIndex = elementIndex + 1;
-                    if (activeIndices.has(strokeIndex)) {
-                        textElement.classList.add('focused-component');
+            idsArray.forEach(id => {
+                const targetGroupElement = this.strokePathsRoot.querySelector(`[id="${id}"]`);
+                if (targetGroupElement) {
+                    if (!hasValidGroup) {
+                        this.strokePathsRoot.classList.add('has-focus');
+                        if (this.strokeNumbersRoot) {
+                            this.strokeNumbersRoot.classList.add('has-focus');
+                        }
+                        hasValidGroup = true;
                     }
-                });
-            }
+                    targetGroupElement.classList.add('focused-component');
+
+                    const activePaths = targetGroupElement.querySelectorAll('path');
+                    const activeIndices = new Set(Array.from(activePaths).map(pathElement => this.cachedPathElements.indexOf(pathElement) + 1));
+
+                    this.cachedTextElements.forEach((textElement, elementIndex) => {
+                        const strokeIndex = elementIndex + 1;
+                        if (activeIndices.has(strokeIndex)) {
+                            textElement.classList.add('focused-component');
+                        }
+                    });
+                }
+            });
         }
 
         toggleColors() {

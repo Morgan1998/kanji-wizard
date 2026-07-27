@@ -8,12 +8,14 @@
             </svg>
         </div>
         <div class="meaning-container unselectable">
-            <h2 id="kanji-meaning">Placeholder Meaning</h2>
+            <h2 id="kanji-meaning">
+                <span class="meaning-pill primary-pill"></span>
+            </h2>
         </div>
         <footer class="deck-utility-footer">
-            <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
-            <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
-            <button id="toggle-theme-button" aria-label="Toggle theme"></button>
+            <a id="report-issue-link" href="" target="_blank" class="utility-link">Report an Issue</a>
+            <a id="rate-deck-link" href="" target="_blank" class="utility-link">Rate the Deck</a>
+            <button id="toggle-theme-button" class="sliding-toggle-button" aria-label="Toggle theme"></button>
         </footer>
     </div>
 </div>
@@ -24,14 +26,7 @@
 <script>
 (() => {
 
-    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
-
-    const DOM_PARSER = new DOMParser();
-
     class DataLoader {
-        /**
-         * @param {string} 
-         */
         constructor(elementId = 'json-container') {
             this.elementId = elementId;
             this.data = this.#init();
@@ -47,8 +42,8 @@
 
             try {
                 return JSON.parse(element.textContent);
-            } catch (err) {
-                console.error("Kanji Wizard Error: Failed to parse JSON data.", err);
+            } catch (parsingError) {
+                console.error("Kanji Wizard Error: Failed to parse JSON data.", parsingError);
                 return null;
             }
         }
@@ -57,138 +52,141 @@
             return this.data !== null;
         }
     }
-    
-    class StrokeStateManager {
-        currentStroke = 0;
-        maxStrokes = 0;
 
-        constructor(maxStrokes) {
-            this.maxStrokes = maxStrokes;
+    class KanjiSvgDOMBuilder {
+        static SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+        static buildElement(jsonNode, tagName) {
+            const svgElement = document.createElementNS(this.SVG_NAMESPACE, tagName);
+
+            for (const [key, value] of Object.entries(jsonNode)) {
+                if (key === 'g' || key === 'path' || key === 'text') {
+                    const childNodesArray = Array.isArray(value) ? value : [value];
+
+                    childNodesArray.forEach(childNode => {
+                        const childElement = this.buildElement(childNode, key);
+                        svgElement.appendChild(childElement);
+                    });
+                }
+                else if (key === '#text') {
+                    const textNode = document.createTextNode(value);
+                    svgElement.appendChild(textNode);
+                }
+                else if (typeof value === 'string' || typeof value === 'number') {
+                    svgElement.setAttribute(key, value);
+                }
+            }
+
+            if (tagName === 'path') {
+                this.setupPathAnimation(svgElement);
+            }
+
+            return svgElement;
+        }
+
+        static setupPathAnimation(pathElement) {
+            pathElement.classList.add('kanji-stroke');
+            const strokeLength = pathElement.getTotalLength();
+            pathElement.dataset.strokeLength = strokeLength;
+            pathElement.style.strokeDasharray = strokeLength;
+            pathElement.style.strokeDashoffset = strokeLength;
+        }
+    }
+
+    class KanjiSvgController {
+        constructor(config) {
+            this.strokePathsRoot = document.querySelector(config.pathsSelector);
+            this.svgData = config.svgData;
+
+            this.#initializeCanvas();
+
+            this.cachedPathElements = Array.from(this.strokePathsRoot.querySelectorAll('path'));
+            this.cachedPathElements.sort((pathElementA, pathElementB) => {
+                const indexA = parseInt(pathElementA.id.split('-s')[1]) || 0;
+                const indexB = parseInt(pathElementB.id.split('-s')[1]) || 0;
+                return indexA - indexB;
+            });
+
+            this.cachedPathElements.forEach((pathElement, elementIndex) => {
+                pathElement.style.setProperty('--stroke-index', elementIndex + 1);
+            });
+        }
+
+        #initializeCanvas() {
+            if (!this.strokePathsRoot || !this.svgData) {
+                console.warn('KanjiSvgController: Required DOM elements or SVG data is missing.');
+                return;
+            }
+
+            this.strokePathsRoot.replaceChildren();
+
+            const pathsGroupNode = this.svgData.g[0];
+            if (pathsGroupNode) {
+                const domPathsGroup = KanjiSvgDOMBuilder.buildElement(pathsGroupNode, 'g');
+                this.strokePathsRoot.appendChild(domPathsGroup);
+            }
+        }
+
+        drawNextStroke(strokeCount) {
+            const targetPathElement = this.cachedPathElements[strokeCount - 1];
+            if (targetPathElement) {
+                targetPathElement.style.transition = 'stroke-dashoffset 0.4s ease-in-out';
+                targetPathElement.style.strokeDashoffset = 0;
+            }
+        }
+
+        resetAllStrokes() {
+            this.cachedPathElements.forEach(pathElement => {
+                const originalLength = pathElement.dataset.strokeLength;
+                if (originalLength) {
+                    pathElement.style.transition = 'none';
+                    pathElement.style.strokeDashoffset = originalLength;
+                }
+            });
+        }
+    }
+
+    class StrokeStateController {
+        constructor(totalStrokeCount) {
+            this.totalStrokeCount = totalStrokeCount;
+            this.currentStrokeIndex = 0;
         }
 
         increment() {
-            if (this.currentStroke >= this.maxStrokes) {
-                this.currentStroke = 0;
+            if (this.currentStrokeIndex >= this.totalStrokeCount) {
+                this.currentStrokeIndex = 0;
             } else {
-                this.currentStroke++;
+                this.currentStrokeIndex++;
             }
         }
 
         getCurrent() {
-            return this.currentStroke;
-        }
-    }
-
-    class PathExtractor {
-        /**
-         * Traverses the nested JSON SVG object and returns a flat array of 'd' strings.
-         * @param {Object} svgNode - The svg property from your JSON blob.
-         * @returns {string[]} 
-         */
-        static extract(svgNode) {
-            if (!svgNode) return [];
-
-            const paths = [];
-
-            const traverse = (node) => {
-                // Collect path 'd' values if they exist
-                if (node.path) {
-                    const p = Array.isArray(node.path) ? node.path : [node.path];
-                    paths.push(...p.map(x => x.d));
-                }
-                // Recurse into groups
-                if (node.g) {
-                    const groups = Array.isArray(node.g) ? node.g : [node.g];
-                    for (const group of groups) {
-                        traverse(group);
-                    }
-                }
-            };
-
-            traverse(svgNode);
-            return paths;
-        }
-    }
-
-    class KanjiSvgManager {
-        svgStrokeGroup = null;
-
-        constructor(svgStrokeGroupId) {
-   
-            this.svgStrokeGroup = document.querySelector(svgStrokeGroupId);
-        }
-
-        updateSvg(strokeDataArray, currentCount) {
-            if (!this.svgStrokeGroup) return;
-
-            if (currentCount === 0) {
-                this.svgStrokeGroup.replaceChildren();
-                return;
-            }
-
-            const newStrokeIndex = currentCount - 1;
-            const newStrokeData = strokeDataArray[newStrokeIndex]; 
-
-            if (this.svgStrokeGroup.children.length > newStrokeIndex) {
-                this.svgStrokeGroup.replaceChildren();
-                for (let i = 0; i < newStrokeIndex; i++) {
-                    this._appendStaticStroke(strokeDataArray[i]);
-                }
-            }
-
-            const lastDrawnStroke = this.svgStrokeGroup.lastElementChild;
-            if (lastDrawnStroke) {
-                lastDrawnStroke.style.transition = 'none';
-            }
-
-            this._appendAnimatedStroke(newStrokeData);
-        }
-
-        _appendStaticStroke(strokeData) {
-            const staticPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
-            staticPathNode.setAttribute('d', strokeData);
-            this._applyDefaultStyles(staticPathNode);
-            this.svgStrokeGroup.append(staticPathNode);
-        }
-
-        _appendAnimatedStroke(strokeData) {
-            const animatedPathNode = document.createElementNS(SVG_NAMESPACE, 'path');
-            animatedPathNode.setAttribute('d', strokeData);
-            this._applyDefaultStyles(animatedPathNode);
-            this.svgStrokeGroup.append(animatedPathNode);
-
-            const totalLength = animatedPathNode.getTotalLength();
-            animatedPathNode.style.strokeDasharray = totalLength;
-            animatedPathNode.style.strokeDashoffset = totalLength;
-
-            requestAnimationFrame(() => {
-                animatedPathNode.style.transition = 'stroke-dashoffset 0.4s ease-in-out';
-                animatedPathNode.style.strokeDashoffset = '0';
-            });
-        }
-
-
-        _applyDefaultStyles(pathNode) {
-            pathNode.classList.add('kanji-stroke');
+            return this.currentStrokeIndex;
         }
     }
 
     class FrontCardApp {
-        strokeData = [];
-        strokeStateManager = null;
-        kanjiSvgManager = null;
+        strokeStateController = null;
+        kanjiSvgController = null;
         tappableArea = null;
 
         constructor() {
-            const loader = new DataLoader('json-container');
-            if (!loader.isValid()) return;
+            const dataLoader = new DataLoader('json-container');
+            if (!dataLoader.isValid()) {
+                return;
+            }
 
+            this.kanjiData = dataLoader.data;
 
-            this.strokeDataArray = PathExtractor.extract(loader.data.svg);
+            this.kanjiSvgController = new KanjiSvgController({
+                pathsSelector: '#svg-stroke-group',
+                svgData: this.kanjiData.svg
+            });
 
-            // Re-anchored to the unified StrokeStateManager class name mapping definition
-            this.strokeStateManager = new StrokeStateManager(this.strokeDataArray.length);
-            this.kanjiSvgManager = new KanjiSvgManager('#svg-stroke-group');
+            this.strokeStateController = new StrokeStateController(
+                this.kanjiSvgController.cachedPathElements.length
+            );
+
             this.tappableArea = document.querySelector('.card-container');
             
             this.init();
@@ -196,71 +194,58 @@
 
         init() {
             this.setupThemeToggle();
+            this.setupMeaning();
 
             if (!this.tappableArea) return;
             this.tappableArea.addEventListener('click', () => this.handleTap());
-
         }
 
+        setupMeaning() {
+            const kanji = this.kanjiData.kanji || '';
+            const customMeaningKey = `kanji-custom-meaning-${kanji}`;
+            const savedMeaning = localStorage.getItem(customMeaningKey);
+            const meaningsList = this.kanjiData.meanings || [];
+            const activeMeaning = savedMeaning || meaningsList[0] || 'Placeholder Meaning';
+
+            const meaningElement = document.querySelector('#kanji-meaning .meaning-pill');
+            if (meaningElement) {
+                meaningElement.textContent = activeMeaning;
+            }
+        }
 
         handleTap() {
-            if (this.strokeDataArray.length === 0) {
-                return;
-            }
+            this.strokeStateController.increment();
+            const currentCount = this.strokeStateController.getCurrent();
 
-            this.strokeStateManager.increment();
-            const currentCount = this.strokeStateManager.getCurrent();
-            this.kanjiSvgManager.updateSvg(this.strokeDataArray, currentCount);
+            if (currentCount === 0) {
+                this.kanjiSvgController.resetAllStrokes();
+            } else {
+                this.kanjiSvgController.drawNextStroke(currentCount);
+            }
         }
-        
+
         setupThemeToggle() {
             this.themeButton = document.querySelector('#toggle-theme-button');
             if (!this.themeButton) return;
 
-            const hasSystemNightThemeOn = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const hasAnkiNightThemeOn = () => {
-                    return document.documentElement.classList.contains('night-mode') ||
-                        document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
-                        document.body.classList.contains('nightMode') ||
-                        document.body.classList.contains('night_mode') ||
-                        document.body.classList.contains('card_dark') ||
-                        document.documentElement.classList.contains('user-night-mode');
-                };
+            const root = document.documentElement;
 
-            const savedTheme = localStorage.getItem('kanji-wizard-theme');
+            const updateState = (isNightModeActive) => {
+                root.classList.toggle('user-night-mode', isNightModeActive);
+                root.classList.toggle('user-day-mode', !isNightModeActive);
+                
+                this.themeButton.setAttribute('data-theme', isNightModeActive ? 'dark' : 'light');
+                localStorage.setItem('kanji-wizard-theme', isNightModeActive ? 'dark' : 'light');
+            };
 
-            let isDark;
-            if (savedTheme !== null) {
-                isDark = savedTheme === 'dark';
-            } else {
-                isDark = hasSystemNightThemeOn() || hasAnkiNightThemeOn();
-            }
+            const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
+            const userSystemSetAsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            updateState(locallySavedTheme ? locallySavedTheme === 'dark' : userSystemSetAsDark);
 
-            if (isDark) {
-                document.documentElement.classList.add('user-night-mode');
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-                this.themeButton.setAttribute('data-theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('user-night-mode', 'night-mode');
-                document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
-                document.documentElement.removeAttribute('data-bs-theme');
-                this.themeButton.setAttribute('data-theme', 'light');
-            }
-
-            this.themeButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const isNightThemeNow = document.documentElement.classList.toggle('user-night-mode');
-                if (isNightThemeNow) {
-                    document.documentElement.setAttribute('data-bs-theme', 'dark');
-                    this.themeButton.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('kanji-wizard-theme', 'dark');
-                } else {
-                    document.documentElement.removeAttribute('data-bs-theme');
-                    document.documentElement.classList.remove('night-mode');
-                    document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
-                    this.themeButton.setAttribute('data-theme', 'light');
-                    localStorage.setItem('kanji-wizard-theme', 'light');
-                }
+            this.themeButton.addEventListener('click', (clickEvent) => {
+                clickEvent.stopPropagation();
+                const switchedToDarkMode = root.classList.contains('user-day-mode');
+                updateState(switchedToDarkMode);
             });
         }
     }

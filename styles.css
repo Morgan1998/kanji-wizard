@@ -53,7 +53,6 @@
     --dock-glow: #0077ff;
     --dock-shadow: rgba(0, 0, 0, 0.1);
 
-
     /* Drawing Canvas */
     --canvas-bg: rgba(245, 245, 245, 0.8);
     --canvas-grid: rgba(0, 0, 0, 0.1);
@@ -297,11 +296,7 @@ html {
     stroke-dasharray: 4 3;
 }
 
-
-/* ==========================================================================
-   1. BASE KANJI STROKE STYLES
-   ========================================================================== */
-
+/* --- BASE KANJI STROKE STYLES --- */
 .kanji-stroke {
     stroke: var(--kanji-stroke-color, #000000);
     stroke-width: 3;
@@ -312,10 +307,7 @@ html {
     transition: stroke-dashoffset 0.4s ease-in-out, stroke 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
 }
 
-/* ==========================================================================
-   2. KANJI CANVAS AUTO-FOCUS (X-RAY THEME)
-   ========================================================================== */
-
+/* --- KANJI CANVAS AUTO-FOCUS (X-RAY THEME) --- */
 .has-focus .kanji-stroke {
     stroke: var(--kanji-stroke-color); 
     opacity: 0.25; 
@@ -326,38 +318,55 @@ html {
     opacity: 1; 
 }
 
-.show-colors.has-focus .focused-component [kvg\:radical="general"] .kanji-stroke {
-    stroke: var(--active-color, var(--accent-color));
-    opacity: 1;
-    filter: drop-shadow(0 0 5px var(--active-color, var(--accent-color)));
+/* --- DYNAMIC COMPONENT COLOR SEQUENCE --- */
+#stroke-paths-root.show-colors .element-color-1 .kanji-stroke {
+    stroke: var(--n5-color);
+    --active-color: var(--n5-color);
 }
 
-/* ==========================================================================
-   3. DYNAMIC COMPONENT COLOR SEQUENCE
-   ========================================================================== */
+#stroke-paths-root.show-colors .element-color-2 .kanji-stroke {
+    stroke: var(--n4-color);
+    --active-color: var(--n4-color);
+}
 
-.show-colors .element-color-1 .kanji-stroke          { stroke: var(--n5-color); --active-color: var(--n5-color); } 
-.show-colors .element-color-2 .kanji-stroke          { stroke: var(--n4-color); --active-color: var(--n4-color); } 
-.show-colors .element-color-3 .kanji-stroke          { stroke: var(--n3-color); --active-color: var(--n3-color); } 
-.show-colors .element-color-4 .kanji-stroke          { stroke: var(--n2-color); --active-color: var(--n2-color); } 
-.show-colors .element-color-5 .kanji-stroke          { stroke: #f97316;         --active-color: #f97316; }        
-.show-colors .element-color-6 .kanji-stroke          { stroke: #ec4899;         --active-color: #ec4899; }        
+#stroke-paths-root.show-colors .element-color-3 .kanji-stroke {
+    stroke: var(--n3-color);
+    --active-color: var(--n3-color);
+}
 
-.highlight-radical [kvg\:radical="general"] .kanji-stroke { 
+#stroke-paths-root.show-colors .element-color-4 .kanji-stroke {
+    stroke: var(--n2-color);
+    --active-color: var(--n2-color);
+}
+
+#stroke-paths-root.show-colors .element-color-5 .kanji-stroke {
+    stroke: #f97316;
+    --active-color: #f97316;
+}
+
+#stroke-paths-root.show-colors .element-color-6 .kanji-stroke {
+    stroke: #ec4899;
+    --active-color: #ec4899;
+}
+
+.highlight-radical #stroke-paths-root:not(.show-colors) :is([kvg\:radical="general"], [kvg\:radical="tradit"]) .kanji-stroke { 
     stroke: var(--n1-color); 
     --active-color: var(--n1-color); 
     stroke-width: 3.5;
 }
 
-.highlight-radical [kvg\:radical="general"] .kanji-stroke {
-    filter: drop-shadow(0 0 4px var(--n1-color));
+.highlight-radical.show-colors.has-focus :is(.focused-component:is([kvg\:radical="general"], [kvg\:radical="tradit"]), .focused-component :is([kvg\:radical="general"], [kvg\:radical="tradit"])) .kanji-stroke,
+.highlight-radical :is([kvg\:radical="general"], [kvg\:radical="tradit"]) .kanji-stroke {
+    filter: drop-shadow(0 0 3px var(--n1-color)) drop-shadow(0 0 8px var(--n1-color));
 }
 
-/* ==========================================================================
-   4. KANJI TOOL & TREE NAVIGATION BUTTONS
-   ========================================================================== */
+.highlight-radical .tree-node-button.radical-node {
+    border-color: var(--n1-color);
+    color: var(--n1-color);
+    box-shadow: 0 0 8px var(--n1-color);
+}
 
-
+/* --- KANJI TOOL & TREE NAVIGATION BUTTONS --- */
 .kanji-tools {
     width: 30%;
     height: 100%; 
@@ -470,54 +479,15 @@ button.kanji-tool-button {
     background: rgba(255, 255, 255, 0.03);
 }
 
-.tree-node-button.element-color-1:hover { border-color: var(--n5-color); color: var(--n5-color); }
-.tree-node-button.element-color-2:hover { border-color: var(--n4-color); color: var(--n4-color); }
-.tree-node-button.element-color-3:hover { border-color: var(--n3-color); color: var(--n3-color); }
-.tree-node-button.element-color-4:hover { border-color: var(--n2-color); color: var(--n2-color); }
-.tree-node-button.element-color-5:hover { border-color: #f97316; color: #f97316; }
-.tree-node-button.element-color-6:hover { border-color: #ec4899; color: #ec4899; }
+.tree-node-button.element-color-1 { border-color: var(--n5-color); color: var(--n5-color); }
+.tree-node-button.element-color-2 { border-color: var(--n4-color); color: var(--n4-color); }
+.tree-node-button.element-color-3 { border-color: var(--n3-color); color: var(--n3-color); }
+.tree-node-button.element-color-4 { border-color: var(--n2-color); color: var(--n2-color); }
+.tree-node-button.element-color-5 { border-color: #f97316; color: #f97316; }
+.tree-node-button.element-color-6 { border-color: #ec4899; color: #ec4899; }
 
-
-
-.kanji-tree-elements {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    overflow-x: auto;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 4px;
-    min-height: 38px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--wizard-color-3) transparent;
-    border: 1px solid var(--border-card);
-    border-radius: 6px;
-    background-color: var(--bg-kanji-house);
-}
-
-.kanji-tree-elements::-webkit-scrollbar {
-    height: 3px;
-}
-
-.kanji-tree-elements::-webkit-scrollbar-thumb {
-    background-color: var(--wizard-color-3);
-    border-radius: 4px;
-}
-
-.kanji-tree-placeholder {
-    font-size: 0.85rem;
-    color: var(--text-vocab-muted); 
-    font-style: italic;
-    padding: 0 12px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-/* ==========================================================================
-   5. HORIZONTAL WAYFINDING BREADCRUMBS
-   ========================================================================== */
-
+/* --- CONSOLIDATED CONTAINER BOXES --- */
+.kanji-tree-elements,
 .kanji-tree-breadcrumbs {
     display: flex;
     flex-direction: row;
@@ -535,15 +505,27 @@ button.kanji-tool-button {
     background-color: var(--bg-kanji-house);
 }
 
+.kanji-tree-elements::-webkit-scrollbar,
 .kanji-tree-breadcrumbs::-webkit-scrollbar {
-    height: 3px; 
+    height: 3px;
 }
 
+.kanji-tree-elements::-webkit-scrollbar-thumb,
 .kanji-tree-breadcrumbs::-webkit-scrollbar-thumb {
     background-color: var(--wizard-color-3);
     border-radius: 4px;
 }
 
+.kanji-tree-placeholder {
+    font-size: 0.85rem;
+    color: var(--text-vocab-muted); 
+    font-style: italic;
+    padding: 0 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* --- HORIZONTAL WAYFINDING BREADCRUMBS --- */
 .breadcrumb-item {
     font-size: 0.8rem;
     padding: 4px 10px;
@@ -584,10 +566,7 @@ button.kanji-tool-button {
     font-size: 0.85rem;
 }
 
-/* ==========================================================================
-   6. ANNOTATIONS
-   ========================================================================== */
-
+/* --- ANNOTATIONS --- */
 #stroke-numbers-root text {
     display: none;
     font-family: inherit;
@@ -650,14 +629,10 @@ button.kanji-tool-button {
     justify-self: center;
 }
 
-button.meaning-expand-button {
-    margin: 0 0 0 10px;
-}
-
 #kanji-meaning .meaning-expand-button {
     grid-column: 3;
     justify-self: start;
-    margin-right: 24px;
+    margin: 0 24px 0 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -815,16 +790,6 @@ button.meaning-expand-button {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 /* ==========================================================================
    SECTION 6: KANJI READINGS COMPONENT
    ========================================================================== */
@@ -834,18 +799,15 @@ div.vocabulary-top-bar button.reading-button {
     min-width: 105px;
     height: 38px;
     padding: 0 20px;
-    
     background: var(--bg-vocab-ledger);
     border: 1px solid var(--border-card);
     border-radius: 2px;
-    
     font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
     font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--text-secondary);
-    
     cursor: pointer;
     position: relative;
     transition: all 0.2s ease;
@@ -974,23 +936,18 @@ div.kanji-neighborhood button.reading-button:hover {
     min-width: 80px;
     height: 36px;
     padding: 0 16px;
-    
     background: #0d1117;
     border: 1px solid #30363d;
-    
     display: flex;
     align-items: center;
     justify-content: center;
-    
     font-family: 'JetBrains Mono', monospace; 
     font-size: 0.7rem;
     font-weight: 500;
     text-transform: uppercase;
-    
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1149,16 +1106,12 @@ div.kanji-neighborhood button.reading-button:hover {
     }
 }
 
-button.vocab-gloss-expand-button {
-    margin: 0;
-}
-
 #vocab-ledger .vocab-gloss-expand-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    margin-left: 8px;
+    margin: 0 0 0 8px;
     height: 18px;
     padding: 0 6px 0 12px;
     background: var(--bg-vocab-ledger);
@@ -1212,13 +1165,6 @@ button.vocab-gloss-expand-button {
         opacity: 0;
     }
 }
-
-
-
-
-
-
-
 
 .badge-container {
     position: relative;
@@ -1286,12 +1232,6 @@ button.vocab-gloss-expand-button {
     display: none;
 }
 
-
-
-
-
-
-
 .badge-container-n5 .hat-vector path { fill: var(--n5-color); }
 .badge-container-n4 .hat-vector path { fill: var(--n4-color); }
 .badge-container-n3 .hat-vector path { fill: var(--n3-color); }
@@ -1329,8 +1269,6 @@ button.vocab-gloss-expand-button {
     color: var(--text-vocab-muted);
     font-weight: 300;
 }
-
-
 
 
 /* ==========================================================================
@@ -1516,6 +1454,7 @@ button.vocab-gloss-expand-button {
     color: var(--text-secondary);
     text-transform: uppercase;
 }
+
 .sliding-toggle-button {
     position: relative;
     display: inline-flex;
@@ -1650,8 +1589,6 @@ button.vocab-gloss-expand-button {
 }
 
 
-
-
 /* ==========================================================================
    SECTION 11: GLOBAL UTILITY HELPERS
    ========================================================================== */
@@ -1665,7 +1602,3 @@ button.vocab-gloss-expand-button {
     opacity: 0;
     pointer-events: none;
 }
-
-
-
-

@@ -1,16 +1,16 @@
 <div class="deck-workspace">
     <div class="card-container card-container-front">
         <div class="kanji-house">
-            <svg id="kanji-svg" viewBox="0 0 109 109" width=100% height=100%>
+            <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
                 <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
                 <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
                 <g id="svg-stroke-group"></g>
             </svg>
         </div>
         <footer class="deck-utility-footer">
-            <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
-            <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
-            <button id="toggle-theme-button" aria-label="Toggle theme"></button>
+            <a id="report-issue-link" href="" target="_blank" class="utility-link">Report an Issue</a>
+            <a id="rate-deck-link" href="" target="_blank" class="utility-link">Rate the Deck</a>
+            <button id="toggle-theme-button" class="sliding-toggle-button" aria-label="Toggle theme"></button>
         </footer>
     </div>
 </div>
@@ -20,144 +20,109 @@
 <script>
 (() => {
 
-class DataLoader {
-    /**
-     * @param {string} 
-     */
-    constructor(elementId = 'json-container') {
-        this.elementId = elementId;
-        this.data = this.#init();
-    }
-
-    #init() {
-        const element = document.getElementById(this.elementId);
-        
-        if (!element || !element.textContent.trim()) {
-            console.error(`Kanji Wizard Error: #${this.elementId} not found or empty.`);
-            return null;
+    class DataLoader {
+        constructor(elementId = 'json-container') {
+            this.elementId = elementId;
+            this.data = this.#init();
         }
 
-        try {
-            return JSON.parse(element.textContent);
-        } catch (err) {
-            console.error("Kanji Wizard Error: Failed to parse JSON data.", err);
-            return null;
-        }
-    }
-
-    isValid() {
-        return this.data !== null;
-    }
-}
-
-class FrontCardApp {
-    constructor() {
-        const loader = new DataLoader('json-container');
-        if (!loader.isValid()) {
-            console.log('JSON container not accessed properly');
-            return;
-        }
-
-        this.kanjiData = loader.data;
-
-        this.#init();
-    }
-
-    #init() {
-        this.setupThemeToggle();
-        this.renderStrokes();
-    }
-
-    renderStrokes() {
-        const strokeGroup = document.getElementById('svg-stroke-group');
-        if (!strokeGroup || !this.kanjiData.svg) return;
-
-        // Helper: Recursively traverse the nested JSON
-        const traverse = (node) => {
-            // 1. Check for paths
-            if (node.path) {
-                const paths = Array.isArray(node.path) ? node.path : [node.path];
-                
-                for (const p of paths) {
-                    const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    
-                    // Use classList for clean style management
-                    pathEl.classList.add("kanji-stroke");
-                    pathEl.setAttribute("d", p.d);
-                    
-                    // Add the specific ID for potential future animation
-                    if (p.id) pathEl.id = p.id;
-                    
-                    strokeGroup.appendChild(pathEl);
-                }
+        #init() {
+            const element = document.getElementById(this.elementId);
+            
+            if (!element || !element.textContent.trim()) {
+                console.error(`Kanji Wizard Error: #${this.elementId} not found or empty.`);
+                return null;
             }
 
-            // 2. Check for nested groups (g) and recurse
-            if (node.g) {
-                const groups = Array.isArray(node.g) ? node.g : [node.g];
-                for (const group of groups) {
-                    traverse(group);
-                }
+            try {
+                return JSON.parse(element.textContent);
+            } catch (parsingError) {
+                console.error("Kanji Wizard Error: Failed to parse JSON data.", parsingError);
+                return null;
             }
-        };
+        }
 
-        traverse(this.kanjiData.svg);
+        isValid() {
+            return this.data !== null;
+        }
     }
 
-    setupThemeToggle() {
-        this.themeButton = document.querySelector('#toggle-theme-button');
-        if (!this.themeButton) return;
+    class FrontCardApp {
+        constructor() {
+            const dataLoader = new DataLoader('json-container');
+            if (!dataLoader.isValid()) {
+                console.log('JSON container not accessed properly');
+                return;
+            }
 
-        const hasSystemNightThemeOn = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const hasAnkiNightThemeOn = () => {
-                return document.documentElement.classList.contains('night-mode') ||
-                    document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
-                    document.body.classList.contains('nightMode') ||
-                    document.body.classList.contains('night_mode') ||
-                    document.body.classList.contains('card_dark') ||
-                    document.documentElement.classList.contains('user-night-mode');
+            this.kanjiData = dataLoader.data;
+
+            this.#init();
+        }
+
+        #init() {
+            this.setupThemeToggle();
+            this.renderStrokes();
+        }
+
+        renderStrokes() {
+            const strokeGroup = document.getElementById('svg-stroke-group');
+            if (!strokeGroup || !this.kanjiData.svg) return;
+
+            const traverse = (node) => {
+                if (node.path) {
+                    const paths = Array.isArray(node.path) ? node.path : [node.path];
+                    
+                    for (const pathDataNode of paths) {
+                        const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        
+                        pathElement.classList.add("kanji-stroke");
+                        pathElement.setAttribute("d", pathDataNode.d);
+                        
+                        if (pathDataNode.id) pathElement.id = pathDataNode.id;
+                        
+                        strokeGroup.appendChild(pathElement);
+                    }
+                }
+
+                if (node.g) {
+                    const groups = Array.isArray(node.g) ? node.g : [node.g];
+                    for (const group of groups) {
+                        traverse(group);
+                    }
+                }
             };
 
-        const savedTheme = localStorage.getItem('kanji-wizard-theme');
-
-        let isDark;
-        if (savedTheme !== null) {
-            isDark = savedTheme === 'dark';
-        } else {
-            isDark = hasSystemNightThemeOn() || hasAnkiNightThemeOn();
+            traverse(this.kanjiData.svg);
         }
 
-        if (isDark) {
-            document.documentElement.classList.add('user-night-mode');
-            document.documentElement.setAttribute('data-bs-theme', 'dark');
-            this.themeButton.setAttribute('data-theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('user-night-mode', 'night-mode');
-            document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
-            document.documentElement.removeAttribute('data-bs-theme');
-            this.themeButton.setAttribute('data-theme', 'light');
-        }
+        setupThemeToggle() {
+            this.themeButton = document.querySelector('#toggle-theme-button');
+            if (!this.themeButton) return;
 
-        this.themeButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const isNightThemeNow = document.documentElement.classList.toggle('user-night-mode');
-            if (isNightThemeNow) {
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-                this.themeButton.setAttribute('data-theme', 'dark');
-                localStorage.setItem('kanji-wizard-theme', 'dark');
-            } else {
-                document.documentElement.removeAttribute('data-bs-theme');
-                document.documentElement.classList.remove('night-mode');
-                document.body.classList.remove('nightMode', 'night_mode', 'card_dark');
-                this.themeButton.setAttribute('data-theme', 'light');
-                localStorage.setItem('kanji-wizard-theme', 'light');
-            }
-        });
+            const root = document.documentElement;
+
+            const updateState = (isNightModeActive) => {
+                root.classList.toggle('user-night-mode', isNightModeActive);
+                root.classList.toggle('user-day-mode', !isNightModeActive);
+                
+                this.themeButton.setAttribute('data-theme', isNightModeActive ? 'dark' : 'light');
+                localStorage.setItem('kanji-wizard-theme', isNightModeActive ? 'dark' : 'light');
+            };
+
+            const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
+            const userSystemSetAsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            updateState(locallySavedTheme ? locallySavedTheme === 'dark' : userSystemSetAsDark);
+
+            this.themeButton.addEventListener('click', (clickEvent) => {
+                clickEvent.stopPropagation();
+                const switchedToDarkMode = root.classList.contains('user-day-mode');
+                updateState(switchedToDarkMode);
+            });
+        }
     }
-}
 
-
-new FrontCardApp();
+    new FrontCardApp();
     
 })();
 </script>
