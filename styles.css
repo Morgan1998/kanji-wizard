@@ -2,12 +2,6 @@
    SECTION 1: THEMES & VARIABLE DEFINITIONS
    ========================================================================== */
 
-@property --active-color {
-    syntax: "<color>";
-    inherits: true;
-    initial-value: transparent;
-}
-
 /* DEFAULT LIGHT THEME ── */
 :root, :root.user-day-mode {
     --bg: white;
@@ -25,6 +19,7 @@
     --accent-color: #000000;
 
     /* Vocab Ledger */
+    --vocab-entry-color: #6d28d9;
     --bg-vocab-ledger: #f1f3f5;
     --text-vocab-main: #1a1a1a;
     --text-vocab-muted: #64748b;
@@ -102,6 +97,7 @@
     --accent-color: #ffffff;
 
     /* Vocab Ledger */
+    --vocab-entry-color: #38bdf8;
     --bg-vocab-ledger: #1e1e24;
     --text-vocab-main: #f8fafc;
     --text-vocab-muted: #94a3b8;
@@ -267,10 +263,10 @@ html {
 
 .kanji-neighborhood {
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     justify-content: center;
-    height: 150px;
-    gap: 16px;   
+    height: 170px;
+    gap: 12px;   
     width: 100%;           
 }
 
@@ -286,7 +282,7 @@ html {
     box-shadow: var(--shadow-card);
     border-radius: 12px;
     transition: background-color 0.2s ease, border-color 0.2s ease;
-    overflow: hidden;
+    overflow: visible;
     flex-shrink: 0;
 }
 
@@ -295,6 +291,8 @@ html {
     stroke-width: 1;
     stroke-dasharray: 4 3;
 }
+
+
 
 /* --- BASE KANJI STROKE STYLES --- */
 .kanji-stroke {
@@ -307,68 +305,13 @@ html {
     transition: stroke-dashoffset 0.4s ease-in-out, stroke 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
 }
 
-/* --- KANJI CANVAS AUTO-FOCUS (X-RAY THEME) --- */
-.has-focus .kanji-stroke {
-    stroke: var(--kanji-stroke-color); 
-    opacity: 0.25; 
-}
 
-.has-focus .focused-component .kanji-stroke {
-    stroke: var(--accent-color); 
-    opacity: 1; 
-}
-
-/* --- DYNAMIC COMPONENT COLOR SEQUENCE --- */
-#stroke-paths-root.show-colors .element-color-1 .kanji-stroke {
-    stroke: var(--n5-color);
-    --active-color: var(--n5-color);
-}
-
-#stroke-paths-root.show-colors .element-color-2 .kanji-stroke {
-    stroke: var(--n4-color);
-    --active-color: var(--n4-color);
-}
-
-#stroke-paths-root.show-colors .element-color-3 .kanji-stroke {
-    stroke: var(--n3-color);
-    --active-color: var(--n3-color);
-}
-
-#stroke-paths-root.show-colors .element-color-4 .kanji-stroke {
-    stroke: var(--n2-color);
-    --active-color: var(--n2-color);
-}
-
-#stroke-paths-root.show-colors .element-color-5 .kanji-stroke {
-    stroke: #f97316;
-    --active-color: #f97316;
-}
-
-#stroke-paths-root.show-colors .element-color-6 .kanji-stroke {
-    stroke: #ec4899;
-    --active-color: #ec4899;
-}
-
-.highlight-radical #stroke-paths-root:not(.show-colors) :is([kvg\:radical="general"], [kvg\:radical="tradit"]) .kanji-stroke { 
-    stroke: var(--n1-color); 
-    --active-color: var(--n1-color); 
-    stroke-width: 3.5;
-}
-
-.highlight-radical.show-colors.has-focus :is(.focused-component:is([kvg\:radical="general"], [kvg\:radical="tradit"]), .focused-component :is([kvg\:radical="general"], [kvg\:radical="tradit"])) .kanji-stroke,
-.highlight-radical :is([kvg\:radical="general"], [kvg\:radical="tradit"]) .kanji-stroke {
-    filter: drop-shadow(0 0 3px var(--n1-color)) drop-shadow(0 0 8px var(--n1-color));
-}
-
-.highlight-radical .tree-node-button.radical-node {
-    border-color: var(--n1-color);
-    color: var(--n1-color);
-    box-shadow: 0 0 8px var(--n1-color);
-}
 
 /* --- KANJI TOOL & TREE NAVIGATION BUTTONS --- */
+
 .kanji-tools {
     width: 30%;
+    max-width: 30%;
     height: 100%; 
     max-height: 100%;
     display: flex;
@@ -379,226 +322,93 @@ html {
 #kanji-tools-left {
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 12px;
+    padding-top: 4px;
 }
 
-#kanji-tree {
+#kanji-tools-right {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-}
-
-#kanji-tree-head {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    width: 95%;
-    margin-bottom: 8px;
-    flex-shrink: 0;
+    justify-content: flex-start;
 }
 
-#kanji-tree-body {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 95%;
-    flex-grow: 1;
-    min-height: 0; 
-}
-
-button.kanji-tool-button {
-    -webkit-appearance: none;
-    appearance: none;
-    outline: none;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    height: 24px;
-    background: var(--bg-vocab-ledger);
-    border: 1px solid var(--border-card);
-    border-radius: 2px;
-    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-secondary);
-    cursor: pointer;
-    box-shadow: var(--shadow-card);
-    transition: opacity 0.2s ease,
-                border-color 0.2s ease,
-                background-color 0.2s ease,
-                color 0.2s ease;
-    margin: 0;
-}
-
-.tree-head-button {
-    width: 36px;
-    padding: 0 0 0 8px;
-}
-
-.tree-head-button::before {
-    content: "";
+#kanji-house .kanji-house-sigil-dock {
     position: absolute;
-    left: 5px;
-    top: 25%;
-    width: 2px;
-    height: 50%;
-    background: var(--text-secondary);
-    border-radius: 1px;
-    opacity: 0.3;
-    transition: opacity 0.2s ease, background-color 0.2s ease;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    bottom: -16px;
+    transform-origin: bottom center;
 }
 
-.tree-head-button:hover {
-    border-color: var(--text-secondary);
-    background: rgba(255, 255, 255, 0.03);
-}
 
-.tree-head-button.active {
-    border-color: var(--accent-color);
-    color: var(--accent-color);
-    background: var(--bg-card);
-}
-
-.tree-head-button.active::before {
-    background-color: var(--accent-color);
-    opacity: 1;
-}
-
-.tree-node-button {
-    padding: 0 10px;
-}
-
-.tree-node-button:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.tree-node-button.element-color-1 { border-color: var(--n5-color); color: var(--n5-color); }
-.tree-node-button.element-color-2 { border-color: var(--n4-color); color: var(--n4-color); }
-.tree-node-button.element-color-3 { border-color: var(--n3-color); color: var(--n3-color); }
-.tree-node-button.element-color-4 { border-color: var(--n2-color); color: var(--n2-color); }
-.tree-node-button.element-color-5 { border-color: #f97316; color: #f97316; }
-.tree-node-button.element-color-6 { border-color: #ec4899; color: #ec4899; }
-
-/* --- CONSOLIDATED CONTAINER BOXES --- */
-.kanji-tree-elements,
-.kanji-tree-breadcrumbs {
+.kanji-house-toggle-wrapper {
+    position: absolute;
+    bottom: -12px;
+    z-index: 10;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 6px;
-    overflow-x: auto;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 4px;
-    min-height: 38px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--wizard-color-3) transparent;
-    border: 1px solid var(--border-card);
-    border-radius: 6px;
-    background-color: var(--bg-kanji-house);
 }
 
-.kanji-tree-elements::-webkit-scrollbar,
-.kanji-tree-breadcrumbs::-webkit-scrollbar {
-    height: 3px;
+.kanji-house-toggle-wrapper.position-bottom-left {
+    left: -12px;
+    transform: scale(0.85);
+    transform-origin: bottom left;
 }
 
-.kanji-tree-elements::-webkit-scrollbar-thumb,
-.kanji-tree-breadcrumbs::-webkit-scrollbar-thumb {
-    background-color: var(--wizard-color-3);
-    border-radius: 4px;
+.kanji-house-toggle-wrapper.position-bottom-right {
+    right: -6px;
+    transform: scale(0.85);
+    transform-origin: bottom right;
 }
 
-.kanji-tree-placeholder {
-    font-size: 0.85rem;
-    color: var(--text-vocab-muted); 
-    font-style: italic;
-    padding: 0 12px;
-    text-align: center;
-    white-space: nowrap;
+
+
+.highlight-radical .kanji-stroke {
+    opacity: 0.25;
 }
 
-/* --- HORIZONTAL WAYFINDING BREADCRUMBS --- */
-.breadcrumb-item {
-    font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 2px;
-    background-color: var(--bg-vocab-ledger);
-    border: 1px solid var(--wizard-color-3);
-    font-weight: 600;
-    box-shadow: var(--shadow-card);
-    transition: background-color 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
-    white-space: nowrap;
+.highlight-radical :is([kvg\:radical="general"], [kvg\:radical="tradit"]) .kanji-stroke { 
+    stroke: var(--n1-color); 
+    --active-color: var(--n1-color); 
+    stroke-width: 3.5;
+    opacity: 1;
+    filter: drop-shadow(0 0 3px var(--n1-color)) drop-shadow(0 0 8px var(--n1-color));
 }
 
-.breadcrumb-link {
-    cursor: pointer;
-    color: var(--accent-color); 
-}
-
-.breadcrumb-link:hover {
-    background-color: var(--wizard-color-1);
-    color: var(--accent-color);
-    border-color: var(--accent-color);
-    box-shadow: 0 0 8px rgba(109, 40, 217, 0.2);
-}
-
-.breadcrumb-active {
-    background-color: var(--wizard-color-1);
-    color: var(--text-primary); 
-    border-color: var(--accent-color);
-    box-shadow: 0 0 6px rgba(0, 119, 255, 0.15);
-}
-
-.breadcrumb-separator {
-    color: var(--accent-color); 
-    font-weight: 700;
-    font-size: 0.85rem;
-}
-
-/* --- ANNOTATIONS --- */
 #stroke-numbers-root text {
     display: none;
-    font-family: inherit;
-    font-size: 8px;
-    font-weight: 800;
-    fill: var(--text-secondary);
-    transition: opacity 0.3s ease, fill 0.3s ease;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 7.5px;
+    font-weight: 900;
+    fill: var(--wizard-color-6);
+    stroke: var(--bg-kanji-house);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    paint-order: stroke fill;
+    text-anchor: middle;
+    dominant-baseline: central;
+    opacity: 0;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease;
 }
 
-#stroke-numbers-root.show-drawn-numbers text.is-drawn {
+#kanji-svg #stroke-numbers-root.show-drawn-numbers text.is-drawn {
     display: block;
+    opacity: 0.95;
+    fill: var(--text-primary);
+    stroke: var(--bg-kanji-house);
+    stroke-width: 2.5px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    paint-order: stroke fill;
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--bg-kanji-house) 80%, transparent));
 }
 
-#stroke-numbers-root.has-focus text {
-    opacity: 0.15;
-}
-
-#stroke-numbers-root.has-focus text.focused-component {
-    opacity: 1;
-    fill: var(--accent-color);
-}
-
-#stroke-paths-root.show-colors ~ #stroke-numbers-root text {
-    fill: var(--accent-color);
-}
-
-#stroke-paths-root.show-colors ~ #stroke-numbers-root.has-focus text {
-    fill: var(--text-secondary);
-}
-
-#stroke-paths-root.show-colors ~ #stroke-numbers-root.has-focus text.focused-component {
-    fill: var(--accent-color);
+#kanji-svg #stroke-numbers-root.show-drawn-numbers text.is-drawn {
+    display: block;
 }
 
 
@@ -778,15 +588,52 @@ button.kanji-tool-button {
 }
 
 .meaning-pill.secondary-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px 0 16px;
+    background: var(--bg-vocab-ledger);
+    border: 1px solid var(--border-card);
+    border-radius: 2px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-card);
     cursor: pointer;
+    transition: border-color 0.2s ease,
+                background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.meaning-pill.secondary-pill::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 25%;
+    width: 2px;
+    height: 50%;
+    background: var(--accent-color);
+    border-radius: 1px;
+    opacity: 0.5;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .meaning-pill.secondary-pill:hover {
-    background-color: var(--accent-color);
     border-color: var(--accent-color);
-    color: var(--wizard-color-1);
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color) 30%, transparent);
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--accent-color) 8%, var(--bg-card));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.meaning-pill.secondary-pill:hover::before {
+    opacity: 1;
 }
 
 
@@ -794,8 +641,36 @@ button.kanji-tool-button {
    SECTION 6: KANJI READINGS COMPONENT
    ========================================================================== */
 
+#vocabulary-top-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 16px 8px 16px;
+    width: 95%;
+    background-color: var(--bg-card);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    border-radius: 12px 12px 0px 0px;
+}
+
+.vocabulary-top-bar-title-row {
+    padding: 4px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.vocabulary-top-bar-buttons-row {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+}
+
 div.vocabulary-top-bar button.reading-button {
-    flex: 0 0 auto;
+    flex: 1 1 0px;
     min-width: 105px;
     height: 38px;
     padding: 0 20px;
@@ -851,6 +726,15 @@ div.vocabulary-top-bar button.reading-button::after {
     opacity: 1;
 }
 
+#irregular-button.active {
+    color: var(--wizard-color-6);
+    border-color: var(--wizard-color-6);
+}
+#irregular-button.active::before {
+    background: var(--wizard-color-6);
+    opacity: 1;
+}
+
 div.vocabulary-top-bar button.reading-button.active::after {
     color: currentColor;
 }
@@ -860,22 +744,11 @@ div.kanji-neighborhood button.reading-button:hover {
     background: rgba(255, 255, 255, 0.03);
 }
 
-.readings-display-wrapper {
+.kanji-house:has(.readings-display-wrapper.active)::before {
+    content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: black;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.8s ease-in-out;
-    overflow: hidden;
-    border-radius: 12px;
+    inset: 0;
+    background-color: #000000;
     background-image: 
         radial-gradient(1px 1px at 20% 30%, #fff, transparent),
         radial-gradient(1px 1px at 40% 70%, #fff, transparent),
@@ -884,6 +757,23 @@ div.kanji-neighborhood button.reading-button:hover {
         radial-gradient(1px 1px at 10% 90%, #fff, transparent);
     background-size: 200px 200px;
     animation: driftStardust 20s linear infinite;
+    z-index: 2;
+    border-radius: 12px;
+}
+
+.readings-display-wrapper {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    overflow: hidden;
+    border-radius: 12px;
 }
 
 .readings-display-wrapper.active {
@@ -949,8 +839,15 @@ div.kanji-neighborhood button.reading-button:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     border-radius: 4px;
-    cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#readings-display-wrapper-kun .readings-badge {
+    border: 2px solid var(--wizard-color-4)
+}
+
+#readings-display-wrapper-on .readings-badge {
+    border: 2px solid var(--wizard-color-5)
 }
 
 .readings-badge::after {
@@ -965,22 +862,13 @@ div.kanji-neighborhood button.reading-button:hover {
 }
 
 #readings-display-wrapper-kun .readings-badge {
-    color: #5eead4; 
+    color: whitesmoke; 
 }
 
 #readings-display-wrapper-on .readings-badge {
-    color: #f472b6; 
+    color: whitesmoke; 
 }
 
-.readings-badge:hover {
-    background: #161b22;
-    border-color: currentColor;
-    box-shadow: 0 0 8px rgba(0,0,0,0.4);
-}
-
-.readings-badge:hover::after {
-    width: 100%;
-}
 
 
 /* ==========================================================================
@@ -1002,7 +890,7 @@ div.kanji-neighborhood button.reading-button:hover {
     justify-content: space-around;
     align-items: center;
     flex: 0 0 auto;
-    padding: 8px 0px 0px 24px;
+    padding: 4px 8px;
     width: 95%;
     background-color: var(--bg-card);
     font-family: 'Cinzel', serif;
@@ -1014,7 +902,7 @@ div.kanji-neighborhood button.reading-button:hover {
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-gutter: stable;  
-    padding: 2px 24px;
+    padding: 2px 16px;
     width: 95%;
     min-height: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -1041,53 +929,55 @@ div.kanji-neighborhood button.reading-button:hover {
     display: flex;
     align-items: center;
     position: relative;
-    z-index: 10; 
-    overflow: visible;
-    margin: 8px 0; 
-    padding: 14px 8px 8px 8px;
-    background: color-mix(in srgb, var(--accent-color), transparent 97%);
-    color: #fff;
-    border: 1px solid color-mix(in srgb, var(--accent-color), white 20%);
-    border-bottom: 1px solid color-mix(in srgb, var(--accent-color), white 20%);
-    border-radius: 20px; 
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                box-shadow 0.4s ease, 
-                margin 0.4s ease,
-                border-color 0.3s ease, 
-                opacity 0.2s ease, 
-                background-color 0.4s ease;
+    z-index: 10;
+    margin: 8px 0;
+    padding: 10px 14px;
+    background: color-mix(in srgb, var(--vocab-entry-color) 3%, var(--bg-card));
+    color: var(--text-vocab-main);
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+    transition: transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease,
+                background-color 0.25s ease;
 }
 
 .vocab-entry.active-reveal {
-    border: 1px solid var(--accent-color);
-    background: linear-gradient(90deg, rgba(var(--accent-color-rgb), 0.08) 0%, transparent 100%);
-    box-shadow: inset 2px 0 0 var(--accent-color), 0 0 20px rgba(var(--accent-color-rgb), 0.1);
+    border-color: var(--vocab-entry-color);
+    background: color-mix(in srgb, var(--vocab-entry-color) 10%, var(--bg-card));
+    box-shadow: 0 0 14px color-mix(in srgb, var(--vocab-entry-color) 30%, transparent);
     transform: translateX(4px);
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vocab-entry.active-reveal::before {
     content: "◈";
     position: absolute;
-    left: -18px;
-    color: var(--accent-color);
-    font-size: 0.8rem;
-    animation: pulse 2s infinite;
+    left: -16px;
+    color: var(--vocab-entry-color);
+    font-size: 0.75rem;
+    animation: activeRevealPulse 2s infinite ease-in-out;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
+@keyframes activeRevealPulse {
+    0%, 100% {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.25);
+    }
 }
 
 #vocab-ledger[data-active-filter] .vocab-entry {
     opacity: 0.25;
 }
 
-#vocab-ledger[data-active-filter="kun"] .vocab-entry[data-target-kanji-reading-type="kun"],
-#vocab-ledger[data-active-filter="on"] .vocab-entry[data-target-kanji-reading-type="on"] {
+#vocab-ledger[data-active-filter="kun"] .vocab-entry[data-target-kanji-reading-type~="kun"],
+#vocab-ledger[data-active-filter="on"] .vocab-entry[data-target-kanji-reading-type~="on"],
+#vocab-ledger[data-active-filter="jukujikun"] .vocab-entry[data-target-kanji-reading-type~="jukujikun"] {
     opacity: 1;
-    transform: scale(1.01); 
+    transform: scale(1.01);
 }
 
 .vocab-gloss-extra {
@@ -1139,15 +1029,15 @@ div.kanji-neighborhood button.reading-button:hover {
     top: 25%;
     width: 1.5px;
     height: 50%;
-    background: var(--accent-color);
+    background: var(--vocab-entry-color);
     border-radius: 1px;
     opacity: 0.6;
     transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .vocab-gloss-expand-button:hover {
-    border-color: var(--accent-color);
-    color: var(--accent-color);
+    border-color: var(--vocab-entry-color);
+    color: var(--vocab-entry-color);
     background: rgba(255, 255, 255, 0.03);
 }
 
@@ -1168,18 +1058,17 @@ div.kanji-neighborhood button.reading-button:hover {
 
 .badge-container {
     position: relative;
-    width: 46px;
-    height: 46px;
+    width: 38px;
+    height: 38px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 18px;
+    margin-right: 14px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1.5px solid color-mix(in srgb, var(--accent-color), transparent 70%);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color), transparent 90%), inset 0 0 8px rgba(0, 0, 0, 0.2);
+    background: color-mix(in srgb, var(--vocab-entry-color) 8%, transparent);
+    border: 1.5px solid color-mix(in srgb, var(--vocab-entry-color) 40%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--vocab-entry-color) 20%, transparent);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1190,13 +1079,13 @@ div.kanji-neighborhood button.reading-button:hover {
 
 .hat-vector {
     position: absolute;
-    top: -12px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%) rotate(-12deg);
-    width: 24px;
-    height: 24px;
+    transform: translate(-50%, -55%) rotate(-8deg);
+    width: 26px;
+    height: 26px;
     z-index: 3;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 
 .badge {
@@ -1228,16 +1117,32 @@ div.kanji-neighborhood button.reading-button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-.gem-slots {
-    display: none;
+
+.badge-container .hat-vector {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
 }
 
-.badge-container-n5 .hat-vector path { fill: var(--n5-color); }
-.badge-container-n4 .hat-vector path { fill: var(--n4-color); }
-.badge-container-n3 .hat-vector path { fill: var(--n3-color); }
-.badge-container-n2 .hat-vector path { fill: var(--n2-color); }
-.badge-container-n1 .hat-vector path { fill: var(--n1-color); }
-.badge-container-na .hat-vector path { fill: var(--na-color); }
+.badge-container .hat-vector path {
+    fill: var(--wizard-color-6);
+    transition: fill 0.3s ease;
+}
+
+.vocab-entry:hover .hat-vector {
+    transform: translate(-50%, -60%) rotate(-12deg) scale(1.12);
+    filter: drop-shadow(0 0 6px var(--wizard-color-6));
+}
+
+.vocab-entry.active-reveal .hat-vector path {
+    fill: var(--vocab-entry-color);
+}
+
+.vocab-entry.active-reveal .hat-vector {
+    filter: drop-shadow(0 0 8px var(--vocab-entry-color));
+}
+
+
+
+
 
 .vocab {
     display: flex;
@@ -1601,4 +1506,269 @@ div.kanji-neighborhood button.reading-button:hover {
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+.drawing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.drawing-house {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    width: 150px;
+    background-color: var(--bg-kanji-house);
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card);
+    border-radius: 12px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+#drawing-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+button.kanji-tool-button {
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 24px;
+    padding: 0 12px;
+    background: var(--bg-vocab-ledger);
+    border: 1px solid var(--border-card);
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition: opacity 0.2s ease,
+                border-color 0.2s ease,
+                background-color 0.2s ease,
+                color 0.2s ease;
+    margin: 0;
+}
+
+button.kanji-tool-button:hover {
+    border-color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.drawing-house button#clear-drawing-button.kanji-tool-button {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    z-index: 10;
+    font-size: 0.65rem;
+    height: 22px;
+    padding: 0 8px;
+    background: color-mix(in srgb, var(--bg-card) 85%, transparent);
+    backdrop-filter: blur(4px);
+    opacity: 0.8;
+    transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.drawing-house button#clear-drawing-button:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+
+
+
+
+
+.utility-icon-button {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    color: var(--text-secondary);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.utility-icon-button:hover {
+    color: var(--text-primary);
+    transform: rotate(45deg) scale(1.1);
+}
+
+.settings-drawer-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    transition: opacity 0.3s ease, display 0.3s ease;
+    transition-behavior: allow-discrete;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.settings-drawer-backdrop.is-hidden {
+    display: none;
+    opacity: 0;
+}
+
+.settings-drawer-backdrop.is-hidden .settings-drawer-sheet {
+    transform: translateY(100%);
+}
+
+.settings-drawer-sheet {
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-card);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 20px 24px 28px 24px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    transform: translateY(0);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@starting-style {
+    .settings-drawer-backdrop {
+        opacity: 0;
+    }
+    .settings-drawer-backdrop .settings-drawer-sheet {
+        transform: translateY(100%);
+    }
+}
+
+.settings-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-card);
+    padding-bottom: 12px;
+}
+
+.settings-drawer-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.settings-close-button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s ease;
+}
+
+.settings-close-button:hover {
+    color: var(--text-primary);
+}
+
+.settings-drawer-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent-color);
+}
+
+.settings-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.settings-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.settings-value-indicator {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.settings-select {
+    background-color: var(--bg-vocab-ledger);
+    color: var(--text-primary);
+    border: 1px solid var(--border-card);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.settings-range-input {
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    width: 100%;
+}
+
+.settings-available-indicator {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: 4px;
 }

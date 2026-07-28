@@ -1,21 +1,10 @@
 <div class="deck-workspace">
     <div class="card-container">
         <div class="kanji-neighborhood">
-
             <div id="kanji-tools-left" class="kanji-tools">
-                <div id="radical-toggle-wrapper" class="toggle-wrapper">
-                    <span id="radical-toggle-label" class="toggle-label">Radical</span>
-                    <button id="toggle-radical-button" class="sliding-toggle-button" aria-label="Toggle Radical"></button>
-                </div>
-                <div id="stroke-numbers-toggle-wrapper" class="toggle-wrapper">
-                    <span id="stroke-numbers-toggle-label" class="toggle-label">Stroke Numbers</span>
-                    <button id="toggle-stroke-numbers-button" class="sliding-toggle-button" aria-label="Toggle Numbers"></button>
-                </div>
-            </div>
 
-            
-            
-            <div class="kanji-house">
+            </div>
+            <div id="kanji-house" class="kanji-house">
                 <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
                     <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
                     <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
@@ -30,18 +19,30 @@
                 <div id="readings-display-wrapper-on" class="readings-display-wrapper">
                     <div id="readings-display-on" class="readings-display"></div>
                 </div>
+
+                <div id="radical-toggle-wrapper" class="kanji-house-toggle-wrapper position-bottom-left">
+                    <button id="toggle-radical-button" class="sliding-toggle-button" aria-label="Toggle Radical"></button>
+                </div>
+
+                <div id="stroke-sigil-dock" class="sigil-dock kanji-house-sigil-dock">
+
+                </div>
+
+                <div id="stroke-numbers-toggle-wrapper" class="kanji-house-toggle-wrapper position-bottom-right">
+                    <button id="toggle-stroke-numbers-button" class="sliding-toggle-button" aria-label="Toggle Numbers"></button>
+                </div>
             </div>
             
             <div id="kanji-tools-right" class="kanji-tools">
-                <div id="kanji-tree">
-                    <div id="kanji-tree-head"></div>
-                    <div id="kanji-tree-body">
-                        <div id="kanji-tree-breadcrumbs" class="kanji-tree-breadcrumbs"></div>
-                        <div id="kanji-tree-elements" class="kanji-tree-elements"></div>
+                <div class="drawing-container">
+                    <div class="drawing-house">
+                        <canvas id="drawing-canvas"></canvas>
+                        <button id="clear-drawing-button" class="kanji-tool-button">Clear</button>
                     </div>
                 </div>
             </div>
         </div>
+
 
 
 
@@ -52,9 +53,14 @@
         <div id="vocab-section">
 
             <div id="vocabulary-top-bar" class="vocabulary-top-bar">
-                <div id="vocabulary-title">VOCABULARY</div>
-                <button id="kunyomi-button" class="reading-button" data-type="kun">⛩️Kun</button>
-                <button id="onyomi-button" class="reading-button" data-type="on">🐉On</button>
+                <div class="vocabulary-top-bar-title-row">
+                    <div id="vocabulary-title">VOCABULARY</div>
+                </div>
+                <div class="vocabulary-top-bar-buttons-row">
+                    <button id="kunyomi-button" class="reading-button" data-type="kun">⛩️Kun</button>
+                    <button id="irregular-button" class="reading-button" data-type="jukujikun">🌀Irregular</button>
+                    <button id="onyomi-button" class="reading-button" data-type="on">🐉On</button>
+                </div>
             </div>
             
             <div id="vocab-ledger"></div>
@@ -62,13 +68,45 @@
         <footer class="deck-utility-footer">
             <a id="report-issue-link" href="" target="" class="utility-link">Report an Issue</a>
             <a id="rate-deck-link" href="" target="" class="utility-link">Rate the Deck</a>
+            <button id="open-settings-button" class="utility-icon-button" aria-label="Deck Settings">⚙️</button>
             <button id="toggle-theme-button" class="sliding-toggle-button" aria-label="Toggle theme"></button>
             <div id="sigil-dock" class="sigil-dock"></div>
         </footer>
     </div>
-    <div id="kanji-sigil" class="sigil" data-type="stroke-advancer">
-    <span class="icon"></span>
+    <div id="settings-drawer-backdrop" class="settings-drawer-backdrop is-hidden">
+        <div class="settings-drawer-sheet">
+            <div class="settings-drawer-header">
+                <span class="settings-drawer-title">Deck Settings</span>
+                <button id="close-settings-button" class="settings-close-button" aria-label="Close Settings">✕</button>
+            </div>
+            
+            <div class="settings-drawer-body">
+                <div class="settings-section">
+                    <div class="settings-section-title">Vocabulary Ledger</div>
+                    
+                    <div class="settings-control-group">
+                        <div class="settings-label-row">
+                            <label for="settings-vocab-max-count" class="settings-label">Max Word Count</label>
+                            <div>
+                                <span id="settings-vocab-max-count-value" class="settings-value-indicator">10</span>
+                                <span id="settings-vocab-total-available-value" class="settings-available-indicator">(0 available)</span>
+                            </div>
+                        </div>
+                        <input type="range" id="settings-vocab-max-count" class="settings-range-input" min="1" max="20" value="10">
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div id="stroke-sigil" class="sigil" data-type="stroke-advancer">
+        <span class="icon">🖌️</span>
+    </div>
+    <div id="vocab-sigil" class="sigil" data-type="vocab">
+        <span class="icon">📜</span>
+    </div>
+
 </div>
 
 <div id="json-container" class="hidden">{{json}}</div>
@@ -79,264 +117,6 @@
 
     const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
-
-
-    class SigilController {
-        sigil = null;
-        isDragging = null;
-        constructor(sigilElement, sigilType) {
-            this.sigil = document.querySelector(sigilElement);
-            this.sigilType = sigilType;
-            this.isDragging = false;
-
-            this.startXCoordinate = 0;
-            this.startYCoordinate = 0;
-            this.hasMoved = false;
-
-            this.currentIndex = 0;
-            this.init();
-        }
-
-        updateSigilColor() {
-            const activeEntry = this.getActiveVocabEntry();
-            if (!activeEntry) return;
-
-            const style = getComputedStyle(activeEntry);
-            const color = style.getPropertyValue('--accent-color');
-
-            this.sigil.style.setProperty('--accent-color', color);
-        }
-
-        getActiveVocabEntry() {
-            return document.querySelector('.vocab-entry.active-reveal');
-        }
-
-
-        revealNextVocabSegment() {
-            const entries = document.querySelectorAll('.vocab-entry');
-            if (this.currentIndex >= entries.length) {
-                entries[this.currentIndex - 1].classList.remove('active-reveal');
-                return;
-            }
-
-            if (this.currentIndex > 0) {
-                entries[this.currentIndex - 1].classList.remove('active-reveal');
-            }
-            
-            const currentEntry = entries[this.currentIndex];
-
-            const allFurigana = currentEntry.querySelectorAll('.furigana');
-
-            const hiddenFurigana = Array.from(allFurigana).find(furigana => furigana.classList.contains('is-hidden'));
-
-            if (hiddenFurigana) {
-                hiddenFurigana.classList.remove('is-hidden');
-                currentEntry.classList.add('active-reveal');
-            } else {
-                const english = currentEntry.querySelector('.vocab-english');
-                if (english && english.classList.contains('is-hidden')) {
-                    english.classList.remove('is-hidden');
-                    this.currentIndex++;
-                }
-            }
-        }
-
-        dockSigil() {
-            const dock = document.querySelector('#sigil-dock');
-            const workspace = document.querySelector('.deck-workspace');
-            const dockRect = dock.getBoundingClientRect();
-            const workspaceRect = workspace.getBoundingClientRect();
-            const targetX = dockRect.left - workspaceRect.left + (dockRect.width / 2) - (this.sigil.offsetWidth / 2);
-            const targetY = dockRect.top - workspaceRect.top + (dockRect.height / 2) - (this.sigil.offsetHeight / 2);
-
-            this.sigil.style.left = `${targetX}px`;
-            this.sigil.style.top = `${targetY}px`;
-
-            setTimeout(() => {
-                this.sigil.classList.add('hidden-in-dock');
-            }, 10);
-
-            localStorage.setItem(`${this.sigilType}-sigil-docked`, 'true');
-        }
-
-        undockSigil() {
-            const workspace = document.querySelector('.deck-workspace');
-            const dock = document.querySelector('#sigil-dock');
-            const dockRect = dock.getBoundingClientRect();
-            const workspaceRect = workspace.getBoundingClientRect();
-
-            this.sigil.classList.add('is-animating'); 
-            workspace.appendChild(this.sigil);
-
-            const startX = dockRect.left - workspaceRect.left;
-            const startY = dockRect.top - workspaceRect.top;
-            
-            this.sigil.style.left = `${startX}px`;
-            this.sigil.style.top = `${startY}px`;
-
-            this.sigil.offsetHeight; 
-
-            this.sigil.classList.remove('hidden-in-dock');
-            this.sigil.style.top = `${startY - 80}px`; 
-
-            localStorage.setItem(`${this.sigilType}-sigil-docked`, 'false');
-
-            setTimeout(() => this.sigil.classList.remove('is-animating'), 400);
-        }
-
-        loadPosition() {
-            const xCoordinate = localStorage.getItem(`${this.sigilType}-sigil-x-coordinate`);
-            const yCoordinate = localStorage.getItem(`${this.sigilType}-sigil-y-coordinate`);
-            if (xCoordinate && yCoordinate) {
-                this.sigil.style.left = xCoordinate;
-                this.sigil.style.top = yCoordinate;
-                this.sigil.style.bottom = 'auto';
-                this.sigil.style.right = 'auto';
-            }
-        }
-
-        setupListeners() {
-            const workspace = document.querySelector('.deck-workspace');
-            const sigilDock = document.querySelector('#sigil-dock');
-
-            sigilDock.addEventListener('click', (event) => {
-                event.stopPropagation();
-                
-                if (this.sigil.classList.contains('hidden-in-dock')) {
-                    this.undockSigil(); // Spit it out
-                } else {
-                    this.dockSigil();
-                }
-            });
-
-            this.sigil.addEventListener('pointerdown', (event) => {
-                this.sigil.classList.remove('is-animating');
-                this.isDragging = true;
-                this.hasMoved = false;
-                this.startXCoordinate = event.clientX;
-                this.startYCoordinate = event.clientY;
-
-                const sigilRectangle = this.sigil.getBoundingClientRect();
-                const workspaceRectangle = workspace.getBoundingClientRect();
-
-                this.grabOffsetX = event.clientX - sigilRectangle.left;
-                this.grabOffsetY = event.clientY - sigilRectangle.top;
-
-                this.sigil.setPointerCapture(event.pointerId);
-
-                const onPointerMove = (moveEvent) => {
-                    if (!this.isDragging) return;
-
-                    if (Math.abs(moveEvent.clientX - this.startXCoordinate) > 5 || Math.abs(moveEvent.clientY - this.startYCoordinate) > 5) {
-                        this.hasMoved = true;
-                    }
-
-                    requestAnimationFrame(() => {
-                        const currentWorkspaceRectangle = workspace.getBoundingClientRect();
-
-                        let newX = moveEvent.clientX - currentWorkspaceRectangle.left - this.grabOffsetX;
-                        let newY = moveEvent.clientY - currentWorkspaceRectangle.top - this.grabOffsetY;
-
-                        const maximumX = currentWorkspaceRectangle.width - this.sigil.offsetWidth;
-                        const maximumY = currentWorkspaceRectangle.height - this.sigil.offsetHeight;
-
-                        this.sigil.style.left = Math.max(0, Math.min(newX, maximumX)) + 'px';
-                        this.sigil.style.top = Math.max(0, Math.min(newY, maximumY)) + 'px';
-                    });
-                };
-
-                const onPointerUp = () => {
-                    const dock = document.querySelector('#sigil-dock');
-                    const sigilRect = this.sigil.getBoundingClientRect();
-                    const dockRect = dock.getBoundingClientRect();
-
-                    const isOverDock = !(sigilRect.right < dockRect.left || 
-                    sigilRect.left > dockRect.right || 
-                    sigilRect.bottom < dockRect.top || 
-                    sigilRect.top > dockRect.bottom);
-
-                    if (this.isDragging) {
-                        this.isDragging = false;
-                        this.sigil.classList.add('is-animating')
-                        if (isOverDock) {
-                            this.dockSigil();
-                        } else {
-                            localStorage.setItem(`${this.sigilType}-sigil-x-coordinate`, this.sigil.style.left);
-                            localStorage.setItem(`${this.sigilType}-sigil-y-coordinate`, this.sigil.style.top);
-                        }
-                    }
-                    window.removeEventListener('pointermove', onPointerMove);
-                    window.removeEventListener('pointerup', onPointerUp);
-                };
-
-                window.addEventListener('pointermove', onPointerMove);
-                window.addEventListener('pointerup', onPointerUp);
-            });
-
-            this.sigil.addEventListener('click', (event) => {
-                if (this.hasMoved) return;
-                if (this.sigilType === 'vocab') {
-                    this.revealNextVocabSegment();
-                    this.updateSigilColor();
-                }
-            });
-        }
-
-        restoreState() {
-            const isDocked = localStorage.getItem(`${this.sigilType}-sigil-docked`) === 'true';
-            const dock = document.querySelector('#sigil-dock');
-
-            if (isDocked && dock) {
-                this.sigil.classList.add('hidden-in-dock');
-                dock.appendChild(this.sigil);
-            } else {
-                this.loadPosition();
-            }
-        }
-
-        init() {
-            this.sigil.classList.add('is-animating');
-            this.restoreState();
-            this.setupListeners();
-        }
-    }
-
-    class LinkInstallationService {
-        targetLinkElement = null;
-
-        constructor(config) {
-            this.targetLinkElement = document.querySelector(config.linkSelector);
-
-            if (!this.targetLinkElement) {
-                return;
-            }
-
-            this.installDynamicUrl(config.baseUrl, config.params, config.openInNewTab);
-        }
-
-        installDynamicUrl(baseUrlString, parametersObject = {}, openInNewTabFlag = true) {
-            const urlParametersBuilder = new URLSearchParams();
-
-            for (const [parameterKey, parameterValue] of Object.entries(parametersObject)) {
-                const resolvedValue = (parameterValue !== null && parameterValue !== undefined)
-                    ? String(parameterValue).trim()
-                    : 'Unknown';
-
-                urlParametersBuilder.append(parameterKey, resolvedValue);
-            }
-
-            const hasParametersFlag = Object.keys(parametersObject).length > 0;
-            const finalizedUrlString = hasParametersFlag
-                ? `${baseUrlString}?${urlParametersBuilder.toString()}`
-                : baseUrlString;
-                
-            this.targetLinkElement.href = finalizedUrlString;
-
-            if (openInNewTabFlag) {
-                this.targetLinkElement.target = '_blank';
-            }
-        }
-    }
     
     class ReadingDisplayController {
         kunyomiButtonElement = null;
@@ -375,15 +155,35 @@
 
         init() {
             this.buildReadingsSpans(this.kunyomiData, this.kunDisplayElement, 'No Kunyomi');
-
             this.buildReadingsSpans(this.onyomiData, this.onDisplayElement, 'No Onyomi');
 
-            this.kunyomiButtonElement.addEventListener('click', (event) => {
-                this.handleToggle(event, this.kunyomiButtonElement, this.onyomiButtonElement, this.kunyomiData);
-            });
+            const allReadingButtons = document.querySelectorAll('.reading-button');
+            const vocabLedger = document.querySelector('#vocab-ledger');
 
-            this.onyomiButtonElement.addEventListener('click', (event) => {
-                this.handleToggle(event, this.onyomiButtonElement, this.kunyomiButtonElement, this.onyomiData);
+            allReadingButtons.forEach(buttonElement => {
+                buttonElement.addEventListener('click', (event) => {
+                    event.stopPropagation();
+
+                    const isCurrentlyActive = buttonElement.classList.contains('active');
+
+                    allReadingButtons.forEach(otherButton => otherButton.classList.remove('active'));
+                    if (this.kunDisplayWrapperElement) this.kunDisplayWrapperElement.classList.remove('active');
+                    if (this.onDisplayWrapperElement) this.onDisplayWrapperElement.classList.remove('active');
+
+                    if (isCurrentlyActive) {
+                        vocabLedger.removeAttribute('data-active-filter');
+                    } else {
+                        buttonElement.classList.add('active');
+                        const readingType = buttonElement.dataset.type;
+                        vocabLedger.setAttribute('data-active-filter', readingType);
+
+                        if (readingType === 'kun' && this.kunDisplayWrapperElement) {
+                            this.kunDisplayWrapperElement.classList.add('active');
+                        } else if (readingType === 'on' && this.onDisplayWrapperElement) {
+                            this.onDisplayWrapperElement.classList.add('active');
+                        }
+                    }
+                });
             });
         }
 
@@ -450,6 +250,184 @@
                     vocabLedger.setAttribute('data-active-filter', targetKanjiReadingType);
                 }
             }
+        }
+    }
+
+    class RadicalColorToggleController {
+        constructor(config) {
+            this.toggleButton = document.querySelector(config.buttonSelector);
+            this.strokePathsRoot = document.querySelector(config.pathsSelector);
+            this.container = document.querySelector('.card-container') || this.strokePathsRoot;
+            this.storageKey = config.storageKey || "kanji-radical-highlight-active";
+
+            if (!this.toggleButton || !this.strokePathsRoot) {
+                return;
+            }
+
+            this.init();
+        }
+
+        init() {
+            const isHighlightActive = localStorage.getItem(this.storageKey) === "true";
+
+            const radicalGroup = this.strokePathsRoot.querySelector('[kvg\\:radical="general"]') || 
+                                 this.strokePathsRoot.querySelector('[kvg\\:radical="tradit"]');
+            const radicalCharacter = radicalGroup ? (radicalGroup.getAttribute("kvg:element") || "🏮") : "🏮";
+
+            if (isHighlightActive) {
+                this.toggleButton.classList.add("active");
+                this.container.classList.add("highlight-radical");
+                this.toggleButton.style.setProperty("--radical-content", `"${radicalCharacter}"`);
+            } else {
+                this.container.classList.remove("highlight-radical");
+                this.toggleButton.style.setProperty("--radical-content", '"🏮"');
+            }
+
+            this.toggleButton.addEventListener("click", (clickEvent) => {
+                clickEvent.stopPropagation();
+                const wasActive = this.container.classList.contains("highlight-radical");
+                const shouldBeActive = !wasActive;
+
+                this.container.classList.toggle("highlight-radical", shouldBeActive);
+                this.toggleButton.classList.toggle("active", shouldBeActive);
+
+                if (shouldBeActive) {
+                    this.toggleButton.style.setProperty("--radical-content", `"${radicalCharacter}"`);
+                } else {
+                    this.toggleButton.style.setProperty("--radical-content", '"🏮"');
+                }
+
+                localStorage.setItem(this.storageKey, shouldBeActive ? "true" : "false");
+            });
+        }
+    }
+
+    class StrokeNumbersToggleController {
+        constructor(config) {
+            this.toggleButton = document.querySelector(config.buttonSelector);
+            this.strokeNumbersRoot = document.querySelector(config.numbersSelector);
+            this.storageKey = config.storageKey || "kanji-stroke-numbers-active";
+
+            if (!this.toggleButton || !this.strokeNumbersRoot) {
+                return;
+            }
+
+            this.init();
+        }
+
+        init() {
+            const isNumbersActive = localStorage.getItem(this.storageKey) === "true";
+
+            const pathsRoot = document.querySelector("#stroke-paths-root");
+            const totalStrokes = pathsRoot ? pathsRoot.querySelectorAll("path").length : 0;
+
+            if (isNumbersActive) {
+                this.toggleButton.classList.add("active");
+                this.strokeNumbersRoot.classList.add("show-drawn-numbers");
+                this.toggleButton.style.setProperty("--stroke-count-content", `"${totalStrokes}"`);
+            } else {
+                this.strokeNumbersRoot.classList.remove("show-drawn-numbers");
+                this.toggleButton.style.setProperty("--stroke-count-content", '"🔢"');
+            }
+
+            this.toggleButton.addEventListener("click", (clickEvent) => {
+                clickEvent.stopPropagation();
+                const wasActive = this.strokeNumbersRoot.classList.contains("show-drawn-numbers");
+                const shouldBeActive = !wasActive;
+
+                this.strokeNumbersRoot.classList.toggle("show-drawn-numbers", shouldBeActive);
+                this.toggleButton.classList.toggle("active", shouldBeActive);
+
+                if (shouldBeActive) {
+                    this.toggleButton.style.setProperty("--stroke-count-content", `"${totalStrokes}"`);
+                } else {
+                    this.toggleButton.style.setProperty("--stroke-count-content", '"🔢"');
+                }
+
+                localStorage.setItem(this.storageKey, shouldBeActive ? "true" : "false");
+            });
+        }
+    }
+
+    class DrawingPadController {
+        constructor(config) {
+            this.canvasElement = document.querySelector(config.canvasSelector);
+            this.clearButtonElement = document.querySelector(config.clearButtonSelector);
+
+            if (!this.canvasElement || !this.clearButtonElement) {
+                return;
+            }
+
+            this.canvasContext = this.canvasElement.getContext('2d');
+            this.isCurrentlyDrawing = false;
+
+            this.initialize();
+        }
+
+        initialize() {
+            this.configureCanvasResolution();
+            window.addEventListener('resize', () => this.configureCanvasResolution());
+
+            this.canvasElement.addEventListener('pointerdown', (pointerEvent) => this.startDrawingSequence(pointerEvent));
+            this.canvasElement.addEventListener('pointermove', (pointerEvent) => this.drawStrokeSegment(pointerEvent));
+            this.canvasElement.addEventListener('pointerup', () => this.terminateDrawingSequence());
+            this.canvasElement.addEventListener('pointerleave', () => this.terminateDrawingSequence());
+
+            this.clearButtonElement.addEventListener('click', (clickEvent) => {
+                clickEvent.stopPropagation();
+                this.clearCanvas();
+            });
+        }
+
+        configureCanvasResolution() {
+            const boundingRectangle = this.canvasElement.getBoundingClientRect();
+            this.canvasElement.width = boundingRectangle.width * window.devicePixelRatio;
+            this.canvasElement.height = boundingRectangle.height * window.devicePixelRatio;
+            this.canvasContext.scale(window.devicePixelRatio, window.devicePixelRatio);
+            this.clearCanvas();
+        }
+
+        getPointerCoordinates(pointerEvent) {
+            const boundingRectangle = this.canvasElement.getBoundingClientRect();
+            return {
+                coordinateX: pointerEvent.clientX - boundingRectangle.left,
+                coordinateY: pointerEvent.clientY - boundingRectangle.top
+            };
+        }
+
+        startDrawingSequence(pointerEvent) {
+            pointerEvent.stopPropagation();
+            this.isCurrentlyDrawing = true;
+            const pointerCoordinates = this.getPointerCoordinates(pointerEvent);
+            this.canvasContext.beginPath();
+            this.canvasContext.moveTo(pointerCoordinates.coordinateX, pointerCoordinates.coordinateY);
+        }
+
+        drawStrokeSegment(pointerEvent) {
+            if (!this.isCurrentlyDrawing) {
+                return;
+            }
+            pointerEvent.stopPropagation();
+
+            const pointerCoordinates = this.getPointerCoordinates(pointerEvent);
+            const rootStyleContext = getComputedStyle(document.documentElement);
+            const activeInkColor = rootStyleContext.getPropertyValue('--ink-color').trim() || '#2d3436';
+
+            this.canvasContext.lineWidth = 3;
+            this.canvasContext.lineCap = 'round';
+            this.canvasContext.lineJoin = 'round';
+            this.canvasContext.strokeStyle = activeInkColor;
+
+            this.canvasContext.lineTo(pointerCoordinates.coordinateX, pointerCoordinates.coordinateY);
+            this.canvasContext.stroke();
+        }
+
+        terminateDrawingSequence() {
+            this.isCurrentlyDrawing = false;
+        }
+
+        clearCanvas() {
+            this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
         }
     }
 
@@ -552,35 +530,90 @@
         }
     }
 
+    class GlobalSettingsManager {
+        storageKey = "kanji-wizard-global-settings";
+
+        defaultSettings = {
+            vocabulary: {
+                maximumWordCount: 4
+            }
+        };
+
+        constructor() {
+            this.settings = this.loadSettings();
+        }
+
+        loadSettings() {
+            const storedSettingsString = localStorage.getItem(this.storageKey);
+            if (!storedSettingsString) {
+                return JSON.parse(JSON.stringify(this.defaultSettings));
+            }
+
+            try {
+                const parsedSettings = JSON.parse(storedSettingsString);
+                return {
+                    vocabulary: {
+                        ...this.defaultSettings.vocabulary,
+                        ...(parsedSettings.vocabulary || {})
+                    }
+                };
+            } catch (parsingError) {
+                return JSON.parse(JSON.stringify(this.defaultSettings));
+            }
+        }
+
+        saveSettings() {
+            localStorage.setItem(this.storageKey, JSON.stringify(this.settings));
+        }
+
+        getVocabularySettings() {
+            return this.settings.vocabulary;
+        }
+
+        updateVocabularySettings(newVocabularySettings) {
+            this.settings.vocabulary = {
+                ...this.settings.vocabulary,
+                ...newVocabularySettings
+            };
+            this.saveSettings();
+        }
+    }
+
     class VocabLedgerService {
         constructor(config) {
             this.ledgerContainer = document.querySelector(config.ledgerContainerElement);
-            this.vocabData = config.vocabData;
+            this.rawVocabData = config.vocabData || [];
+            this.settingsManager = config.settingsManager;
 
-            if (!this.ledgerContainer || !this.vocabData) {
-                console.warn('VocabLedgerService: Container element or vocabulary data is missing.');
+            if (!this.ledgerContainer) {
                 return;
             }
 
             this.render();
         }
 
+        getProcessedVocabData() {
+            const vocabularySettings = this.settingsManager.getVocabularySettings();
+            const uniqueVocabEntries = this.getUniqueVocabEntries();
+            const limit = vocabularySettings.maximumWordCount ?? uniqueVocabEntries.length;
+            return uniqueVocabEntries.slice(0, limit);
+        }
+
         render() {
             this.ledgerContainer.replaceChildren();
+            const vocabDataToDisplay = this.getProcessedVocabData();
 
-            this.vocabData.forEach(vocab => {
-                
+            vocabDataToDisplay.forEach(vocab => {
                 const vocabEntryElement = document.createElement('div');
                 vocabEntryElement.classList.add('vocab-entry');
 
                 const level = vocab.jlptLevel ? `n${vocab.jlptLevel}` : 'na';
-                vocabEntryElement.classList.add(`level-${level}`);
 
-                const targetKanjiReadingType = vocab.targetKanjiReadingType && vocab.targetKanjiReadingType[0] ? vocab.targetKanjiReadingType[0] : 'neither';
-                vocabEntryElement.dataset.targetKanjiReadingType = targetKanjiReadingType;
+                const targetKanjiReadingTypes = Array.isArray(vocab.targetKanjiReadingType) ? vocab.targetKanjiReadingType.join(' ') : 'neither';
+                vocabEntryElement.dataset.targetKanjiReadingType = targetKanjiReadingTypes;
 
                 const badgeContainerElement = document.createElement('div');
-                badgeContainerElement.classList.add('badge-container', `badge-container-${level}`);
+                badgeContainerElement.classList.add('badge-container');
 
                 const svgNS = 'http://www.w3.org/2000/svg';
                 const hatSvg = document.createElementNS(svgNS, 'svg');
@@ -591,19 +624,8 @@
                 hatPath.setAttribute("d", "m25.87549,50c-0.19455,0 -0.23499,0.37562 -1.75097,0.77821c-0.18804,0.04993 -0.58366,0.19455 -0.97276,0.38911c-0.3891,0.19455 -0.9856,0.3653 -1.36187,0.58366c-0.60671,0.35209 -1.14909,0.79833 -1.36187,0.97276c-0.54247,0.44472 -1.33624,0.83436 -2.14008,1.16732c-0.5684,0.23544 -1.1295,0.47635 -1.94552,0.77821c-0.75233,0.27831 -1.36689,0.32677 -1.75097,0.3891c-0.60728,0.09855 -0.91312,0.47837 -1.16731,0.58366c-0.17974,0.07445 -0.61985,0.13474 -0.97276,0.3891c-0.2232,0.16088 -0.58366,0.19455 -0.77821,0.38911c-0.19455,0.19455 -0.64064,0.05698 -0.77821,0.19455c-0.13757,0.13757 -0.05698,0.25154 -0.19455,0.38911c-0.13757,0.13757 0.05698,0.25154 0.19455,0.38911c0.13757,0.13757 0.55501,0.22823 0.77821,0.3891c0.35292,0.25437 0.82283,0.06459 1.55642,0.38911c0.6415,0.28378 1.36187,0.3891 2.14008,0.58366c0.77821,0.19455 1.73303,0.48565 2.52918,0.58366c0.77238,0.09508 1.94553,0.19455 2.72374,0.38911c0.77821,0.19455 1.96739,0.30098 2.91829,0.58366c1.00426,0.29854 1.96254,0.73812 2.91829,1.16732c0.79371,0.35643 1.9714,0.69446 2.72373,0.97276c0.81602,0.30186 1.9714,0.69446 2.72374,0.97276c0.81602,0.30186 1.51861,0.6709 2.33463,0.97276c0.75233,0.27831 1.193,0.3415 1.94553,0.77821c0.60671,0.35209 1.16731,0.58366 1.55642,0.97276c0.38911,0.38911 0.97276,0.58366 1.55642,0.97276c0.58366,0.38911 1.04514,0.65858 1.75097,1.16732c0.66961,0.48263 1.37289,0.95672 1.94553,1.36186c0.79411,0.56184 1.34906,0.80628 1.75097,0.97276c0.5684,0.23544 1.36187,0.3891 1.94553,0.58366c0.58366,0.19455 1.17485,0.10107 1.75097,0.19456c0.60728,0.09855 1.14937,0.29109 1.94553,0.38911c0.77238,0.09509 1.36187,0 2.14008,0c0.77821,0 1.54361,-0.02808 1.94553,-0.19456c0.56839,-0.23544 0.97276,-0.38911 1.55642,-0.58366c0.58366,-0.19455 1.16732,-0.38911 1.55642,-0.58366c0.38911,-0.19456 0.97779,-0.52132 1.36187,-0.58366c0.60728,-0.09855 0.96572,-0.6062 1.55642,-0.77821c0.77017,-0.22427 1.1983,-0.5079 1.75097,-0.77821c0.63014,-0.30819 1.40057,-0.68723 1.94552,-0.97276c0.86166,-0.45147 1.40305,-0.7226 1.94553,-1.16732c0.42555,-0.34887 0.79105,-0.75441 1.16732,-0.97276c0.6067,-0.35208 0.98802,-0.54277 1.55642,-0.77821c0.40192,-0.16648 0.75516,-0.42613 1.36186,-0.77821c0.37627,-0.21835 0.97276,-0.3891 1.36187,-0.58366c0.38911,-0.19455 0.79105,-0.3653 1.16732,-0.58366c0.6067,-0.35209 1.03307,-0.45476 1.55642,-0.77821c0.23405,-0.14465 0.97276,-0.38911 1.55642,-0.58366c0.58366,-0.19455 0.9808,-0.16483 1.75097,-0.3891c0.59069,-0.17201 1.36187,-0.38911 1.94553,-0.38911c0.58366,0 0.95995,-0.22263 1.36187,-0.3891c0.5684,-0.23544 0.94913,-0.29056 1.55642,-0.38911c0.57612,-0.09349 1.36187,0 2.33463,0c0.97276,0 2.14008,0 3.11284,0c0.77821,0 1.61566,0.10326 2.33463,-0.19455c0.50838,-0.21058 0.70375,-0.59846 0.77821,-0.77821c0.10529,-0.25419 0.38911,-0.3891 0.38911,-0.58366c0,-0.38911 -0.08939,-0.59407 0,-0.97276c0.09995,-0.4234 0.19455,-0.77821 0.19455,-1.36187c0,-0.38911 0,-0.97276 0,-1.75097c0,-0.58366 -0.42612,-1.33882 -0.77821,-1.94553c-0.21835,-0.37627 -0.52384,-1.00895 -0.77821,-1.36187c-0.32175,-0.44641 -0.64143,-0.89763 -1.16731,-1.36187c-0.32613,-0.28791 -0.68847,-0.70164 -1.16732,-0.97276c-0.69804,-0.39522 -1.37583,-0.52359 -2.33463,-0.77821c-1.18924,-0.31582 -2.14008,-0.58366 -3.11284,-0.58366c-0.77821,0 -1.75098,0 -2.52918,0c-0.58366,0 -1.17315,-0.09508 -1.94553,0c-0.79615,0.09801 -1.56116,0.29325 -2.52918,0.3891c-0.9872,0.09775 -2.14008,0.19455 -3.11285,0.19455c-0.97276,0 -1.94553,0 -2.72373,0c-0.58366,0 -1.17485,0.09349 -1.75098,0c-0.60728,-0.09855 -0.94971,-0.23157 -1.55642,-0.58366c-0.37626,-0.21835 -0.85428,-0.53881 -1.55642,-0.97276c-0.52335,-0.32344 -1.00978,-0.56061 -1.36187,-1.16732c-0.21836,-0.37627 -0.6062,-0.77117 -0.77821,-1.36187c-0.22428,-0.77017 -0.48565,-1.34393 -0.58366,-2.14008c-0.04754,-0.38619 -0.06045,-0.98838 -0.19455,-1.55642c-0.09995,-0.4234 -0.0699,-1.17736 -0.19455,-1.94553c-0.09855,-0.60728 -0.38911,-1.16732 -0.38911,-1.75097c0,-0.58366 -0.09946,-1.17315 -0.19455,-1.94553c-0.09801,-0.79615 -0.12324,-1.17168 -0.19455,-1.75097c-0.09801,-0.79615 -0.29056,-1.33824 -0.38911,-1.94552c-0.09349,-0.57612 -0.02254,-1.16028 -0.19455,-1.75097c-0.22427,-0.77017 -0.22329,-1.35086 -0.58366,-2.33463c-0.21161,-0.57769 -0.29055,-1.14369 -0.3891,-1.75097c-0.06233,-0.38408 0,-0.97276 0,-1.36187c0,-0.58366 -0.13409,-1.18293 0,-1.75097c0.09995,-0.42339 0.4999,-0.99864 0.77821,-1.75097c0.15093,-0.40801 0.24445,-0.93327 0.3891,-1.16731c0.32345,-0.52334 0.16339,-1.16983 0.19455,-1.36187c0.09855,-0.60729 0.19455,-0.77821 0.19455,-0.97276c0,-0.3891 -0.05964,-0.67292 0.19455,-0.77821c0.17974,-0.07445 0.19455,-0.19455 0.3891,-0.19455c0.19455,0 0.38911,0 0.58366,0.19455c0.19455,0.19455 0.19455,0.3891 0.58366,0.58366c0.3891,0.19455 0.69922,0.68346 1.16731,0.97276c0.52335,0.32345 1.14427,0.62068 1.75098,0.97276c0.37627,0.21836 0.97276,0.38911 1.36186,0.58366c0.38911,0.19455 0.60871,0.21997 1.16732,0.3891c0.67137,0.20327 0.9808,0.55394 1.75097,0.77821c0.59069,0.17201 1.35484,0.41165 1.94553,0.58366c0.77017,0.22428 1.54198,0.68046 2.52918,0.77821c0.58082,0.05751 1.56371,0.27025 2.52918,0.3891c0.79615,0.09801 1.34393,0.2911 2.14008,0.3891c0.57928,0.07131 0.97276,0 1.36186,0c0.38911,0 0.97276,0 1.36187,0c0.38911,0 0.80727,-0.09227 0.97276,-0.19455c0.37006,-0.22871 0.38911,-0.58366 0.38911,-0.77821c0,-0.38911 0.16914,-0.80326 0,-1.36187c-0.20328,-0.67137 -0.50791,-1.1983 -0.77821,-1.75097c-0.3082,-0.63014 -1.00978,-0.94971 -1.36187,-1.55642c-0.43671,-0.75253 -1.01394,-1.30625 -1.55642,-1.75097c-0.63833,-0.5233 -0.91809,-1.03311 -1.55642,-1.55642c-0.54247,-0.44472 -1.0604,-0.86585 -1.55642,-1.36187c-0.49601,-0.49601 -1.14426,-0.81523 -1.75097,-1.16732c-0.75253,-0.43671 -1.17536,-0.74849 -1.94553,-0.97276c-0.59069,-0.17201 -1.44204,-0.38298 -2.14008,-0.77821c-0.47884,-0.27112 -1.00894,-0.52384 -1.36186,-0.77821c-0.44641,-0.32175 -0.75517,-0.62068 -1.36187,-0.97276c-0.37627,-0.21836 -0.97276,-0.3891 -1.55642,-0.58366c-0.58366,-0.19455 -1.12083,-0.47002 -1.75098,-0.77821c-0.55267,-0.2703 -1.18257,-0.34822 -1.75097,-0.58366c-0.80384,-0.33296 -1.33824,-0.67966 -1.94553,-0.77821c-0.57612,-0.09349 -1.37191,-0.26445 -2.14008,-0.38911c-0.60728,-0.09855 -1.34393,-0.29109 -2.14008,-0.38911c-0.57928,-0.07131 -1.17169,0.07131 -1.75097,0c-0.79615,-0.09801 -1.36187,-0.19455 -2.14008,-0.19455c-0.77821,0 -1.75097,0 -2.52918,0c-0.77821,0 -1.75534,0.12324 -2.33463,0.19455c-0.79615,0.09801 -1.32758,0.48371 -1.75097,0.58366c-0.56804,0.1341 -1.00895,0.13474 -1.36187,0.38911c-0.2232,0.16088 -0.5965,0.3653 -0.97276,0.58366c-0.60671,0.35209 -1.16732,0.58366 -1.55642,0.97276c-0.3891,0.3891 -0.89763,0.64144 -1.36187,1.16732c-0.28791,0.32613 -0.45646,0.91546 -0.77821,1.36187c-0.25437,0.35292 -0.50709,1.07757 -0.77821,1.55642c-0.39522,0.69804 -0.40768,1.55201 -0.58366,2.33463c-0.21764,0.96786 -0.23328,2.15264 -0.3891,3.11284c-0.1971,1.21457 -0.88501,2.493 -1.16732,3.50195c-0.31888,1.13964 -0.48565,2.12214 -0.58366,2.91829c-0.11885,0.96548 -0.096,1.72734 -0.19455,2.33463c-0.12466,0.76816 -0.18843,1.44204 -0.58366,2.14008c-0.27112,0.47885 -0.92516,1.193 -1.36187,1.94553c-0.35209,0.60671 -0.73733,1.37713 -0.97276,1.94552c-0.33296,0.80384 -0.48565,1.53848 -0.58366,2.33463c-0.09509,0.77238 -0.10106,1.56396 -0.19455,2.14008c-0.09855,0.60728 -0.22263,0.95995 -0.3891,1.36187c-0.23544,0.5684 -0.62389,1.13087 -0.97276,1.55642c-0.44473,0.54248 -0.66457,0.92628 -0.97276,1.55642c-0.2703,0.55267 -0.3891,0.97276 -0.58366,1.36187c-0.19455,0.3891 -0.48371,0.74392 -0.58366,1.16732c-0.0894,0.37869 -0.19455,0.58366 -0.19455,0.77821c0,0.3891 -0.17852,0.46437 -0.3891,0.97276c-0.07445,0.17974 -0.19455,0.3891 -0.19455,0.58366c0,0.19455 -0.19455,0.3891 -0.19455,0.58366c0,0.38911 -0.0946,0.74392 -0.19455,1.16732c-0.0894,0.37869 0,0.58366 0,0.77821c0,0.19455 -0.05698,0.25154 -0.19455,0.38911c-0.13757,0.13757 -0.01481,0.31465 -0.19455,0.3891c-0.2542,0.10529 -0.3891,0.19455 -0.58366,0.38911c-0.19455,0.19455 -0.41872,0.04565 -0.77821,0.19455c-0.2542,0.10529 -0.3891,0.19455 -0.58366,0.38911c-0.19455,0.19455 -0.47837,0.13491 -0.58366,0.38911c-0.07445,0.17974 -0.28382,0.52401 -0.3891,0.77821c-0.07445,0.17974 0,0.3891 0,0.58366l0,0.19455l-0.19455,0l0,0.19455");
                 hatSvg.append(hatPath);
 
-                const levelSpan = document.createElement('span');
-                levelSpan.classList.add('badge', `badge-${level}`);
-                levelSpan.textContent = level.toUpperCase();
-
-                const gemSlotsElement = document.createElement('div');
-                gemSlotsElement.classList.add('gem-slots');
-                for (let slotIndex = 0; slotIndex < 5; slotIndex++) {
-                    const slotSpan = document.createElement('span');
-                    slotSpan.classList.add('slot', `slot-${slotIndex + 1}`)
-                    gemSlotsElement.append(slotSpan);
-                }
                 
-                badgeContainerElement.append(hatSvg, levelSpan, gemSlotsElement);
+                badgeContainerElement.append(hatSvg);
 
                 const frequency = vocab.frequency || null;
                 if (frequency) {
@@ -660,7 +682,6 @@
 
                     vocabGlossExpandButton.addEventListener('click', (clickEvent) => {
                         clickEvent.stopPropagation();
-                        
                         extraGlossesSpan.classList.remove('is-hidden');
                         vocabGlossExpandButton.classList.add('is-hidden');
                     });
@@ -682,17 +703,37 @@
                 this.ledgerContainer.append(vocabEntryElement);
             });
         }
+
+        getUniqueVocabEntries() {
+            const seenWrittenForms = new Set();
+            const uniqueEntries = [];
+
+            for (const vocabEntry of this.rawVocabData) {
+                const writtenForm = vocabEntry.writtenForm;
+                if (!seenWrittenForms.has(writtenForm)) {
+                    seenWrittenForms.add(writtenForm);
+                    uniqueEntries.push(vocabEntry);
+                }
+            }
+
+            return uniqueEntries;
+        }
     }
 
-
-    class RadicalColorToggleController {
+    class SettingsDrawerController {
         constructor(config) {
-            this.toggleButton = document.querySelector(config.buttonSelector);
-            this.strokePathsRoot = document.querySelector(config.pathsSelector);
-            this.container = document.querySelector('.card-container') || this.strokePathsRoot;
-            this.storageKey = config.storageKey || "kanji-radical-highlight-active";
+            this.openButton = document.querySelector(config.openButtonSelector);
+            this.closeButton = document.querySelector(config.closeButtonSelector);
+            this.backdropElement = document.querySelector(config.backdropSelector);
+            this.settingsManager = config.settingsManager;
+            this.vocabLedgerService = config.vocabLedgerService;
 
-            if (!this.toggleButton || !this.strokePathsRoot) {
+            this.sortSelectElement = document.querySelector(config.sortSelectSelector);
+            this.maxCountInput = document.querySelector(config.maxCountInputSelector);
+            this.maxCountDisplay = document.querySelector(config.maxCountDisplaySelector);
+            this.totalAvailableDisplay = document.querySelector(config.totalAvailableDisplaySelector);
+
+            if (!this.openButton || !this.backdropElement || !this.settingsManager) {
                 return;
             }
 
@@ -700,87 +741,108 @@
         }
 
         init() {
-            const isHighlightActive = localStorage.getItem(this.storageKey) === "true";
+            this.openButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.syncControlsFromSettings();
+                this.backdropElement.classList.remove('is-hidden');
+            });
 
-            const radicalGroup = this.strokePathsRoot.querySelector('[kvg\\:radical="general"]') || 
-                                 this.strokePathsRoot.querySelector('[kvg\\:radical="tradit"]');
-            const radicalCharacter = radicalGroup ? (radicalGroup.getAttribute("kvg:element") || "🏮") : "🏮";
-
-            if (isHighlightActive) {
-                this.toggleButton.classList.add("active");
-                this.container.classList.add("highlight-radical");
-                this.toggleButton.style.setProperty("--radical-content", `"${radicalCharacter}"`);
-            } else {
-                this.container.classList.remove("highlight-radical");
-                this.toggleButton.style.setProperty("--radical-content", '"🏮"');
+            if (this.closeButton) {
+                this.closeButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    this.backdropElement.classList.add('is-hidden');
+                });
             }
 
-            this.toggleButton.addEventListener("click", (clickEvent) => {
-                clickEvent.stopPropagation();
-                const wasActive = this.container.classList.contains("highlight-radical");
-                const shouldBeActive = !wasActive;
-
-                this.container.classList.toggle("highlight-radical", shouldBeActive);
-                this.toggleButton.classList.toggle("active", shouldBeActive);
-
-                if (shouldBeActive) {
-                    this.toggleButton.style.setProperty("--radical-content", `"${radicalCharacter}"`);
-                } else {
-                    this.toggleButton.style.setProperty("--radical-content", '"🏮"');
+            this.backdropElement.addEventListener('click', (event) => {
+                if (event.target === this.backdropElement) {
+                    this.backdropElement.classList.add('is-hidden');
                 }
-
-                localStorage.setItem(this.storageKey, shouldBeActive ? "true" : "false");
             });
+
+            if (this.sortSelectElement) {
+                this.sortSelectElement.addEventListener('change', (event) => {
+                    this.settingsManager.updateVocabularySettings({
+                        sortCriterion: event.target.value
+                    });
+                    if (this.vocabLedgerService) {
+                        this.vocabLedgerService.render();
+                    }
+                });
+            }
+
+            if (this.maxCountInput) {
+                this.maxCountInput.addEventListener('input', (event) => {
+                    const newCount = parseInt(event.target.value, 10) || 10;
+                    if (this.maxCountDisplay) {
+                        this.maxCountDisplay.textContent = newCount;
+                    }
+                    this.settingsManager.updateVocabularySettings({
+                        maximumWordCount: newCount
+                    });
+                    if (this.vocabLedgerService) {
+                        this.vocabLedgerService.render();
+                    }
+                });
+            }
+        }
+
+        syncControlsFromSettings() {
+            const vocabularySettings = this.settingsManager.getVocabularySettings();
+            const savedCount = vocabularySettings.maximumWordCount || 10;
+
+            if (this.maxCountInput) {
+                this.maxCountInput.max = 20;
+                this.maxCountInput.value = savedCount;
+            }
+
+            if (this.maxCountDisplay) {
+                this.maxCountDisplay.textContent = savedCount;
+            }
+
+            if (this.totalAvailableDisplay && this.vocabLedgerService) {
+                const totalAvailableWords = this.vocabLedgerService.getUniqueVocabEntries().length;
+                this.totalAvailableDisplay.textContent = `(${totalAvailableWords} available)`;
+            }
         }
     }
 
-    class StrokeNumbersToggleController {
-        constructor(config) {
-            this.toggleButton = document.querySelector(config.buttonSelector);
-            this.strokeNumbersRoot = document.querySelector(config.numbersSelector);
-            this.storageKey = config.storageKey || "kanji-stroke-numbers-active";
+    class LinkInstallationService {
+        targetLinkElement = null;
 
-            if (!this.toggleButton || !this.strokeNumbersRoot) {
+        constructor(config) {
+            this.targetLinkElement = document.querySelector(config.linkSelector);
+
+            if (!this.targetLinkElement) {
                 return;
             }
 
-            this.init();
+            this.installDynamicUrl(config.baseUrl, config.params, config.openInNewTab);
         }
 
-        init() {
-            const isNumbersActive = localStorage.getItem(this.storageKey) === "true";
+        installDynamicUrl(baseUrlString, parametersObject = {}, openInNewTabFlag = true) {
+            const urlParametersBuilder = new URLSearchParams();
 
-            const pathsRoot = document.querySelector("#stroke-paths-root");
-            const totalStrokes = pathsRoot ? pathsRoot.querySelectorAll("path").length : 0;
+            for (const [parameterKey, parameterValue] of Object.entries(parametersObject)) {
+                const resolvedValue = (parameterValue !== null && parameterValue !== undefined)
+                    ? String(parameterValue).trim()
+                    : 'Unknown';
 
-            if (isNumbersActive) {
-                this.toggleButton.classList.add("active");
-                this.strokeNumbersRoot.classList.add("show-drawn-numbers");
-                this.toggleButton.style.setProperty("--stroke-count-content", `"${totalStrokes}"`);
-            } else {
-                this.strokeNumbersRoot.classList.remove("show-drawn-numbers");
-                this.toggleButton.style.setProperty("--stroke-count-content", '"🔢"');
+                urlParametersBuilder.append(parameterKey, resolvedValue);
             }
 
-            this.toggleButton.addEventListener("click", (clickEvent) => {
-                clickEvent.stopPropagation();
-                const wasActive = this.strokeNumbersRoot.classList.contains("show-drawn-numbers");
-                const shouldBeActive = !wasActive;
+            const hasParametersFlag = Object.keys(parametersObject).length > 0;
+            const finalizedUrlString = hasParametersFlag
+                ? `${baseUrlString}?${urlParametersBuilder.toString()}`
+                : baseUrlString;
+                
+            this.targetLinkElement.href = finalizedUrlString;
 
-                this.strokeNumbersRoot.classList.toggle("show-drawn-numbers", shouldBeActive);
-                this.toggleButton.classList.toggle("active", shouldBeActive);
-
-                if (shouldBeActive) {
-                    this.toggleButton.style.setProperty("--stroke-count-content", `"${totalStrokes}"`);
-                } else {
-                    this.toggleButton.style.setProperty("--stroke-count-content", '"🔢"');
-                }
-
-                localStorage.setItem(this.storageKey, shouldBeActive ? "true" : "false");
-            });
+            if (openInNewTabFlag) {
+                this.targetLinkElement.target = '_blank';
+            }
         }
     }
-
 
 
 
@@ -823,280 +885,6 @@
             pathElement.dataset.strokeLength = strokeLength;
             pathElement.style.strokeDasharray = strokeLength;
             pathElement.style.strokeDashoffset = 0;
-        }
-    }
-
-    class KanjiSvgLogicalTreeParser {
-        static parse(rawSvgData) {
-            if (!rawSvgData || !rawSvgData.g) {
-                console.warn('KanjiSvgLogicalTreeParser: Raw SVG data or root groups are missing.');
-                return null;
-            }
-
-            const rootStrokePathsGroupNode = rawSvgData.g[0];
-            if (!rootStrokePathsGroupNode) {
-                return null;
-            }
-
-            const parsedTreeResult = this.#buildTreeNode(rootStrokePathsGroupNode);
-
-            const baseTree = Array.isArray(parsedTreeResult) ? parsedTreeResult[0] : parsedTreeResult;
-
-            return this.consolidateParts(baseTree);
-        }
-
-        static #buildTreeNode(jsonNode) {
-            if (!jsonNode || typeof jsonNode !== 'object') {
-                return null;
-            }
-
-            const hasSemanticElement = !!jsonNode["kvg:element"];
-            const isRadical = !!jsonNode["kvg:radical"] && (jsonNode["kvg:radical"] === "general" || jsonNode["kvg:radical"] === "tradit");
-
-            let collectedChildNodes = [];
-            if (jsonNode.g) {
-                jsonNode.g.forEach(nestedGroupNode => {
-                    const parsedChildResult = this.#buildTreeNode(nestedGroupNode);
-
-                    if (parsedChildResult) {
-                        if (Array.isArray(parsedChildResult)) {
-                            collectedChildNodes = collectedChildNodes.concat(parsedChildResult);
-                        } else {
-                            collectedChildNodes.push(parsedChildResult);
-                        }
-                    }
-                }) ;
-            }
-
-            if (hasSemanticElement) {
-                return {
-                    id:jsonNode.id || '',
-                    element: jsonNode["kvg:element"],
-                    isRadical: isRadical,
-                    children: collectedChildNodes
-                };
-            } else {
-                return collectedChildNodes;
-            }
-        }
-
-        static consolidateParts(node) {
-            if (!node || !node.children) return node;
-
-            node.children = node.children.map(child => this.consolidateParts(child));
-
-            const mergedChildren = [];
-            const elementMap = new Map();
-
-            node.children.forEach(child => {
-                const elementName = child.element;
-                if (elementName) {
-                    if (elementMap.has(elementName)) {
-                        const existingNode = elementMap.get(elementName);
-                        existingNode.ids = (existingNode.ids || [existingNode.id]).concat(child.ids || [child.id]);
-                        existingNode.children = (existingNode.children || []).concat(child.children || []);
-                        existingNode.isRadical = existingNode.isRadical || child.isRadical;
-                    } else {
-                        child.ids = child.ids || [child.id];
-                        elementMap.set(elementName, child);
-                        mergedChildren.push(child);
-                    }
-                } else {
-                    mergedChildren.push(child);
-                }
-            });
-
-            node.children = mergedChildren;
-
-            if (node.element === "干") {
-                const tenChild = node.children.find(child => child.element === "十");
-                if (tenChild && node.ids && node.ids.length > 1) {
-                    const partTwoId = node.ids[node.ids.length - 1];
-                    if (partTwoId && !tenChild.ids.includes(partTwoId)) {
-                        tenChild.ids.push(partTwoId);
-                    }
-                }
-            }
-
-            return node;
-        }
-    }
-
-    class KanjiTreeNavigationController {
-        constructor(config) {
-            this.treeHeadContainer = document.querySelector(config.treeHeadSelector);
-            this.treeElementsContainer = document.querySelector(config.treeElementsSelector);
-            this.treeBreadcrumbsContainer = document.querySelector(config.treeBreadcrumbsSelector);
-            this.logicalKanjiTree = config.logicalKanjiTree;
-            this.kanjiSvgController = config.kanjiSvgController;
-
-            if (!this.treeHeadContainer || !this.treeElementsContainer || !this.treeBreadcrumbsContainer || !this.logicalKanjiTree) {
-                console.warn("KanjiTreeNavigationController: One or more required configuration elements are missing.");
-                return;
-            }
-
-            this.navigationHistoryStack = []; 
-            this.isTreeActive = false;
-
-            this.initialize();
-        }
-
-        initialize() {
-            this.renderNavigationState();
-        }
-
-        renderNavigationState() {
-            this.treeHeadContainer.replaceChildren();
-            this.treeElementsContainer.replaceChildren();
-
-            const headButton = document.createElement('button');
-                    headButton.classList.add('kanji-tool-button', 'tree-head-button');
-                    headButton.textContent = '🔍';
-
-                    if (this.isTreeActive) {
-                        headButton.classList.add('active');
-                    }
-
-            headButton.addEventListener('click', (clickEvent) => {
-                clickEvent.stopPropagation();
-                this.isTreeActive = !this.isTreeActive;
-                if (!this.isTreeActive) {
-                    this.navigationHistoryStack = [];
-                }
-                this.renderNavigationState();
-            });
-
-            this.treeHeadContainer.appendChild(headButton);
-
-            if (!this.isTreeActive) {
-                this.treeElementsContainer.replaceChildren();
-                this.renderBreadcrumbsTrail();
-
-                if (this.kanjiSvgController) {
-                    this.kanjiSvgController.focusComponent(null);
-                    this.kanjiSvgController.applyDynamicColors([]);
-                    this.kanjiSvgController.strokePathsRoot.classList.remove('show-colors');
-                }
-                return;
-            }
-
-            if (this.kanjiSvgController) {
-                this.kanjiSvgController.strokePathsRoot.classList.add('show-colors');
-            }
-
-            const isAtHomeLevel = this.navigationHistoryStack.length === 0;
-
-            let elementsToRender = [];
-
-            if (isAtHomeLevel) {
-                elementsToRender = this.logicalKanjiTree.children || [];
-            } else {
-                const activeNavigationNode = this.navigationHistoryStack[this.navigationHistoryStack.length - 1];
-                elementsToRender = activeNavigationNode.children || [];
-            }
-
-            const hasNoChildren = elementsToRender.length === 0;
-
-            if (hasNoChildren) {
-                const noChildrenPlaceholder = document.createElement('div');
-                noChildrenPlaceholder.classList.add('kanji-tree-placeholder');
-                noChildrenPlaceholder.textContent = 'No sub-elements';
-                this.treeElementsContainer.appendChild(noChildrenPlaceholder);
-            } else {
-                elementsToRender.forEach((treeNode, elementIndex) => {
-                    const elementButton = document.createElement('button');
-                    elementButton.classList.add('kanji-tool-button', 'tree-node-button');
-                    elementButton.textContent = treeNode.element;
-
-                    if (treeNode.isRadical) {
-                        elementButton.classList.add('radical-node');
-                    }
-
-                    const colorIndex = (elementIndex % 6) + 1;
-                    elementButton.classList.add(`element-color-${colorIndex}`);
-
-                    elementButton.addEventListener('click', (clickEvent) => {
-                        clickEvent.stopPropagation();
-                        this.navigationHistoryStack.push(treeNode);
-                        this.renderNavigationState();
-                    });
-
-                    this.treeElementsContainer.appendChild(elementButton);
-                });
-            }
-
-            this.renderBreadcrumbsTrail();
-
-            if (this.kanjiSvgController) {
-                if (isAtHomeLevel) {
-                    this.kanjiSvgController.focusComponent(null);
-                    const colorsToApply = (this.logicalKanjiTree.children && this.logicalKanjiTree.children.length > 0)
-                        ? this.logicalKanjiTree.children
-                        : [this.logicalKanjiTree];
-                    this.kanjiSvgController.applyDynamicColors(colorsToApply);
-                } else {
-                    const activeNavigationNode = this.navigationHistoryStack[this.navigationHistoryStack.length - 1];
-                    this.kanjiSvgController.focusComponent(activeNavigationNode.ids || activeNavigationNode.id);
-                    if (elementsToRender.length > 0) {
-                        this.kanjiSvgController.applyDynamicColors(elementsToRender);
-                    } else {
-                        this.kanjiSvgController.applyDynamicColors([activeNavigationNode]);
-                    }
-                }
-            }
-        }
-
-        renderBreadcrumbsTrail() {
-            this.treeBreadcrumbsContainer.replaceChildren();
-
-            if (!this.isTreeActive) {
-                return;
-            }
-
-            const rootBreadcrumbItem = document.createElement('span');
-            rootBreadcrumbItem.classList.add('breadcrumb-item');
-            rootBreadcrumbItem.textContent = this.logicalKanjiTree.element;
-
-            const isRootActiveLevel = this.navigationHistoryStack.length === 0;
-
-            if (!isRootActiveLevel) {
-                rootBreadcrumbItem.classList.add('breadcrumb-link');
-                rootBreadcrumbItem.addEventListener('click', (clickEvent) => {
-                    clickEvent.stopPropagation();
-                    this.navigationHistoryStack = [];
-                    this.renderNavigationState();
-                });
-            } else {
-                rootBreadcrumbItem.classList.add('breadcrumb-active');
-            }
-
-            this.treeBreadcrumbsContainer.appendChild(rootBreadcrumbItem);
-
-            this.navigationHistoryStack.forEach((treeNode, navigationIndex) => {
-                const breadcrumbSeparator = document.createElement('span');
-                breadcrumbSeparator.classList.add('breadcrumb-separator');
-                breadcrumbSeparator.textContent = ' > ';
-                this.treeBreadcrumbsContainer.appendChild(breadcrumbSeparator);
-
-                const breadcrumbItem = document.createElement('span');
-                breadcrumbItem.classList.add('breadcrumb-item');
-                breadcrumbItem.textContent = treeNode.element;
-
-                const isActiveLevel = navigationIndex === this.navigationHistoryStack.length - 1;
-
-                if (!isActiveLevel) {
-                    breadcrumbItem.classList.add('breadcrumb-link');
-                    breadcrumbItem.addEventListener('click', (clickEvent) => {
-                        clickEvent.stopPropagation();
-                        this.navigationHistoryStack = this.navigationHistoryStack.slice(0, navigationIndex + 1);
-                        this.renderNavigationState();
-                    });
-                } else {
-                    breadcrumbItem.classList.add('breadcrumb-active');
-                }
-
-                this.treeBreadcrumbsContainer.appendChild(breadcrumbItem);
-            });
         }
     }
     
@@ -1159,8 +947,6 @@
             });
 
             this.updateCurrentStrokeCount(this.cachedPathElements.length);
-            
-            this.strokePathsRoot.classList.add('show-colors');
         }
 
         updateCurrentStrokeCount(count) {
@@ -1181,44 +967,57 @@
                 this.strokeNumbersRoot.replaceChildren();
             }
 
-            const pathsGroupNode = this.svgData.g[0];
+            let pathsGroupNode = this.svgData.g[0];
+            if (!pathsGroupNode || !pathsGroupNode.id || !pathsGroupNode.id.startsWith("kvg:StrokePaths_")) {
+                const traverseToFindPaths = (node) => {
+                    if (node && node.id && node.id.startsWith("kvg:StrokePaths_")) {
+                        return node;
+                    }
+                    if (node && node.g) {
+                        const groups = Array.isArray(node.g) ? node.g : [node.g];
+                        for (const group of groups) {
+                            const found = traverseToFindPaths(group);
+                            if (found) return found;
+                        }
+                    }
+                    return null;
+                };
+                const foundPaths = traverseToFindPaths(this.svgData);
+                if (foundPaths) {
+                    pathsGroupNode = foundPaths;
+                }
+            }
+
             if (pathsGroupNode) {
                 const domPathsGroup = KanjiSvgDOMBuilder.buildElement(pathsGroupNode, 'g');
                 this.strokePathsRoot.appendChild(domPathsGroup);
             }
 
-            const numbersGroupNode = this.svgData.g[1];
+            let numbersGroupNode = this.svgData.g[1];
+            if (!numbersGroupNode || !numbersGroupNode.id || !numbersGroupNode.id.startsWith("kvg:StrokeNumbers_")) {
+                const traverseToFindNumbers = (node) => {
+                    if (node && node.id && node.id.startsWith("kvg:StrokeNumbers_")) {
+                        return node;
+                    }
+                    if (node && node.g) {
+                        const groups = Array.isArray(node.g) ? node.g : [node.g];
+                        for (const group of groups) {
+                            const found = traverseToFindNumbers(group);
+                            if (found) return found;
+                        }
+                    }
+                    return null;
+                };
+                const foundNumbers = traverseToFindNumbers(this.svgData);
+                if (foundNumbers) {
+                    numbersGroupNode = foundNumbers;
+                }
+            }
+
             if (this.strokeNumbersRoot && numbersGroupNode) {
                 const domNumbersGroup = KanjiSvgDOMBuilder.buildElement(numbersGroupNode, 'g');
                 this.strokeNumbersRoot.appendChild(domNumbersGroup);
             }
-        }
-
-        applyDynamicColors(elementsToRender) {
-            if (!this.strokePathsRoot || !elementsToRender) return;
-
-            const previouslyColoredGroups = this.strokePathsRoot.querySelectorAll('[class*="element-color-"]');
-            previouslyColoredGroups.forEach(groupElement => {
-                for (let colorIndex = 1; colorIndex <= 6; colorIndex++) {
-                    groupElement.classList.remove(`element-color-${colorIndex}`);
-                }
-            });
-
-            const sequenceLength = 6;
-            let colorIndexCounter = 0;
-
-            elementsToRender.forEach(treeNode => {
-                const idsToColor = treeNode.ids || [treeNode.id];
-                const colorIndex = (colorIndexCounter % sequenceLength) + 1;
-
-                idsToColor.forEach(id => {
-                    const targetGroupElement = this.strokePathsRoot.querySelector(`[id="${id}"]`);
-                    if (targetGroupElement) {
-                        targetGroupElement.classList.add(`element-color-${colorIndex}`);
-                    }
-                });
-                colorIndexCounter++;
-            });
         }
 
         drawNextStroke(strokeCount) {
@@ -1237,63 +1036,251 @@
                 }
             });
         }
-
-        focusComponent(targetGroupIds) {
-            if (!this.strokePathsRoot) return;
-
-            this.strokePathsRoot.classList.remove('has-focus');
-            if (this.strokeNumbersRoot) {
-                this.strokeNumbersRoot.classList.remove('has-focus');
-            }
-
-            const previouslyFocusedPaths = this.strokePathsRoot.querySelectorAll('.focused-component');
-            previouslyFocusedPaths.forEach(element => element.classList.remove('focused-component'));
-
-            const previouslyFocusedTexts = this.strokeNumbersRoot.querySelectorAll('.focused-component');
-            previouslyFocusedTexts.forEach(element => element.classList.remove('focused-component'));
-
-            if (!targetGroupIds) {
-                return;
-            }
-
-            const idsArray = Array.isArray(targetGroupIds) ? targetGroupIds : [targetGroupIds];
-            let hasValidGroup = false;
-
-            idsArray.forEach(id => {
-                const targetGroupElement = this.strokePathsRoot.querySelector(`[id="${id}"]`);
-                if (targetGroupElement) {
-                    if (!hasValidGroup) {
-                        this.strokePathsRoot.classList.add('has-focus');
-                        if (this.strokeNumbersRoot) {
-                            this.strokeNumbersRoot.classList.add('has-focus');
-                        }
-                        hasValidGroup = true;
-                    }
-                    targetGroupElement.classList.add('focused-component');
-
-                    const activePaths = targetGroupElement.querySelectorAll('path');
-                    const activeIndices = new Set(Array.from(activePaths).map(pathElement => this.cachedPathElements.indexOf(pathElement) + 1));
-
-                    this.cachedTextElements.forEach((textElement, elementIndex) => {
-                        const strokeIndex = elementIndex + 1;
-                        if (activeIndices.has(strokeIndex)) {
-                            textElement.classList.add('focused-component');
-                        }
-                    });
-                }
-            });
-        }
-
-        toggleColors() {
-            if (this.strokePathsRoot) {
-                this.strokePathsRoot.classList.toggle('show-colors');
-            }
-        }
     }
 
 
 
 
+    class SigilController {
+        sigil = null;
+        isDragging = null;
+        constructor(sigilElement, sigilType, dockElement, clickCallback) {
+            this.sigil = document.querySelector(sigilElement);
+            this.dock = document.querySelector(dockElement || '#sigil-dock');
+            this.sigilType = sigilType;
+            this.clickCallback = clickCallback || null;
+            this.isDragging = false;
+
+            this.startXCoordinate = 0;
+            this.startYCoordinate = 0;
+            this.hasMoved = false;
+
+            this.currentIndex = 0;
+            this.init();
+        }
+
+        getActiveVocabEntry() {
+            return document.querySelector('.vocab-entry.active-reveal');
+        }
+
+
+        revealNextVocabSegment() {
+            const entries = document.querySelectorAll('.vocab-entry');
+            if (this.currentIndex >= entries.length) {
+                entries[this.currentIndex - 1].classList.remove('active-reveal');
+                return;
+            }
+
+            if (this.currentIndex > 0) {
+                entries[this.currentIndex - 1].classList.remove('active-reveal');
+            }
+            
+            const currentEntry = entries[this.currentIndex];
+
+            const allFurigana = currentEntry.querySelectorAll('.furigana');
+
+            const hiddenFurigana = Array.from(allFurigana).find(furigana => furigana.classList.contains('is-hidden'));
+
+            if (hiddenFurigana) {
+                hiddenFurigana.classList.remove('is-hidden');
+                currentEntry.classList.add('active-reveal');
+            } else {
+                const english = currentEntry.querySelector('.vocab-english');
+                if (english && english.classList.contains('is-hidden')) {
+                    english.classList.remove('is-hidden');
+                    this.currentIndex++;
+                }
+            }
+        }
+
+        dockSigil() {
+            const workspace = document.querySelector('.deck-workspace');
+            const dockRect = this.dock.getBoundingClientRect();
+            const workspaceRect = workspace.getBoundingClientRect();
+            const targetX = dockRect.left - workspaceRect.left + (dockRect.width / 2) - (this.sigil.offsetWidth / 2);
+            const targetY = dockRect.top - workspaceRect.top + (dockRect.height / 2) - (this.sigil.offsetHeight / 2);
+
+            this.sigil.style.left = `${targetX}px`;
+            this.sigil.style.top = `${targetY}px`;
+
+            setTimeout(() => {
+                this.sigil.classList.add('hidden-in-dock');
+            }, 10);
+
+            localStorage.setItem(`${this.sigilType}-sigil-docked`, 'true');
+        }
+
+        undockSigil() {
+            const workspace = document.querySelector('.deck-workspace');
+            const dock = this.dock;
+            const dockRect = dock.getBoundingClientRect();
+            const workspaceRect = workspace.getBoundingClientRect();
+
+            this.sigil.classList.add('is-animating'); 
+            workspace.appendChild(this.sigil);
+
+            const startX = dockRect.left - workspaceRect.left;
+            const startY = dockRect.top - workspaceRect.top;
+            
+            this.sigil.style.left = `${startX}px`;
+            this.sigil.style.top = `${startY}px`;
+
+            this.sigil.offsetHeight; 
+
+            this.sigil.classList.remove('hidden-in-dock');
+            this.sigil.style.top = `${startY - 80}px`; 
+
+            localStorage.setItem(`${this.sigilType}-sigil-docked`, 'false');
+
+            setTimeout(() => this.sigil.classList.remove('is-animating'), 400);
+        }
+
+        loadPosition() {
+            const xCoordinate = localStorage.getItem(`${this.sigilType}-sigil-x-coordinate`);
+            const yCoordinate = localStorage.getItem(`${this.sigilType}-sigil-y-coordinate`);
+            if (xCoordinate && yCoordinate) {
+                this.sigil.style.left = xCoordinate;
+                this.sigil.style.top = yCoordinate;
+                this.sigil.style.bottom = 'auto';
+                this.sigil.style.right = 'auto';
+            }
+        }
+
+        setupListeners() {
+            const workspace = document.querySelector('.deck-workspace');
+
+            if (workspace && typeof ResizeObserver !== 'undefined') {
+                this.resizeObserver = new ResizeObserver(() => {
+                    this.checkBoundaryAndDockIfNeeded();
+                });
+                this.resizeObserver.observe(workspace);
+            }
+
+            this.dock.addEventListener('click', (event) => {
+                event.stopPropagation();
+                
+                if (this.sigil.classList.contains('hidden-in-dock')) {
+                    this.undockSigil();
+                } else {
+                    this.dockSigil();
+                }
+            });
+
+            this.sigil.addEventListener('pointerdown', (event) => {
+                this.sigil.classList.remove('is-animating');
+                this.isDragging = true;
+                this.hasMoved = false;
+                this.startXCoordinate = event.clientX;
+                this.startYCoordinate = event.clientY;
+
+                const sigilRectangle = this.sigil.getBoundingClientRect();
+                const workspaceRectangle = workspace.getBoundingClientRect();
+
+                this.grabOffsetX = event.clientX - sigilRectangle.left;
+                this.grabOffsetY = event.clientY - sigilRectangle.top;
+
+                this.sigil.setPointerCapture(event.pointerId);
+
+                const onPointerMove = (moveEvent) => {
+                    if (!this.isDragging) return;
+
+                    if (Math.abs(moveEvent.clientX - this.startXCoordinate) > 5 || Math.abs(moveEvent.clientY - this.startYCoordinate) > 5) {
+                        this.hasMoved = true;
+                    }
+
+                    requestAnimationFrame(() => {
+                        const currentWorkspaceRectangle = workspace.getBoundingClientRect();
+
+                        let newX = moveEvent.clientX - currentWorkspaceRectangle.left - this.grabOffsetX;
+                        let newY = moveEvent.clientY - currentWorkspaceRectangle.top - this.grabOffsetY;
+
+                        const maximumX = currentWorkspaceRectangle.width - this.sigil.offsetWidth;
+                        const maximumY = currentWorkspaceRectangle.height - this.sigil.offsetHeight;
+
+                        this.sigil.style.left = Math.max(0, Math.min(newX, maximumX)) + 'px';
+                        this.sigil.style.top = Math.max(0, Math.min(newY, maximumY)) + 'px';
+                    });
+                };
+
+                const onPointerUp = () => {
+                    const dock = document.querySelector('#sigil-dock');
+                    const sigilRect = this.sigil.getBoundingClientRect();
+                    const dockRect = this.dock.getBoundingClientRect();
+
+                    const isOverDock = !(sigilRect.right < dockRect.left || 
+                    sigilRect.left > dockRect.right || 
+                    sigilRect.bottom < dockRect.top || 
+                    sigilRect.top > dockRect.bottom);
+
+                    if (this.isDragging) {
+                        this.isDragging = false;
+                        this.sigil.classList.add('is-animating')
+                        if (isOverDock) {
+                            this.dockSigil();
+                        } else {
+                            localStorage.setItem(`${this.sigilType}-sigil-x-coordinate`, this.sigil.style.left);
+                            localStorage.setItem(`${this.sigilType}-sigil-y-coordinate`, this.sigil.style.top);
+                        }
+                    }
+                    window.removeEventListener('pointermove', onPointerMove);
+                    window.removeEventListener('pointerup', onPointerUp);
+                };
+
+                window.addEventListener('pointermove', onPointerMove);
+                window.addEventListener('pointerup', onPointerUp);
+            });
+
+            this.sigil.addEventListener('click', (event) => {
+                if (this.hasMoved) return;
+
+                if (typeof this.clickCallback === 'function') {
+                    this.clickCallback();
+                } else if (this.sigilType === 'vocab') {
+                    this.revealNextVocabSegment();
+                }
+            });
+        }
+
+        restoreState() {
+            const isUndocked = localStorage.getItem(`${this.sigilType}-sigil-docked`) === 'false';
+
+            if (isUndocked) {
+                this.loadPosition();
+                this.checkBoundaryAndDockIfNeeded();
+            } else {
+                this.dockSigil();
+            }
+        }
+
+        checkBoundaryAndDockIfNeeded() {
+            if (this.sigil.classList.contains('hidden-in-dock')) {
+                return;
+            }
+
+            const workspace = document.querySelector('.deck-workspace');
+            if (!workspace) return;
+
+            const sigilRectangle = this.sigil.getBoundingClientRect();
+            const workspaceRectangle = workspace.getBoundingClientRect();
+
+            const isOutOfBounds = (
+                sigilRectangle.left < workspaceRectangle.left ||
+                sigilRectangle.right > workspaceRectangle.right ||
+                sigilRectangle.top < workspaceRectangle.top ||
+                sigilRectangle.bottom > workspaceRectangle.bottom
+            );
+
+            if (isOutOfBounds) {
+                this.dockSigil();
+            }
+        }
+
+        init() {
+            this.sigil.classList.add('is-animating');
+            this.restoreState();
+            this.setupListeners();
+        }
+    }
 
     class DataLoader {
         constructor(elementId = 'json-container') {
@@ -1359,13 +1346,11 @@
     class BackCardApp {
         strokeStateController = null;
         kanjiSvgController = null;
-        kanjiTreeController = null;
         kanjiTappableArea = null;
 
         constructor() {
             const loader = new DataLoader();
             if (!loader.isValid()) {
-                console.warn('BackCardApp: JSON container not accessed properly.');
                 return;
             }
             
@@ -1381,29 +1366,35 @@
                 this.kanjiSvgController.cachedPathElements.length
             );
 
-            const parsedLogicalTree = KanjiSvgLogicalTreeParser.parse(
-                this.dataProvider.getSvgData()
-            );
-
-            this.kanjiTreeController = new KanjiTreeNavigationController({
-                treeHeadSelector: '#kanji-tree-head',
-                treeElementsSelector: '#kanji-tree-elements',
-                treeBreadcrumbsSelector: '#kanji-tree-breadcrumbs',
-                logicalKanjiTree: parsedLogicalTree,
-                kanjiSvgController: this.kanjiSvgController
-            });
-
             this.kanjiTappableArea = document.querySelector('.kanji-house');
 
             this.init();
         }
 
         init() {
-            new SigilController('#kanji-sigil', 'vocab');
+            this.settingsManager = new GlobalSettingsManager();
 
-            new VocabLedgerService({
+            new SigilController('#vocab-sigil', 'vocab', '#sigil-dock');
+
+            new SigilController('#stroke-sigil', 'stroke', '#stroke-sigil-dock', () => {
+                this.advanceKanjiStroke();
+            });
+
+            this.vocabLedgerService = new VocabLedgerService({
                 vocabData: this.dataProvider.getAssociatedWords(),
                 ledgerContainerElement: '#vocab-ledger',
+                settingsManager: this.settingsManager
+            });
+
+            new SettingsDrawerController({
+                openButtonSelector: '#open-settings-button',
+                closeButtonSelector: '#close-settings-button',
+                backdropSelector: '#settings-drawer-backdrop',
+                maxCountInputSelector: '#settings-vocab-max-count',
+                maxCountDisplaySelector: '#settings-vocab-max-count-value',
+                totalAvailableDisplaySelector: '#settings-vocab-total-available-value',
+                settingsManager: this.settingsManager,
+                vocabLedgerService: this.vocabLedgerService
             });
 
             new KanjiMeaningController({
@@ -1446,6 +1437,11 @@
                 storageKey: 'kanji-stroke-numbers-active'
             });
 
+            new DrawingPadController({
+                canvasSelector: '#drawing-canvas',
+                clearButtonSelector: '#clear-drawing-button'
+            });
+
             this.setupThemeToggle();
             this.setupListeners();
         }
@@ -1456,22 +1452,9 @@
             }
             
             this.kanjiTappableArea.addEventListener('click', (event) => this.handleKanjiTap(event));
-
-            const highlightButton = document.querySelector('#highlight-elements-kanji-tool-button');
-            if (highlightButton) {
-                highlightButton.addEventListener('click', (event) => {
-                    event.stopPropagation(); 
-                    this.kanjiSvgController.toggleColors();
-                    highlightButton.classList.toggle('active');
-                });
-            }
         }
 
-        handleKanjiTap(event) {
-            if (event.target.closest('.readings-display-wrapper')) {
-                return;
-            }
-
+        advanceKanjiStroke() {
             this.strokeStateController.increment();
             const currentCount = this.strokeStateController.getCurrent();
 
@@ -1483,6 +1466,15 @@
                 this.kanjiSvgController.updateCurrentStrokeCount(currentCount);
             }
         }
+
+        handleKanjiTap(event) {
+            if (event && event.target && event.target.closest && event.target.closest('.readings-display-wrapper')) {
+                return;
+            }
+            this.advanceKanjiStroke();
+        }
+
+        
 
         setupThemeToggle() {
             this.themeButton = document.querySelector('#toggle-theme-button');
