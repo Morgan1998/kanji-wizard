@@ -1,0 +1,287 @@
+<script>
+(() => {
+    const rootElement = document.documentElement;
+    const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isNightModeActive = locallySavedTheme ? (locallySavedTheme === "dark") : systemPrefersDark;
+    rootElement.classList.toggle("user-night-mode", isNightModeActive);
+    rootElement.classList.toggle("user-day-mode", !isNightModeActive);
+})();
+</script>
+
+<div class="deck-workspace preload">
+    <div class="card-container card-container-front">
+        <div class="front-main-content">
+            <div class="front-card-prompt-hint">Recall the meaning 🧠</div>
+
+            <div class="kanji-house">
+                <svg id="kanji-svg" viewBox="0 0 109 109" width="100%" height="100%">
+                    <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
+                    <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
+                    <g id="stroke-paths-root"></g>
+                    <g id="stroke-numbers-root"></g>
+                </svg>
+            </div>
+
+        </div>
+
+        <footer class="deck-utility-footer">
+            <a id="report-issue-link" href="" class="footer-button">Report an Issue</a>
+            <a id="rate-deck-link" href="" class="footer-button">Rate the Deck</a>
+            <button id="toggle-theme-button" class="sliding-toggle-button" aria-label="Toggle theme"></button>
+        </footer>
+    </div>
+</div>
+
+<div id="json-container" class="hidden">{{json}}</div>
+
+<script>
+(() => {
+
+    class DataLoader {
+        constructor(elementId = 'json-container') {
+            this.elementId = elementId;
+            this.data = this.#init();
+        }
+
+        #init() {
+            const element = document.getElementById(this.elementId);
+            if (!element || !element.textContent.trim()) {
+                return null;
+            }
+            try {
+                return JSON.parse(element.textContent);
+            } catch (parsingError) {
+                return null;
+            }
+        }
+
+        isValid() {
+            return this.data !== null;
+        }
+    }
+
+    class KanjiDataProvider {
+        constructor(rawData) {
+            this.data = rawData || {};
+        }
+
+        getKanji() {
+            return this.data.kanji || '';
+        }
+
+        getJlptLevel() {
+            return this.data.jlpt || null;
+        }
+
+        getSvgData() {
+            return this.data.svg || null;
+        }
+    }
+
+    class KanjiSvgDOMBuilder {
+        static SVG_XML_NAMESPACE = "http://www.w3.org/2000/svg";
+        static SUPPORTED_SVG_ELEMENT_TAGS = new Set(["g", "path", "text"]);
+
+        static buildElement(serializedJsonNode, svgElementTagName) {
+            const svgElement = document.createElementNS(this.SVG_XML_NAMESPACE, svgElementTagName);
+
+            for (const [nodePropertyKey, nodePropertyValue] of Object.entries(serializedJsonNode)) {
+                if (this.SUPPORTED_SVG_ELEMENT_TAGS.has(nodePropertyKey)) {
+                    const nestedChildNodes = Array.isArray(nodePropertyValue) ? nodePropertyValue : [nodePropertyValue];
+
+                    nestedChildNodes.forEach(nestedChildNode => {
+                        const nestedChildElement = this.buildElement(nestedChildNode, nodePropertyKey);
+                        svgElement.appendChild(nestedChildElement);
+                    });
+                } else if (nodePropertyKey === "#text") {
+                    const svgTextNode = document.createTextNode(nodePropertyValue);
+                    svgElement.appendChild(svgTextNode);
+                } else if (typeof nodePropertyValue === "string" || typeof nodePropertyValue === "number") {
+                    const normalizedPropertyKey = nodePropertyKey.toLowerCase().trim();
+                    const isPotentiallyMaliciousAttribute = normalizedPropertyKey.startsWith("on") || 
+                        (typeof nodePropertyValue === "string" && nodePropertyValue.toLowerCase().startsWith("javascript:"));
+
+                    if (!isPotentiallyMaliciousAttribute) {
+                        svgElement.setAttribute(nodePropertyKey, nodePropertyValue);
+                    }
+                }
+            }
+
+            if (svgElementTagName === "path") {
+                this.setupPathOffset(svgElement);
+            }
+
+            return svgElement;
+        }
+
+        static setupPathOffset(svgPathElement) {
+            svgPathElement.classList.add("kanji-stroke");
+            const absoluteStrokeLength = svgPathElement.getTotalLength();
+            svgPathElement.dataset.strokeLength = absoluteStrokeLength;
+            svgPathElement.style.strokeDasharray = absoluteStrokeLength;
+            svgPathElement.style.strokeDashoffset = 0;
+        }
+    }
+
+    class KanjiSvgController {
+        constructor(config) {
+            this.strokePathsRoot = document.querySelector(config.pathsSelector);
+            this.strokeNumbersRoot = document.querySelector(config.numbersSelector);
+            this.svgData = config.svgData;
+
+            this.initializeCanvas();
+        }
+
+        initializeCanvas() {
+            if (!this.strokePathsRoot || !this.svgData) {
+                return;
+            }
+
+            this.strokePathsRoot.replaceChildren();
+            if (this.strokeNumbersRoot) {
+                this.strokeNumbersRoot.replaceChildren();
+            }
+
+            let pathsGroupNode = this.svgData.g[0];
+            if (!pathsGroupNode || !pathsGroupNode.id || !pathsGroupNode.id.startsWith("kvg:StrokePaths_")) {
+                const traverseToFindPaths = (node) => {
+                    if (node && node.id && node.id.startsWith("kvg:StrokePaths_")) {
+                        return node;
+                    }
+                    if (node && node.g) {
+                        const groups = Array.isArray(node.g) ? node.g : [node.g];
+                        for (const group of groups) {
+                            const found = traverseToFindPaths(group);
+                            if (found) return found;
+                        }
+                    }
+                    return null;
+                };
+                const foundPaths = traverseToFindPaths(this.svgData);
+                if (foundPaths) {
+                    pathsGroupNode = foundPaths;
+                }
+            }
+
+            if (pathsGroupNode) {
+                const domPathsGroup = KanjiSvgDOMBuilder.buildElement(pathsGroupNode, "g");
+                this.strokePathsRoot.appendChild(domPathsGroup);
+            }
+        }
+    }
+
+    class LinkInstallationService {
+        targetLinkElement = null;
+
+        constructor(config) {
+            this.targetLinkElement = document.querySelector(config.linkSelector);
+
+            if (!this.targetLinkElement) {
+                return;
+            }
+
+            this.installDynamicUrl(config.baseUrl, config.params, config.openInNewTab);
+        }
+
+        installDynamicUrl(baseUrlString, parametersObject = {}, openInNewTabFlag = true) {
+            const urlParametersBuilder = new URLSearchParams();
+
+            for (const [parameterKey, parameterValue] of Object.entries(parametersObject)) {
+                const resolvedValue = (parameterValue !== null && parameterValue !== undefined)
+                    ? String(parameterValue).trim()
+                    : 'Unknown';
+
+                urlParametersBuilder.append(parameterKey, resolvedValue);
+            }
+
+            const hasParametersFlag = Object.keys(parametersObject).length > 0;
+            const finalizedUrlString = hasParametersFlag
+                ? `${baseUrlString}?${urlParametersBuilder.toString()}`
+                : baseUrlString;
+                
+            this.targetLinkElement.href = finalizedUrlString;
+
+            if (openInNewTabFlag) {
+                this.targetLinkElement.target = '_blank';
+            }
+        }
+    }
+
+    class FrontCardApp {
+        constructor() {
+            const dataLoader = new DataLoader('json-container');
+            if (!dataLoader.isValid()) {
+                return;
+            }
+
+            this.dataProvider = new KanjiDataProvider(dataLoader.data);
+            this.init();
+        }
+
+        init() {
+            this.setupThemeToggle();
+
+            new KanjiSvgController({
+                pathsSelector: '#stroke-paths-root',
+                numbersSelector: '#stroke-numbers-root',
+                svgData: this.dataProvider.getSvgData()
+            });
+
+            new LinkInstallationService({
+                linkSelector: '#report-issue-link',
+                baseUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeji75MTbdugBk8IiQYl4_JQyIoiYMMwil0bMiCjl1r1pjZUg/viewform',
+                openInNewTab: true,
+                params: {
+                    'usp': 'pp_url',
+                    'entry.196764883': this.dataProvider.getKanji(),
+                    'entry.870807372': this.dataProvider.getJlptLevel()
+                }
+            });
+
+            new LinkInstallationService({
+                linkSelector: '#rate-deck-link',
+                baseUrl: 'https://ankiweb.net/shared/decks',
+                openInNewTab: true
+            });
+        }
+
+        setupThemeToggle() {
+            this.themeButton = document.querySelector('#toggle-theme-button');
+            if (!this.themeButton) {
+                return;
+            }
+
+            const root = document.documentElement;
+
+            const updateState = (isNightModeActive) => {
+                root.classList.toggle('user-night-mode', isNightModeActive);
+                root.classList.toggle('user-day-mode', !isNightModeActive);
+                
+                this.themeButton.setAttribute('data-theme', isNightModeActive ? 'dark' : 'light');
+                localStorage.setItem('kanji-wizard-theme', isNightModeActive ? 'dark' : 'light');
+            };
+
+            const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
+            const userSystemSetAsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            updateState(locallySavedTheme ? locallySavedTheme === 'dark' : userSystemSetAsDark);
+
+            this.themeButton.addEventListener('click', (clickEvent) => {
+                clickEvent.stopPropagation();
+                const switchedToDarkMode = root.classList.contains('user-day-mode');
+                updateState(switchedToDarkMode);
+            });
+        }
+    }
+
+    new FrontCardApp();
+
+        const workspaceElement = document.querySelector(".deck-workspace");
+        if (workspaceElement) {
+            setTimeout(() => {
+                workspaceElement.classList.remove("preload");
+            }, 100);
+        }
+        
+})();
+</script>

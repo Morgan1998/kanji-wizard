@@ -1,0 +1,342 @@
+<script>
+(() => {
+    const rootElement = document.documentElement;
+    const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isNightModeActive = locallySavedTheme ? (locallySavedTheme === "dark") : systemPrefersDark;
+    rootElement.classList.toggle("user-night-mode", isNightModeActive);
+    rootElement.classList.toggle("user-day-mode", !isNightModeActive);
+})();
+</script>
+
+<div class="deck-workspace preload">
+    <div class="card-container card-container-front">
+        <div class="front-main-content">
+            <div class="front-card-prompt-hint">Draw the Kanji from its Meaning ✍️</div>
+
+            <div class="drawing-section">
+                <div class="drawing-house">
+                    <svg class="drawing-board-grid-svg" viewBox="0 0 109 109">
+                        <line x1="54.5" y1="0" x2="54.5" y2="109" class="grid-line" />
+                        <line x1="0" y1="54.5" x2="109" y2="54.5" class="grid-line" />
+                    </svg>
+                    <canvas id="drawing-canvas"></canvas>
+                </div>
+                <div class="drawing-controls">
+                    <button id="undo-drawing-button" class="kanji-tool-button">Undo</button>
+                    <button id="clear-drawing-button" class="kanji-tool-button">Clear</button>
+                </div>
+            </div>
+
+            <div class="meaning-container unselectable">
+                <h2 id="kanji-meaning" style="display: flex; justify-content: center; width: 100%;">
+                    <span class="meaning-pill primary-pill"></span> 
+                </h2>
+            </div>
+        </div>
+
+        <footer class="deck-utility-footer">
+            <a id="report-issue-link" href="" class="footer-button">Report an Issue</a>
+            <a id="rate-deck-link" href="" class="footer-button">Rate the Deck</a>
+            <button id="toggle-theme-button" class="sliding-toggle-button" aria-label="Toggle theme"></button>
+        </footer>
+    </div>
+</div>
+
+<div id="json-container" class="hidden">{{json}}</div>
+
+<script>
+(() => {
+
+    class DataLoader {
+        constructor(elementId = 'json-container') {
+            this.elementId = elementId;
+            this.data = this.#init();
+        }
+
+        #init() {
+            const element = document.getElementById(this.elementId);
+            if (!element || !element.textContent.trim()) {
+                return null;
+            }
+            try {
+                return JSON.parse(element.textContent);
+            } catch (parsingError) {
+                return null;
+            }
+        }
+
+        isValid() {
+            return this.data !== null;
+        }
+    }
+
+    class KanjiDataProvider {
+        constructor(rawData) {
+            this.data = rawData || {};
+        }
+
+        getKanji() {
+            return this.data.kanji || '';
+        }
+
+        getJlptLevel() {
+            return this.data.jlpt || null;
+        }
+
+        getMeanings() {
+            return this.data.meanings || [];
+        }
+    }
+
+    class LinkInstallationService {
+        targetLinkElement = null;
+
+        constructor(config) {
+            this.targetLinkElement = document.querySelector(config.linkSelector);
+
+            if (!this.targetLinkElement) {
+                return;
+            }
+
+            this.installDynamicUrl(config.baseUrl, config.params, config.openInNewTab);
+        }
+
+        installDynamicUrl(baseUrlString, parametersObject = {}, openInNewTabFlag = true) {
+            const urlParametersBuilder = new URLSearchParams();
+
+            for (const [parameterKey, parameterValue] of Object.entries(parametersObject)) {
+                const resolvedValue = (parameterValue !== null && parameterValue !== undefined)
+                    ? String(parameterValue).trim()
+                    : 'Unknown';
+
+                urlParametersBuilder.append(parameterKey, resolvedValue);
+            }
+
+            const hasParametersFlag = Object.keys(parametersObject).length > 0;
+            const finalizedUrlString = hasParametersFlag
+                ? `${baseUrlString}?${urlParametersBuilder.toString()}`
+                : baseUrlString;
+                
+            this.targetLinkElement.href = finalizedUrlString;
+
+            if (openInNewTabFlag) {
+                this.targetLinkElement.target = '_blank';
+            }
+        }
+    }
+
+    class DrawingPadController {
+        constructor(config) {
+            this.canvasElement = document.querySelector(config.canvasSelector);
+            this.clearButtonElement = document.querySelector(config.clearButtonSelector);
+            this.undoButtonElement = document.querySelector(config.undoButtonSelector);
+
+            if (!this.canvasElement) {
+                return;
+            }
+
+            this.canvasContext = this.canvasElement.getContext('2d');
+            this.isCurrentlyDrawing = false;
+            this.strokeHistoryStack = [];
+
+            this.initialize();
+        }
+
+        initialize() {
+            this.configureCanvasResolution();
+
+            if (typeof ResizeObserver !== "undefined") {
+                this.resizeObserver = new ResizeObserver(() => this.configureCanvasResolution());
+                this.resizeObserver.observe(this.canvasElement.parentElement);
+            }
+
+            this.canvasElement.addEventListener('pointerdown', (pointerEvent) => this.startDrawingSequence(pointerEvent));
+            this.canvasElement.addEventListener('pointermove', (pointerEvent) => this.drawStrokeSegment(pointerEvent));
+            this.canvasElement.addEventListener('pointerup', () => this.terminateDrawingSequence());
+            this.canvasElement.addEventListener('pointerleave', () => this.terminateDrawingSequence());
+
+            if (this.clearButtonElement) {
+                this.clearButtonElement.addEventListener('click', (clickEvent) => {
+                    clickEvent.stopPropagation();
+                    this.clearCanvas();
+                });
+            }
+
+            if (this.undoButtonElement) {
+                this.undoButtonElement.addEventListener('click', (clickEvent) => {
+                    clickEvent.stopPropagation();
+                    this.undoLastStroke();
+                });
+            }
+        }
+
+        configureCanvasResolution() {
+            const boundingRectangle = this.canvasElement.getBoundingClientRect();
+            this.canvasElement.width = boundingRectangle.width * window.devicePixelRatio;
+            this.canvasElement.height = boundingRectangle.height * window.devicePixelRatio;
+            this.canvasContext.scale(window.devicePixelRatio, window.devicePixelRatio);
+            this.redrawFromHistory();
+        }
+
+        getPointerCoordinates(pointerEvent) {
+            const boundingRectangle = this.canvasElement.getBoundingClientRect();
+            return {
+                coordinateX: pointerEvent.clientX - boundingRectangle.left,
+                coordinateY: pointerEvent.clientY - boundingRectangle.top
+            };
+        }
+
+        saveCurrentStateToHistory() {
+            const width = this.canvasElement.width;
+            const height = this.canvasElement.height;
+            const imageDataSnapshot = this.canvasContext.getImageData(0, 0, width, height);
+            this.strokeHistoryStack.push(imageDataSnapshot);
+        }
+
+        startDrawingSequence(pointerEvent) {
+            pointerEvent.stopPropagation();
+            this.saveCurrentStateToHistory();
+            this.isCurrentlyDrawing = true;
+
+            const pointerCoordinates = this.getPointerCoordinates(pointerEvent);
+            this.canvasContext.beginPath();
+            this.canvasContext.moveTo(pointerCoordinates.coordinateX, pointerCoordinates.coordinateY);
+        }
+
+        drawStrokeSegment(pointerEvent) {
+            if (!this.isCurrentlyDrawing) {
+                return;
+            }
+            pointerEvent.stopPropagation();
+
+            const pointerCoordinates = this.getPointerCoordinates(pointerEvent);
+            const rootStyleContext = getComputedStyle(document.documentElement);
+            const activeInkColor = rootStyleContext.getPropertyValue('--ink-color').trim() || '#2d3436';
+
+            this.canvasContext.lineWidth = 4;
+            this.canvasContext.lineCap = 'round';
+            this.canvasContext.lineJoin = 'round';
+            this.canvasContext.strokeStyle = activeInkColor;
+
+            this.canvasContext.lineTo(pointerCoordinates.coordinateX, pointerCoordinates.coordinateY);
+            this.canvasContext.stroke();
+        }
+
+        terminateDrawingSequence() {
+            this.isCurrentlyDrawing = false;
+        }
+
+        undoLastStroke() {
+            if (this.strokeHistoryStack.length > 0) {
+                const previousSnapshot = this.strokeHistoryStack.pop();
+                this.canvasContext.putImageData(previousSnapshot, 0, 0);
+            }
+        }
+
+        redrawFromHistory() {
+            if (this.strokeHistoryStack.length > 0) {
+                const latestSnapshot = this.strokeHistoryStack[this.strokeHistoryStack.length - 1];
+                this.canvasContext.putImageData(latestSnapshot, 0, 0);
+            } else {
+                this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+            }
+        }
+
+        clearCanvas() {
+            this.strokeHistoryStack = [];
+            this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+        }
+    }
+
+    class FrontCardApp {
+        constructor() {
+            const dataLoader = new DataLoader('json-container');
+            if (!dataLoader.isValid()) {
+                return;
+            }
+
+            this.dataProvider = new KanjiDataProvider(dataLoader.data);
+            this.init();
+        }
+
+        init() {
+            this.setupMeaning();
+            this.setupThemeToggle();
+
+            new DrawingPadController({
+                canvasSelector: '#drawing-canvas',
+                clearButtonSelector: '#clear-drawing-button',
+                undoButtonSelector: '#undo-drawing-button'
+            });
+
+            new LinkInstallationService({
+                linkSelector: '#report-issue-link',
+                baseUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeji75MTbdugBk8IiQYl4_JQyIoiYMMwil0bMiCjl1r1pjZUg/viewform',
+                openInNewTab: true,
+                params: {
+                    'usp': 'pp_url',
+                    'entry.196764883': this.dataProvider.getKanji(),
+                    'entry.870807372': this.dataProvider.getJlptLevel()
+                }
+            });
+
+            new LinkInstallationService({
+                linkSelector: '#rate-deck-link',
+                baseUrl: 'https://ankiweb.net/shared/decks',
+                openInNewTab: true
+            });
+        }
+
+        setupMeaning() {
+            const targetKanjiCharacter = this.dataProvider.getKanji();
+            const customMeaningStorageKey = "kanji-custom-meaning-" + targetKanjiCharacter;
+            const savedCustomMeaning = localStorage.getItem(customMeaningStorageKey);
+            const kanjiMeaningsList = this.dataProvider.getMeanings();
+            const activeKanjiMeaning = savedCustomMeaning || kanjiMeaningsList[0] || "Placeholder Meaning";
+
+            const meaningPillElement = document.querySelector("#kanji-meaning .meaning-pill");
+            if (meaningPillElement) {
+                meaningPillElement.textContent = activeKanjiMeaning;
+            }
+        }
+
+        setupThemeToggle() {
+            this.themeButton = document.querySelector('#toggle-theme-button');
+            if (!this.themeButton) {
+                return;
+            }
+
+            const root = document.documentElement;
+
+            const updateState = (isNightModeActive) => {
+                root.classList.toggle('user-night-mode', isNightModeActive);
+                root.classList.toggle('user-day-mode', !isNightModeActive);
+                
+                this.themeButton.setAttribute('data-theme', isNightModeActive ? 'dark' : 'light');
+                localStorage.setItem('kanji-wizard-theme', isNightModeActive ? 'dark' : 'light');
+            };
+
+            const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
+            const userSystemSetAsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            updateState(locallySavedTheme ? locallySavedTheme === 'dark' : userSystemSetAsDark);
+
+            this.themeButton.addEventListener('click', (clickEvent) => {
+                clickEvent.stopPropagation();
+                const switchedToDarkMode = root.classList.contains('user-day-mode');
+                updateState(switchedToDarkMode);
+            });
+        }
+    }
+
+    new FrontCardApp();
+
+        const workspaceElement = document.querySelector(".deck-workspace");
+        if (workspaceElement) {
+            setTimeout(() => {
+                workspaceElement.classList.remove("preload");
+            }, 100);
+        }
+        
+})();
+</script>
