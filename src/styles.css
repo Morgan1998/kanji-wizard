@@ -149,6 +149,7 @@ html {
     width: 100%;
     max-width: 600px;
     height: 100%;
+    container-type: inline-size;
 }
 
 .card-container {
@@ -212,8 +213,12 @@ html {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 150px;
     width: 150px;
+    max-width: 40vw;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
     background-color: var(--bg-kanji-house);
     border: 1px solid var(--border-card);
     box-shadow: var(--shadow-card);
@@ -221,6 +226,16 @@ html {
     transition: background-color 0.2s ease, border-color 0.2s ease;
     overflow: visible;
     flex-shrink: 0;
+}
+
+.card-container-front .kanji-house {
+    width: 300px;
+    max-width: 85vw;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    margin-top: 0;
 }
 
 .grid-line {
@@ -331,59 +346,70 @@ html {
     filter: drop-shadow(0 0 3px color-mix(in srgb, var(--bg-kanji-house) 80%, transparent));
 }
 
+
 .meaning-container {
     width: 100%;
     padding: 0 15px;
+    box-sizing: border-box;
 }
 
 #kanji-meaning {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     width: 100%;
     height: max-content;
 }
 
-#kanji-meaning::before {
+#kanji-meaning:has(.meaning-expand-button)::before {
     content: "";
+    width: 38px;
     display: block;
+    flex-shrink: 0;
+}
+
+.meaning-pill.primary-pill {
+    background-color: color-mix(in srgb, var(--text-primary) 3%, transparent);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);
+    border-left: 3px solid var(--wizard-color-6);
+    border-right: 3px solid var(--wizard-color-7);
+    color: var(--text-primary);
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: clamp(0.9rem, 1.5cqw + 0.7rem, 1.2rem);
+    border-radius: 4px;
+    padding: 8px 20px;
+    letter-spacing: 0.08em;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--wizard-color-6) 15%, transparent);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: 80%;
+    text-align: center;
+    box-sizing: border-box;
+    flex: 0 1 auto;
 }
 
 #kanji-meaning .meaning-expand-button {
-    grid-column: 3;
-    justify-self: start;
-    margin: 0 24px 0 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    position: relative;
     height: 20px;
-    padding: 0 8px 0 14px;
+    width: 38px;
+    padding: 0;
     background: var(--bg-card);
     border: 1px solid var(--border-card);
     border-radius: 2px;
     font-family: var(--font-specialized);
-    font-size: 0.65rem;
+    font-size: clamp(0.55rem, 1.8cqw, 0.65rem);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--text-secondary);
     cursor: pointer;
     transition: opacity 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
 }
 
-.meaning-expand-button::before {
-    content: "";
-    position: absolute;
-    left: 5px;
-    top: 25%;
-    width: 1.5px;
-    height: 50%;
-    background: var(--accent-color);
-    border-radius: 1px;
-    opacity: 0.6;
-    transition: opacity 0.2s ease, background-color 0.2s ease;
-}
 
 .meaning-expand-button:hover {
     background-color: var(--accent-color);
@@ -437,6 +463,10 @@ html {
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
     transform: translateY(0);
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .settings-drawer-sheet {
@@ -460,12 +490,12 @@ html {
 .meanings-drawer-title,
 .settings-drawer-title {
     font-family: var(--font-specialized);
-    font-size: 0.9rem;
+    font-size: clamp(0.85rem, 3cqw, 1.1rem);
     font-weight: 700;
-    color: var(--text-secondary);
+    color: var(--wizard-color-6);
     margin-bottom: 16px;
     text-align: center;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
 }
 
@@ -510,7 +540,7 @@ html {
     color: var(--text-primary);
     font-family: var(--font-primary);
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: clamp(0.9rem, 3cqw, 1.2rem);
     border-radius: 4px;
     padding: 8px 20px;
     letter-spacing: 0.08em;
@@ -598,15 +628,18 @@ html {
 }
 
 div.vocabulary-top-bar button.reading-button {
-    flex: 1 1 0px;
-    min-width: max-content;
+    flex: 1 0 auto;
+    min-width: 0;
     height: 38px;
-    padding: 0 20px;
+    padding: 0 8px;
     background: var(--bg-reading-button);
     border: 1px solid var(--border-card);
     border-radius: 2px;
     font-family: var(--font-specialized);
-    font-size: 0.72rem;
+    font-size: clamp(0.55rem, 1.5cqw + 0.35rem, 0.72rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -983,21 +1016,26 @@ div.vocabulary-top-bar button.reading-button:hover {
 .vocab {
     display: flex;
     flex-direction: row;
-    gap: 8px;
+    gap: 2px;
     align-items: center;
-    justify-content: space-between;
-    width: calc(100% - 32px);
-    overflow-x: visible;
-    scrollbar-width: thin;
+    flex-grow: 1;
+    min-width: 0;
+    overflow-x: auto;
     padding-bottom: 2px;
     position: relative;
     z-index: 1;
+    margin-right: 12px;
+    scrollbar-width: thin;
+}
+
+.selection-mode-active .vocab {
+    justify-content: space-between;
 }
 
 .vocab-japanese {
     flex-shrink: 0;
     display: flex;
-    font-size: 1.6rem;
+    font-size: clamp(1.1rem, 2cqw + 0.8rem, 1.6rem);
     font-weight: 400;
     color: var(--text-vocab-main);
     line-height: 1.2;
@@ -1037,7 +1075,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 
 .vocab-english {
     align-self: flex-end;
-    font-size: 1rem;
+    font-size: clamp(0.75rem, 1.2cqw + 0.5rem, 1rem);
     color: var(--text-vocab-muted);
     font-weight: 300;
     white-space: nowrap;
@@ -1058,7 +1096,7 @@ div.vocabulary-top-bar button.reading-button:hover {
     justify-content: center;
     align-items: center;
     gap: 4px;
-    width: 140px;
+    width: max-content;
     flex-shrink: 0;
 }
 
@@ -1113,7 +1151,7 @@ div.vocabulary-top-bar button.reading-button:hover {
     background: rgba(10, 10, 15, 0.8);
     backdrop-filter: blur(8px);
     will-change: transform, left, top;
-    z-index: 999;
+    z-index: 1100;
     contain: layout;
 }
 
@@ -1241,6 +1279,7 @@ div.vocabulary-top-bar button.reading-button:hover {
     padding: 16px 0;
     margin-top: auto;     
     border-top: 1px solid var(--border-card);
+    container-type: inline-size;
 }
 
 .footer-button {
@@ -1254,7 +1293,7 @@ div.vocabulary-top-bar button.reading-button:hover {
     border-radius: 4px;
     color: var(--text-secondary);
     font-family: var(--font-specialized);
-    font-size: 0.50rem;
+    font-size: clamp(0.35px, 1.5cqi, 2.5rem);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -1313,8 +1352,10 @@ button.utility-icon-button,
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 300px;
     width: 300px;
+    max-width: 85vw;
+    aspect-ratio: 1 / 1;
+    height: auto;
     background-color: var(--bg-kanji-house);
     border: 1px solid var(--border-card);
     box-shadow: var(--shadow-card);
@@ -1429,6 +1470,22 @@ button.utility-icon-button,
     display: flex;
     flex-direction: column;
     gap: 20px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-vocab-muted) transparent;
+}
+
+.settings-drawer-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.settings-drawer-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.settings-drawer-body::-webkit-scrollbar-thumb {
+    background-color: var(--text-vocab-muted);
+    border-radius: 10px;
 }
 
 .settings-section {
@@ -1438,7 +1495,7 @@ button.utility-icon-button,
 }
 
 .settings-section-title {
-    font-size: 0.75rem;
+    font-size: clamp(0.65rem, 2.2cqw, 0.8rem);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -1459,16 +1516,21 @@ button.utility-icon-button,
 }
 
 .settings-label {
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2.4cqw, 0.85rem);
     font-weight: 500;
     color: var(--text-secondary);
 }
 
 .settings-value-indicator {
     font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-    font-size: 0.9rem;
+    font-size: clamp(0.75rem, 2.5cqw, 0.95rem);
     font-weight: 700;
     color: var(--text-primary);
+}
+
+p.settings-value-indicator {
+    font-size: clamp(0.65rem, 2.1cqw, 0.85rem);
+    font-weight: normal;
 }
 
 .settings-select {
@@ -1477,7 +1539,7 @@ button.utility-icon-button,
     border: 1px solid var(--border-card);
     border-radius: 6px;
     padding: 8px 12px;
-    font-size: 0.85rem;
+    font-size: clamp(0.7rem, 2.4cqw, 0.9rem);
     outline: none;
     cursor: pointer;
 }
@@ -1489,7 +1551,7 @@ button.utility-icon-button,
 }
 
 .settings-available-indicator {
-    font-size: 0.8rem;
+    font-size: clamp(0.65rem, 2.1cqw, 0.8rem);
     color: var(--text-secondary);
 }
 
@@ -1768,14 +1830,6 @@ button.utility-icon-button,
 
 
 
-
-
-.card-container-front .kanji-house {
-    width: 300px;
-    height: 300px;
-    margin-top: 0;
-}
-
 .card-container-front {
     justify-content: center;
 }
@@ -1784,14 +1838,19 @@ button.utility-icon-button,
 
 .practice-backdrop-override {
     background-color: transparent;
-    backdrop-filter: none;
-    pointer-events: none;
+    backdrop-filter: blur(6px);
+    pointer-events: auto;
+    top: 175px;
+    height: calc(100% - 175px);
+    justify-content: flex-start;
+    overflow: visible;
 }
 
 .practice-sheet-override {
     pointer-events: auto;
     border-top: 2px solid var(--border-card);
     background-color: var(--bg-card);
+    border-radius: 20px;
 }
 
 #draw-toggle-button {
@@ -1908,10 +1967,6 @@ button.utility-icon-button,
 }
 
 button.vocab-select-button {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -1924,18 +1979,19 @@ button.vocab-select-button {
     z-index: 17;
     font-size: 0.9rem;
     box-shadow: var(--shadow-card);
+    flex-shrink: 0;
     transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, background-color 0.2s ease;
 }
 
 button.vocab-select-button:hover {
     border-color: var(--wizard-color-6);
-    transform: translateY(-50%) scale(1.08);
+    transform: scale(1.08);
 }
 
 button.vocab-select-button.active {
     border-color: var(--wizard-color-7);
     background-color: var(--vocab-entry-active-bg);
-    transform: translateY(-50%) rotate(45deg);
+    transform: rotate(45deg);
 }
 
 
@@ -1954,21 +2010,21 @@ button.vocab-select-button.active {
 
 .action-preview-display {
     font-family: var(--font-primary);
-    font-size: 0.7rem;
+    font-size: clamp(0.5rem, 2cqi, 2.5rem);
     font-weight: 700;
     color: var(--wizard-color-6);
     background-color: var(--bg-card);
     border: 1px dashed var(--border-card);
     border-radius: 4px;
     width: 100%;
-    height: 18px;
+    height: 1.5em;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0 4px;
+    padding: 2px 4px;
     box-sizing: border-box;
 }
 
@@ -2006,7 +2062,7 @@ button.action-button {
     border: 1px solid var(--border-card);
     border-radius: 4px;
     font-family: var(--font-specialized);
-    font-size: 0.6rem;
+    font-size: clamp(.5rem, 2cqi, 2.5rem);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;

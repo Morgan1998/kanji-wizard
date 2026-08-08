@@ -1,11 +1,24 @@
 <script>
 (() => {
     const rootElement = document.documentElement;
+    rootElement.classList.add("preload");
+    
     const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const isNightModeActive = locallySavedTheme ? (locallySavedTheme === "dark") : systemPrefersDark;
     rootElement.classList.toggle("user-night-mode", isNightModeActive);
     rootElement.classList.toggle("user-day-mode", !isNightModeActive);
+
+    const storedSettingsString = localStorage.getItem("kanji-wizard-global-settings");
+    if (storedSettingsString) {
+        try {
+            const parsedSettings = JSON.parse(storedSettingsString);
+            const fontScale = parsedSettings.vocabulary?.fontScale || 100;
+            rootElement.style.fontSize = fontScale + "%";
+        } catch (parsingError) {
+            rootElement.style.fontSize = "100%";
+        }
+    }
 })();
 </script>
 

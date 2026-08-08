@@ -1,11 +1,24 @@
 <script>
 (() => {
     const rootElement = document.documentElement;
+    rootElement.classList.add("preload");
+    
     const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const isNightModeActive = locallySavedTheme ? (locallySavedTheme === "dark") : systemPrefersDark;
     rootElement.classList.toggle("user-night-mode", isNightModeActive);
     rootElement.classList.toggle("user-day-mode", !isNightModeActive);
+
+    const storedSettingsString = localStorage.getItem("kanji-wizard-global-settings");
+    if (storedSettingsString) {
+        try {
+            const parsedSettings = JSON.parse(storedSettingsString);
+            const fontScale = parsedSettings.vocabulary?.fontScale || 100;
+            rootElement.style.fontSize = fontScale + "%";
+        } catch (parsingError) {
+            rootElement.style.fontSize = "100%";
+        }
+    }
 })();
 </script>
 
@@ -68,6 +81,7 @@
                     <button id="kunyomi-button" class="reading-button" data-type="kun">⛩️Kun</button>
                     <button id="irregular-button" class="reading-button" data-type="jukujikun">🌀Irregular</button>
                     <button id="onyomi-button" class="reading-button" data-type="on">🐉On</button>
+
                 </div>
             </div>
             
@@ -142,8 +156,8 @@
                     <div class="settings-control-group">
                         <div class="settings-label-row">
                             <span class="settings-label">Plain Mode</span>
-                            <button id="settings-vocab-plain-mode-button" class="sliding-toggle-button" aria-label="Toggle Plain Mode"></button>
                             <button id="open-plain-options-button" class="utility-icon-button" aria-label="Plain Mode Settings">⚙️</button>
+                            <button id="settings-vocab-plain-mode-button" class="sliding-toggle-button" aria-label="Toggle Plain Mode"></button>
                         </div>
                     </div>
                     <div class="settings-control-group" style="margin-top: 8px;">
@@ -152,6 +166,13 @@
                             <button id="settings-vocab-reading-filters-button" class="sliding-toggle-button" aria-label="Toggle Reading Filters"></button>
                             <span class="experimental-warning-badge">! experimental</span>
                         </div>
+                    </div>
+                    <div class="settings-control-group" style="margin-top: 8px;">
+                        <div class="settings-label-row">
+                            <label for="settings-vocab-font-size" class="settings-label">Font Scale</label>
+                            <span id="settings-vocab-font-size-value" class="settings-value-indicator">100%</span>
+                        </div>
+                        <input type="range" id="settings-vocab-font-size" class="settings-range-input" min="50" max="200" step="5" value="100">
                     </div>
                 </div>
 
@@ -386,6 +407,7 @@
                 isPlainModeActive: false,
                 isReadingFiltersActive: false,
                 searchDictionary: "jisho",
+                fontScale: 100,
                 plainModeConfig: {
                     hideKanjiTools: true,
                     hideStrokeDock: true,
@@ -403,6 +425,7 @@
             this.settings = this.loadSettings();
             this.applyPlainModeState();
             this.applyReadingFiltersState();
+            this.applyFontScaleState();
         }
 
         loadSettings() {
@@ -440,6 +463,12 @@
             this.saveSettings();
             this.applyPlainModeState();
             this.applyReadingFiltersState();
+            this.applyFontScaleState();
+        }
+
+        applyFontScaleState() {
+            const fontScale = this.settings.vocabulary.fontScale || 100;
+            document.documentElement.style.fontSize = fontScale + "%";
         }
 
         applyPlainModeState() {
@@ -732,6 +761,11 @@
                     englishElement.classList.add('is-hidden');
                 }
             });
+
+            const vocabLedger = document.querySelector('#vocab-ledger');
+            if (vocabLedger) {
+                vocabLedger.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
 
@@ -745,6 +779,7 @@
                     allVocabEntries.forEach(entry => entry.classList.remove('active-reveal'));
                     hiddenFurigana.classList.remove('is-hidden');
                     vocabEntry.classList.add('active-reveal');
+                    vocabEntry.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     return;
                 }
 
@@ -753,6 +788,7 @@
                     allVocabEntries.forEach(entry => entry.classList.remove('active-reveal'));
                     hiddenEnglish.classList.remove('is-hidden');
                     vocabEntry.classList.add('active-reveal');
+                    vocabEntry.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     return;
                 }
             }
@@ -1093,7 +1129,7 @@
 
                 const meaningExpandButton = document.createElement('button');
                 meaningExpandButton.classList.add('meaning-expand-button');
-                meaningExpandButton.textContent = (this.workingMeanings.length - 1) + '+';
+                meaningExpandButton.textContent = '+' + (this.workingMeanings.length - 1);
 
                 meaningExpandButton.addEventListener('click', (clickEvent) => {
                     clickEvent.stopPropagation();
@@ -1683,7 +1719,7 @@
 
                     const vocabGlossExpandButton = document.createElement('button');
                     vocabGlossExpandButton.classList.add('vocab-gloss-expand-button');
-                    vocabGlossExpandButton.textContent = (vocabularyEntry.glosses.length - 1) + '+';
+                    vocabGlossExpandButton.textContent = '+' + (vocabularyEntry.glosses.length - 1);
 
                     vocabGlossExpandButton.addEventListener('click', (clickEvent) => {
                         clickEvent.stopPropagation();
@@ -1780,6 +1816,9 @@
             this.dictionaryInfoButton = document.querySelector("#dictionary-info-button");
             this.dictionaryInfoPopup = document.querySelector("#dictionary-info-popup");
             this.dictionaryInfoCloseButton = document.querySelector("#close-dictionary-info-button");
+
+            this.fontScaleInput = document.querySelector("#settings-vocab-font-size");
+            this.fontScaleDisplay = document.querySelector("#settings-vocab-font-size-value");
 
             if (!this.openButton || !this.backdropElement || !this.settingsManager) {
                 return;
@@ -1959,6 +1998,18 @@
                     }
                 });
             }
+
+            if (this.fontScaleInput) {
+                this.fontScaleInput.addEventListener("input", (event) => {
+                    const newScale = parseInt(event.target.value, 10) || 100;
+                    if (this.fontScaleDisplay) {
+                        this.fontScaleDisplay.textContent = newScale + "%";
+                    }
+                    this.settingsManager.updateVocabularySettings({
+                        fontScale: newScale
+                    });
+                });
+            }
         }
 
         syncControlsFromSettings() {
@@ -2017,6 +2068,14 @@
                     checkboxElement.checked = plainConfig[option.key] ?? option.defaultVal;
                 }
             });
+
+            const savedFontScale = vocabularySettings.fontScale || 100;
+            if (this.fontScaleInput) {
+                this.fontScaleInput.value = savedFontScale;
+            }
+            if (this.fontScaleDisplay) {
+                this.fontScaleDisplay.textContent = savedFontScale + "%";
+            }
         }
     }
 
@@ -2043,14 +2102,22 @@
         initialize() {
             this.openButton.addEventListener('click', (event) => {
                 event.stopPropagation();
-                this.backdropElement.classList.remove('is-hidden');
-                this.configureCanvasResolution();
+                const isDrawerHidden = this.backdropElement.classList.contains('is-hidden');
+                if (isDrawerHidden) {
+                    this.backdropElement.classList.remove('is-hidden');
+                    this.openButton.classList.add('active');
+                    this.configureCanvasResolution();
+                } else {
+                    this.backdropElement.classList.add('is-hidden');
+                    this.openButton.classList.remove('active');
+                }
             });
 
             if (this.closeButton) {
                 this.closeButton.addEventListener('click', (event) => {
                     event.stopPropagation();
                     this.backdropElement.classList.add('is-hidden');
+                    this.openButton.classList.remove('active');
                 });
             }
 
