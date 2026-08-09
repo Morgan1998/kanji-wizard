@@ -727,20 +727,24 @@
     }
 
     class SigilController {
-        sigil = null;
-        isDragging = null;
-        constructor(sigilElement, sigilType, dockElement, clickCallback) {
-            this.sigil = document.querySelector(sigilElement);
-            this.dock = document.querySelector(dockElement || '#sigil-dock');
+        sigilElement = null;
+        dockElement = null;
+        sigilType = null;
+        clickCallback = null;
+        isDragging = false;
+        hasMoved = false;
+        startPointerX = 0;
+        startPointerY = 0;
+        grabOffsetX = 0;
+        grabOffsetY = 0;
+        currentTranslationX = 0;
+        currentTranslationY = 0;
+
+        constructor(sigilSelector, sigilType, dockSelector, clickCallback) {
+            this.sigilElement = document.querySelector(sigilSelector);
+            this.dockElement = document.querySelector(dockSelector || '#sigil-dock');
             this.sigilType = sigilType;
             this.clickCallback = clickCallback || null;
-            this.isDragging = false;
-
-            this.startXCoordinate = 0;
-            this.startYCoordinate = 0;
-            this.hasMoved = false;
-
-            this.currentIndex = 0;
             this.init();
         }
 
@@ -767,7 +771,6 @@
                 vocabLedger.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
-
 
         revealNextVocabSegment() {
             const allVocabEntries = document.querySelectorAll('.vocab-entry');
@@ -796,174 +799,193 @@
             this.resetVocabLedgerToHidden();
         }
 
-        dockSigil() {
-            const workspace = document.querySelector('.deck-workspace');
-            const dockRect = this.dock.getBoundingClientRect();
-            const workspaceRect = workspace.getBoundingClientRect();
-            const targetX = dockRect.left - workspaceRect.left + (dockRect.width / 2) - (this.sigil.offsetWidth / 2);
-            const targetY = dockRect.top - workspaceRect.top + (dockRect.height / 2) - (this.sigil.offsetHeight / 2);
+        applyTransform(coordinateX, coordinateY) {
+            this.sigilElement.style.transform = `translate3d(${coordinateX}px, ${coordinateY}px, 0)`;
+        }
 
-            this.sigil.style.left = `${targetX}px`;
-            this.sigil.style.top = `${targetY}px`;
+        dockSigil() {
+            const workspaceElement = document.querySelector('.deck-workspace');
+            const dockRectangle = this.dockElement.getBoundingClientRect();
+            const workspaceRectangle = workspaceElement.getBoundingClientRect();
+            
+            const targetX = dockRectangle.left - workspaceRectangle.left + (dockRectangle.width / 2) - (this.sigilElement.offsetWidth / 2);
+            const targetY = dockRectangle.top - workspaceRectangle.top + (dockRectangle.height / 2) - (this.sigilElement.offsetHeight / 2);
+
+            this.currentTranslationX = targetX;
+            this.currentTranslationY = targetY;
+            
+            this.sigilElement.classList.add('is-animating');
+            this.applyTransform(targetX, targetY);
 
             setTimeout(() => {
-                this.sigil.classList.add('hidden-in-dock');
-                if (this.dock) {
-                    this.dock.classList.add('is-docked');
-                    this.dock.appendChild(this.sigil);
+                this.sigilElement.classList.add('hidden-in-dock');
+                if (this.dockElement) {
+                    this.dockElement.classList.add('is-docked');
                 }
             }, 400);
 
             localStorage.setItem(`${this.sigilType}-sigil-docked`, 'true');
         }
-        undockSigil() {
-            const workspace = document.querySelector('.deck-workspace');
-            const dock = this.dock;
-            const dockRect = dock.getBoundingClientRect();
-            const workspaceRect = workspace.getBoundingClientRect();
 
-            if (this.dock) {
-                this.dock.classList.remove('is-docked');
+        dockSigilInstant() {
+            this.sigilElement.classList.remove('is-animating');
+            const workspaceElement = document.querySelector('.deck-workspace');
+            const dockRectangle = this.dockElement.getBoundingClientRect();
+            const workspaceRectangle = workspaceElement.getBoundingClientRect();
+            
+            const targetX = dockRectangle.left - workspaceRectangle.left + (dockRectangle.width / 2) - (this.sigilElement.offsetWidth / 2);
+            const targetY = dockRectangle.top - workspaceRectangle.top + (dockRectangle.height / 2) - (this.sigilElement.offsetHeight / 2);
+
+            this.currentTranslationX = targetX;
+            this.currentTranslationY = targetY;
+            this.applyTransform(targetX, targetY);
+
+            this.sigilElement.classList.add('hidden-in-dock');
+            if (this.dockElement) {
+                this.dockElement.classList.add('is-docked');
+            }
+        }
+
+        undockSigil() {
+            const workspaceElement = document.querySelector('.deck-workspace');
+            const dockRectangle = this.dockElement.getBoundingClientRect();
+            const workspaceRectangle = workspaceElement.getBoundingClientRect();
+
+            if (this.dockElement) {
+                this.dockElement.classList.remove('is-docked');
             }
 
-            this.sigil.classList.add('is-animating'); 
-            workspace.appendChild(this.sigil);
+            this.sigilElement.classList.remove('hidden-in-dock');
+            this.sigilElement.classList.add('is-animating');
 
-            const startX = dockRect.left - workspaceRect.left;
-            const startY = dockRect.top - workspaceRect.top;
-            
-            const targetXCoordinate = `${startX}px`;
-            const targetYCoordinate = `${startY + 80}px`;
+            const startX = dockRectangle.left - workspaceRectangle.left + (dockRectangle.width / 2) - (this.sigilElement.offsetWidth / 2);
+            const startY = dockRectangle.top - workspaceRectangle.top + (dockRectangle.height / 2) - (this.sigilElement.offsetHeight / 2);
 
-            this.sigil.style.left = targetXCoordinate;
-            this.sigil.style.top = `${startY}px`;
+            const targetX = startX;
+            const targetY = startY + 80;
 
-            this.sigil.offsetHeight; 
+            this.currentTranslationX = targetX;
+            this.currentTranslationY = targetY;
 
-            this.sigil.classList.remove('hidden-in-dock');
-            this.sigil.style.top = targetYCoordinate; 
+            this.applyTransform(targetX, targetY);
 
-            localStorage.setItem(`${this.sigilType}-sigil-x-coordinate`, targetXCoordinate);
-            localStorage.setItem(`${this.sigilType}-sigil-y-coordinate`, targetYCoordinate);
+            localStorage.setItem(`${this.sigilType}-sigil-x-offset`, targetX);
+            localStorage.setItem(`${this.sigilType}-sigil-y-offset`, targetY);
             localStorage.setItem(`${this.sigilType}-sigil-docked`, 'false');
 
-            setTimeout(() => this.sigil.classList.remove('is-animating'), 400);
+            setTimeout(() => {
+                this.sigilElement.classList.remove('is-animating');
+            }, 400);
         }
 
         loadPosition() {
-            const xCoordinateString = localStorage.getItem(`${this.sigilType}-sigil-x-coordinate`);
-            const yCoordinateString = localStorage.getItem(`${this.sigilType}-sigil-y-coordinate`);
-            const workspace = document.querySelector('.deck-workspace');
+            const storedX = localStorage.getItem(`${this.sigilType}-sigil-x-offset`);
+            const storedY = localStorage.getItem(`${this.sigilType}-sigil-y-offset`);
+            const workspaceElement = document.querySelector('.deck-workspace');
 
-            if (xCoordinateString && yCoordinateString && workspace) {
-                const workspaceRectangle = workspace.getBoundingClientRect();
-                const sigilWidth = this.sigil.offsetWidth || 70;
-                const sigilHeight = this.sigil.offsetHeight || 70;
+            if (storedX !== null && storedY !== null && workspaceElement) {
+                const workspaceRectangle = workspaceElement.getBoundingClientRect();
+                const parsedX = parseFloat(storedX);
+                const parsedY = parseFloat(storedY);
 
-                const parsedXCoordinate = parseFloat(xCoordinateString);
-                const parsedYCoordinate = parseFloat(yCoordinateString);
+                if (!isNaN(parsedX) && !isNaN(parsedY) && workspaceRectangle.width > 0 && workspaceRectangle.height > 0) {
+                    const maxTranslationX = Math.max(0, workspaceRectangle.width - this.sigilElement.offsetWidth);
+                    const maxTranslationY = Math.max(0, workspaceRectangle.height - this.sigilElement.offsetHeight);
 
-                if (!isNaN(parsedXCoordinate) && !isNaN(parsedYCoordinate) && workspaceRectangle.width > 0 && workspaceRectangle.height > 0) {
-                    const maximumXCoordinate = Math.max(0, workspaceRectangle.width - sigilWidth);
-                    const maximumYCoordinate = Math.max(0, workspaceRectangle.height - sigilHeight);
+                    this.currentTranslationX = Math.max(0, Math.min(parsedX, maxTranslationX));
+                    this.currentTranslationY = Math.max(0, Math.min(parsedY, maxTranslationY));
 
-                    const clampedXCoordinate = Math.max(0, Math.min(parsedXCoordinate, maximumXCoordinate));
-                    const clampedYCoordinate = Math.max(0, Math.min(parsedYCoordinate, maximumYCoordinate));
-
-                    this.sigil.style.left = `${clampedXCoordinate}px`;
-                    this.sigil.style.top = `${clampedYCoordinate}px`;
-                    this.sigil.style.bottom = 'auto';
-                    this.sigil.style.right = 'auto';
+                    this.applyTransform(this.currentTranslationX, this.currentTranslationY);
                     return;
                 }
             }
-
-            if (xCoordinateString && yCoordinateString) {
-                this.sigil.style.left = xCoordinateString;
-                this.sigil.style.top = yCoordinateString;
-                this.sigil.style.bottom = 'auto';
-                this.sigil.style.right = 'auto';
-            }
+            
+            this.dockSigilInstant();
         }
 
         setupListeners() {
-            const workspace = document.querySelector('.deck-workspace');
+            const workspaceElement = document.querySelector('.deck-workspace');
 
-            let isInitialResizeObservation = true;
-            if (workspace && typeof ResizeObserver !== 'undefined') {
+            let isInitialResize = true;
+            if (workspaceElement && typeof ResizeObserver !== 'undefined') {
                 this.resizeObserver = new ResizeObserver(() => {
-                    if (isInitialResizeObservation) {
-                        isInitialResizeObservation = false;
+                    if (isInitialResize) {
+                        isInitialResize = false;
                         return;
                     }
                     this.checkBoundaryAndDockIfNeeded();
                 });
-                this.resizeObserver.observe(workspace);
+                this.resizeObserver.observe(workspaceElement);
             }
 
-            this.dock.addEventListener('click', (event) => {
-                event.stopPropagation();
+            this.dockElement.addEventListener('click', (pointerEvent) => {
+                pointerEvent.stopPropagation();
                 
-                if (this.sigil.classList.contains('hidden-in-dock')) {
+                if (this.sigilElement.classList.contains('hidden-in-dock')) {
                     this.undockSigil();
                 } else {
                     this.dockSigil();
                 }
             });
 
-            this.sigil.addEventListener('pointerdown', (event) => {
-                this.sigil.classList.remove('is-animating');
+            this.sigilElement.addEventListener('pointerdown', (pointerEvent) => {
+                this.sigilElement.classList.remove('is-animating');
                 this.isDragging = true;
                 this.hasMoved = false;
-                this.startXCoordinate = event.clientX;
-                this.startYCoordinate = event.clientY;
+                this.startPointerX = pointerEvent.clientX;
+                this.startPointerY = pointerEvent.clientY;
 
-                const sigilRectangle = this.sigil.getBoundingClientRect();
-                const workspaceRectangle = workspace.getBoundingClientRect();
+                const workspaceRectangle = workspaceElement.getBoundingClientRect();
+                const sigilRectangle = this.sigilElement.getBoundingClientRect();
 
-                this.grabOffsetX = event.clientX - sigilRectangle.left;
-                this.grabOffsetY = event.clientY - sigilRectangle.top;
+                this.grabOffsetX = pointerEvent.clientX - sigilRectangle.left;
+                this.grabOffsetY = pointerEvent.clientY - sigilRectangle.top;
 
-                this.sigil.setPointerCapture(event.pointerId);
+                this.sigilElement.setPointerCapture(pointerEvent.pointerId);
 
                 const onPointerMove = (moveEvent) => {
                     if (!this.isDragging) return;
 
-                    if (Math.abs(moveEvent.clientX - this.startXCoordinate) > 5 || Math.abs(moveEvent.clientY - this.startYCoordinate) > 5) {
+                    if (Math.abs(moveEvent.clientX - this.startPointerX) > 5 || Math.abs(moveEvent.clientY - this.startPointerY) > 5) {
                         this.hasMoved = true;
                     }
 
                     requestAnimationFrame(() => {
-                        const currentWorkspaceRectangle = workspace.getBoundingClientRect();
+                        const currentWorkspaceRectangle = workspaceElement.getBoundingClientRect();
 
-                        let newX = moveEvent.clientX - currentWorkspaceRectangle.left - this.grabOffsetX;
-                        let newY = moveEvent.clientY - currentWorkspaceRectangle.top - this.grabOffsetY;
+                        const pointerWorkspaceX = moveEvent.clientX - currentWorkspaceRectangle.left;
+                        const pointerWorkspaceY = moveEvent.clientY - currentWorkspaceRectangle.top;
 
-                        const maximumX = currentWorkspaceRectangle.width - this.sigil.offsetWidth;
-                        const maximumY = currentWorkspaceRectangle.height - this.sigil.offsetHeight;
+                        const requestedX = pointerWorkspaceX - this.grabOffsetX;
+                        const requestedY = pointerWorkspaceY - this.grabOffsetY;
 
-                        this.sigil.style.left = Math.max(0, Math.min(newX, maximumX)) + 'px';
-                        this.sigil.style.top = Math.max(0, Math.min(newY, maximumY)) + 'px';
+                        const maxTranslationX = currentWorkspaceRectangle.width - this.sigilElement.offsetWidth;
+                        const maxTranslationY = currentWorkspaceRectangle.height - this.sigilElement.offsetHeight;
+
+                        this.currentTranslationX = Math.max(0, Math.min(requestedX, maxTranslationX));
+                        this.currentTranslationY = Math.max(0, Math.min(requestedY, maxTranslationY));
+
+                        this.applyTransform(this.currentTranslationX, this.currentTranslationY);
                     });
                 };
 
                 const onPointerUp = () => {
-                    const sigilRect = this.sigil.getBoundingClientRect();
-                    const dockRect = this.dock.getBoundingClientRect();
+                    const sigilRectangle = this.sigilElement.getBoundingClientRect();
+                    const dockRectangle = this.dockElement.getBoundingClientRect();
 
-                    const isOverDock = !(sigilRect.right < dockRect.left || 
-                    sigilRect.left > dockRect.right || 
-                    sigilRect.bottom < dockRect.top || 
-                    sigilRect.top > dockRect.bottom);
+                    const isOverDock = !(sigilRectangle.right < dockRectangle.left || 
+                    sigilRectangle.left > dockRectangle.right || 
+                    sigilRectangle.bottom < dockRectangle.top || 
+                    sigilRectangle.top > dockRectangle.bottom);
 
                     if (this.isDragging) {
                         this.isDragging = false;
-                        this.sigil.classList.add('is-animating');
+                        this.sigilElement.classList.add('is-animating');
                         if (isOverDock) {
                             this.dockSigil();
                         } else {
-                            localStorage.setItem(`${this.sigilType}-sigil-x-coordinate`, this.sigil.style.left);
-                            localStorage.setItem(`${this.sigilType}-sigil-y-coordinate`, this.sigil.style.top);
+                            localStorage.setItem(`${this.sigilType}-sigil-x-offset`, this.currentTranslationX);
+                            localStorage.setItem(`${this.sigilType}-sigil-y-offset`, this.currentTranslationY);
                             localStorage.setItem(`${this.sigilType}-sigil-docked`, 'false');
                         }
                     }
@@ -975,7 +997,7 @@
                 window.addEventListener('pointerup', onPointerUp);
             });
 
-            this.sigil.addEventListener('click', (event) => {
+            this.sigilElement.addEventListener('click', () => {
                 if (this.hasMoved) return;
 
                 if (typeof this.clickCallback === 'function') {
@@ -990,55 +1012,46 @@
             const isUndocked = localStorage.getItem(`${this.sigilType}-sigil-docked`) === 'false';
 
             if (isUndocked) {
-                const workspace = document.querySelector('.deck-workspace');
-                if (workspace) {
-                    workspace.appendChild(this.sigil);
-                }
-                this.sigil.classList.remove('hidden-in-dock');
-                if (this.dock) {
-                    this.dock.classList.remove('is-docked');
+                this.sigilElement.classList.remove('hidden-in-dock');
+                if (this.dockElement) {
+                    this.dockElement.classList.remove('is-docked');
                 }
                 this.loadPosition();
                 this.checkBoundaryAndDockIfNeeded();
             } else {
-                this.sigil.classList.remove('is-animating');
-                this.sigil.classList.add('hidden-in-dock');
-                if (this.dock) {
-                    this.dock.classList.add('is-docked');
-                    this.dock.appendChild(this.sigil);
-                }
+                this.dockSigilInstant();
             }
         }
 
         checkBoundaryAndDockIfNeeded() {
-            if (this.sigil.classList.contains('hidden-in-dock')) {
+            if (this.sigilElement.classList.contains('hidden-in-dock')) {
                 return;
             }
 
-            const workspace = document.querySelector('.deck-workspace');
-            if (!workspace) return;
+            const workspaceElement = document.querySelector('.deck-workspace');
+            if (!workspaceElement) return;
 
-            const sigilRectangle = this.sigil.getBoundingClientRect();
-            const workspaceRectangle = workspace.getBoundingClientRect();
+            const workspaceRectangle = workspaceElement.getBoundingClientRect();
 
-            if (workspaceRectangle.width === 0 || workspaceRectangle.height === 0 || sigilRectangle.width === 0) {
+            if (workspaceRectangle.width === 0 || workspaceRectangle.height === 0) {
                 return;
             }
 
-            const isOutOfBounds = (
-                sigilRectangle.left < (workspaceRectangle.left - 5) ||
-                sigilRectangle.right > (workspaceRectangle.right + 5) ||
-                sigilRectangle.top < (workspaceRectangle.top - 5) ||
-                sigilRectangle.bottom > (workspaceRectangle.bottom + 5)
-            );
+            const maxTranslationX = workspaceRectangle.width - this.sigilElement.offsetWidth;
+            const maxTranslationY = workspaceRectangle.height - this.sigilElement.offsetHeight;
 
-            if (isOutOfBounds) {
+            if (this.currentTranslationX > maxTranslationX || this.currentTranslationY > maxTranslationY) {
                 this.dockSigil();
             }
         }
 
         init() {
-            this.sigil.classList.add('is-animating');
+            this.sigilElement.style.position = 'absolute';
+            this.sigilElement.style.left = '0';
+            this.sigilElement.style.top = '0';
+            this.sigilElement.style.right = 'auto';
+            this.sigilElement.style.bottom = 'auto';
+            this.sigilElement.classList.add('is-animating');
             this.restoreState();
             this.setupListeners();
         }
@@ -1787,7 +1800,6 @@
         }
     }
 
-
     class SettingsDrawerController {
         constructor(config) {
             this.openButton = document.querySelector(config.openButtonSelector);
@@ -2376,13 +2388,15 @@
 
         setupThemeToggle() {
             this.themeButton = document.querySelector('#toggle-theme-button');
-            if (!this.themeButton) return;
+            if (!this.themeButton) {
+                return;
+            }
 
-            const root = document.documentElement;
+            const rootElement = document.documentElement;
 
-            const updateState = (isDark) => {
-                root.classList.toggle('user-night-mode', isDark);
-                root.classList.toggle('user-day-mode', !isDark);
+            const applyThemeUpdate = (isDark) => {
+                rootElement.classList.toggle('user-night-mode', isDark);
+                rootElement.classList.toggle('user-day-mode', !isDark);
                 
                 this.themeButton.setAttribute('data-theme', isDark ? 'dark' : 'light');
                 localStorage.setItem('kanji-wizard-theme', isDark ? 'dark' : 'light');
@@ -2390,12 +2404,21 @@
 
             const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
             const userSystemSetAsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            updateState(locallySavedTheme ? locallySavedTheme === 'dark' : userSystemSetAsDark);
+            const isNightModeActive = locallySavedTheme ? (locallySavedTheme === 'dark') : userSystemSetAsDark;
+            
+            applyThemeUpdate(isNightModeActive);
 
-            this.themeButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const switchedToDarkMode = root.classList.contains('user-day-mode');
-                updateState(switchedToDarkMode);
+            this.themeButton.addEventListener('click', (clickEvent) => {
+                clickEvent.stopPropagation();
+                const willBeDark = rootElement.classList.contains('user-day-mode');
+                
+                if (document.startViewTransition) {
+                    document.startViewTransition(() => {
+                        applyThemeUpdate(willBeDark);
+                    });
+                } else {
+                    applyThemeUpdate(willBeDark);
+                }
             });
         }
     }

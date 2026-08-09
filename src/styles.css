@@ -34,6 +34,8 @@
     --wizard-color-5: #064e3b;
     --wizard-color-6: #6d28d9;
     --wizard-color-7: #1d4ed8;
+    --wizard-color-8: #a21caf;
+    --wizard-color-9: #c2410c;
     --n5-color: #0284c7;
     --n4-color: #d97706;
     --n3-color: #7c3aed;
@@ -83,6 +85,8 @@
     --wizard-color-5: #10b981;
     --wizard-color-6: #a78bfa;
     --wizard-color-7: #60a5fa;
+    --wizard-color-8: #e879f9;
+    --wizard-color-9: #fb923c;
     --n5-color: #38bdf8;
     --n4-color: #fbbf24;
     --n3-color: #a78bfa;
@@ -1283,6 +1287,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .footer-button {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1293,7 +1298,7 @@ div.vocabulary-top-bar button.reading-button:hover {
     border-radius: 4px;
     color: var(--text-secondary);
     font-family: var(--font-specialized);
-    font-size: clamp(0.35px, 1.5cqi, 2.5rem);
+    font-size: clamp(0.35px, 1cqi + 0.2rem, 2.5rem);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -1441,11 +1446,40 @@ button.utility-icon-button,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-card);
-    padding-bottom: 12px;
+    padding-bottom: 14px;
+    position: relative;
 }
 
-.settings-close-button {
+.settings-drawer-header::before {
+    content: "";
+    width: 28px;
+    display: block;
+    flex-shrink: 0;
+}
+
+.settings-drawer-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--wizard-color-6), var(--wizard-color-7), transparent);
+    box-shadow: 0 1px 8px color-mix(in srgb, var(--wizard-color-6) 40%, transparent);
+}
+
+.settings-drawer-title {
+    font-family: var(--font-specialized);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--wizard-color-6);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--wizard-color-6) 20%, transparent);
+    text-align: center;
+}
+
+button.settings-close-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1458,9 +1492,10 @@ button.utility-icon-button,
     cursor: pointer;
     padding: 0;
     transition: color 0.2s ease, transform 0.2s ease;
+    z-index: 5;
 }
 
-.settings-close-button:hover {
+button.settings-close-button:hover {
     color: var(--wizard-color-1);
     background: var(--wizard-color-7);
     transform: translateY(-1px);
@@ -1499,7 +1534,7 @@ button.utility-icon-button,
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: var(--accent-color);
+    color: var(--wizard-color-8);
     font-family: var(--font-specialized);
 }
 
