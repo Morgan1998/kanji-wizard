@@ -556,7 +556,8 @@ html {
     position: relative;
     display: inline-flex;
     align-items: center;
-    height: 32px;
+    height: max-content;
+    overflow-x: auto;
     padding: 0 12px 0 16px;
     background: var(--bg-card);
     border: 1px solid var(--border-card);
@@ -627,6 +628,7 @@ html {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    overflow-x: auto;
     width: 100%;
     gap: 8px;
 }
@@ -704,12 +706,14 @@ div.vocabulary-top-bar button.reading-button::after {
 }
 
 #irregular-button {
+    width: 0;
     opacity: 0;
     filter: grayscale(100%);
     pointer-events: none;
 }
 
 .reading-filters-active #irregular-button {
+    width: auto;
     opacity: 1;
     filter: none;
     pointer-events: auto;
@@ -1046,7 +1050,7 @@ div.vocabulary-top-bar button.reading-button:hover {
     font-family: var(--font-primary);
     overflow-x: auto;
     overflow-y: hidden;
-    max-width: 100%;
+    max-width: 50%;
     white-space: nowrap;
     scrollbar-width: thin;
     scrollbar-color: var(--text-vocab-muted) transparent;
@@ -2045,7 +2049,7 @@ button.vocab-select-button.active {
 
 .action-preview-display {
     font-family: var(--font-primary);
-    font-size: clamp(0.5rem, 2cqi, 2.5rem);
+    font-size: clamp(0.5rem, 2.4cqi, 2.5rem);
     font-weight: 700;
     color: var(--wizard-color-6);
     background-color: var(--bg-card);
