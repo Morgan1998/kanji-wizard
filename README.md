@@ -54,3 +54,9 @@ If you use or build upon the TUBELEX dataset, please cite the original authors:
 ##### License & Usage
 
 The TUBELEX dataset and its associated code are distributed under the **BSD 3-Clause License**. You can review the full license terms directly in the [TUBELEX Repository](https://github.com/naist-nlp/tubelex/blob/main/LICENSE).
+
+#### 7. CEJC Frequency Dictionary
+
+- **Direct Source:** [forsakeninfinity/CEJC_yomichan_freq_dict](https://github.com/forsakeninfinity/CEJC_yomichan_freq_dict) (Dictionaries of words ordered by spoken frequency)
+- **Upstream Creator:** [NINJAL](https://www.ninjal.ac.jp/english/research/cr-project/project-3/institute/spoken-language/)
+- **License/Terms:** Restricted via NINJAL End-User License Agreements (EULA) with strict non-redissemination and privacy terms; distinct tiers apply for academic, general, and commercial usage.
