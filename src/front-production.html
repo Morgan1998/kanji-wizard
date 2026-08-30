@@ -201,6 +201,18 @@
           this.resizeObserver.observe(this.canvasElement.parentElement);
         }
 
+        this.canvasElement.addEventListener(
+          "touchstart",
+          (touchEvent) => touchEvent.preventDefault(),
+          { passive: false },
+        );
+
+        this.canvasElement.addEventListener(
+          "touchmove",
+          (touchEvent) => touchEvent.preventDefault(),
+          { passive: false },
+        );
+
         this.canvasElement.addEventListener("pointerdown", (pointerEvent) =>
           this.startDrawingSequence(pointerEvent),
         );

@@ -51,7 +51,7 @@
 
         <div
           id="stroke-sigil-dock"
-          class="sigil-dock kanji-house-sigil-dock"
+          class="sigil-dock kanji-house-sigil-dock tappable"
         ></div>
       </div>
 
@@ -95,7 +95,7 @@
     <div id="vocab-section">
       <div id="vocabulary-top-bar" class="vocabulary-top-bar">
         <div class="vocabulary-top-bar-title-row">
-          <div id="vocab-ledger-sigil-dock" class="sigil-dock"></div>
+          <div id="vocab-ledger-sigil-dock" class="sigil-dock tappable"></div>
         </div>
         <div class="vocabulary-top-bar-buttons-row">
           <button id="kunyomi-button" class="reading-button" data-type="kun">
@@ -138,10 +138,10 @@
     </footer>
   </div>
 
-  <div id="stroke-sigil" class="sigil" data-type="stroke-advancer">
+  <div id="stroke-sigil" class="sigil tappable" data-type="stroke-advancer">
     <span class="icon">🖌️</span>
   </div>
-  <div id="vocab-sigil" class="sigil" data-type="vocab">
+  <div id="vocab-sigil" class="sigil tappable" data-type="vocab">
     <span class="icon">📜</span>
   </div>
 
@@ -2313,14 +2313,15 @@
             copyButtonElement.classList.add("copied");
           });
 
-          searchButtonElement.addEventListener("click", (event) => {
-            event.stopPropagation();
+          searchButtonElement.addEventListener("click", (clickEvent) => {
+            clickEvent.stopPropagation();
             if (this.selectedData.length === 0) {
               return;
             }
             const compiledString = this.selectedData
-              .map((item) => item.character)
+              .map((characterItem) => characterItem.character)
               .join("");
+            const encodedQuery = encodeURIComponent(compiledString);
 
             const vocabularySettings =
               this.settingsManager.getVocabularySettings();
@@ -2328,26 +2329,24 @@
               vocabularySettings.searchDictionary || "jisho";
 
             let finalizedUrlString = "";
+
             if (targetDictionary === "jisho") {
-              finalizedUrlString =
-                "https://jisho.org/search/" +
-                encodeURIComponent(compiledString);
+              finalizedUrlString = `https://jisho.org/search/${encodedQuery}`;
             } else if (targetDictionary === "mazii") {
-              finalizedUrlString =
-                "https://mazii.net/en-US/search/word/ja/" +
-                encodeURIComponent(compiledString);
+              finalizedUrlString = `https://mazii.net/en-US/search/word/ja/${encodedQuery}`;
             } else if (targetDictionary === "weblio") {
-              finalizedUrlString =
-                "https://ejje.weblio.jp/content/" +
-                encodeURIComponent(compiledString);
+              finalizedUrlString = `https://ejje.weblio.jp/content/${encodedQuery}`;
             } else if (targetDictionary === "kotobank") {
-              finalizedUrlString =
-                "https://kotobank.jp/word/" +
-                encodeURIComponent(compiledString);
+              finalizedUrlString = `https://kotobank.jp/word/${encodedQuery}`;
             }
 
             if (finalizedUrlString) {
-              window.open(finalizedUrlString, "_blank");
+              const temporaryAnchor = document.createElement("a");
+              temporaryAnchor.href = finalizedUrlString;
+              temporaryAnchor.target = "_blank";
+              document.body.appendChild(temporaryAnchor);
+              temporaryAnchor.click();
+              document.body.removeChild(temporaryAnchor);
             }
           });
 
@@ -2796,6 +2795,18 @@
           );
           this.resizeObserver.observe(this.canvasElement.parentElement);
         }
+
+        this.canvasElement.addEventListener(
+          "touchstart",
+          (touchEvent) => touchEvent.preventDefault(),
+          { passive: false },
+        );
+
+        this.canvasElement.addEventListener(
+          "touchmove",
+          (touchEvent) => touchEvent.preventDefault(),
+          { passive: false },
+        );
 
         this.canvasElement.addEventListener("pointerdown", (pointerEvent) =>
           this.startDrawingSequence(pointerEvent),
