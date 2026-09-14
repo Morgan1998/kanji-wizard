@@ -2,4 +2,4 @@
 .vscode/
 dist/
 node_modules/
-anki-release-notes-template.md
+anki-release-notes-template.html
