@@ -1,34 +1,34 @@
 <script>
   (() => {
     const rootElement = document.documentElement;
-    rootElement.classList.add("preload");
+    rootElement.classList.add('preload');
 
-    const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
+    const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
     const systemPrefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
+      '(prefers-color-scheme: dark)',
     ).matches;
     const isNightModeActive = locallySavedTheme
-      ? locallySavedTheme === "dark"
+      ? locallySavedTheme === 'dark'
       : systemPrefersDark;
-    rootElement.classList.toggle("user-night-mode", isNightModeActive);
-    rootElement.classList.toggle("user-day-mode", !isNightModeActive);
+    rootElement.classList.toggle('user-night-mode', isNightModeActive);
+    rootElement.classList.toggle('user-day-mode', !isNightModeActive);
 
     const storedSettingsString = localStorage.getItem(
-      "kanji-wizard-global-settings",
+      'kanji-wizard-global-settings',
     );
     if (storedSettingsString) {
       try {
         const parsedSettings = JSON.parse(storedSettingsString);
         const fontScale = parsedSettings.vocabulary?.fontScale || 100;
-        rootElement.style.fontSize = fontScale + "%";
+        rootElement.style.fontSize = fontScale + '%';
       } catch (parsingError) {
-        rootElement.style.fontSize = "100%";
+        rootElement.style.fontSize = '100%';
       }
     }
   })();
 </script>
 
-<div class="deck-workspace preload">
+<div class="deck-workspace preload tappable">
   <div class="card-container">
     <div class="kanji-neighborhood">
       <div id="kanji-tools-left" class="kanji-tools"></div>
@@ -564,10 +564,10 @@
 
 <script>
   (() => {
-    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+    const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
     class DataLoader {
-      constructor(jsonElementId = "json-container") {
+      constructor(jsonElementId = 'json-container') {
         this.jsonElementId = jsonElementId;
         this.data = this.#init();
       }
@@ -586,7 +586,7 @@
           return JSON.parse(jsonElement.textContent);
         } catch (parsingError) {
           console.error(
-            "DataLoader Error: Failed to parse JSON data.",
+            'DataLoader Error: Failed to parse JSON data.',
             parsingError,
           );
           return null;
@@ -604,11 +604,11 @@
       }
 
       getSortingGroup() {
-        return this.data.sortingGroup || "unclassified";
+        return this.data.sortingGroup || 'unclassified';
       }
 
       getKanji() {
-        return this.data.kanji || "";
+        return this.data.kanji || '';
       }
 
       getJlptLevel() {
@@ -637,15 +637,15 @@
     }
 
     class GlobalSettingsManager {
-      storageKey = "kanji-wizard-global-settings";
+      storageKey = 'kanji-wizard-global-settings';
 
       defaultSettings = {
         vocabulary: {
           maximumWordCount: 4,
-          sortCriterion: "spoken",
+          sortCriterion: 'spoken',
           isPlainModeActive: false,
           isReadingFiltersActive: false,
-          searchDictionary: "jisho",
+          searchDictionary: 'jisho',
           fontScale: 100,
           plainModeConfig: {
             hideKanjiTools: true,
@@ -707,7 +707,7 @@
 
       applyFontScaleState() {
         const fontScale = this.settings.vocabulary.fontScale || 100;
-        document.documentElement.style.fontSize = fontScale + "%";
+        document.documentElement.style.fontSize = fontScale + '%';
       }
 
       applyPlainModeState() {
@@ -716,41 +716,41 @@
         const plainConfig = this.settings.vocabulary.plainModeConfig || {};
 
         document.documentElement.classList.toggle(
-          "visuals-plain-mode-active",
+          'visuals-plain-mode-active',
           isPlainActive,
         );
 
         document.documentElement.classList.toggle(
-          "plain-hide-kanji-tools",
+          'plain-hide-kanji-tools',
           isPlainActive && (plainConfig.hideKanjiTools ?? true),
         );
         document.documentElement.classList.toggle(
-          "plain-hide-stroke-dock",
+          'plain-hide-stroke-dock',
           isPlainActive && (plainConfig.hideStrokeDock ?? true),
         );
         document.documentElement.classList.toggle(
-          "plain-hide-vocab-dock",
+          'plain-hide-vocab-dock',
           isPlainActive && (plainConfig.hideVocabDock ?? true),
         );
         document.documentElement.classList.toggle(
-          "plain-hide-meaning-expand",
+          'plain-hide-meaning-expand',
           isPlainActive && (plainConfig.hideMeaningExpand ?? true),
         );
         document.documentElement.classList.toggle(
-          "plain-hide-gloss-expand",
+          'plain-hide-gloss-expand',
           isPlainActive && (plainConfig.hideGlossExpand ?? true),
         );
         document.documentElement.classList.toggle(
-          "plain-hide-vocab-select",
+          'plain-hide-vocab-select',
           isPlainActive && (plainConfig.hideVocabSelect ?? false),
         );
 
         document.documentElement.classList.toggle(
-          "plain-style-stroke-sigil",
+          'plain-style-stroke-sigil',
           isPlainActive && (plainConfig.simplifyStrokeSigil ?? true),
         );
         document.documentElement.classList.toggle(
-          "plain-style-vocab-sigil",
+          'plain-style-vocab-sigil',
           isPlainActive && (plainConfig.simplifyVocabSigil ?? true),
         );
       }
@@ -759,15 +759,15 @@
         const isReadingFiltersActive =
           this.settings.vocabulary.isReadingFiltersActive || false;
         document.documentElement.classList.toggle(
-          "reading-filters-active",
+          'reading-filters-active',
           isReadingFiltersActive,
         );
       }
     }
 
     class KanjiSvgDOMBuilder {
-      static SVG_XML_NAMESPACE = "http://www.w3.org/2000/svg";
-      static SUPPORTED_SVG_ELEMENT_TAGS = new Set(["g", "path", "text"]);
+      static SVG_XML_NAMESPACE = 'http://www.w3.org/2000/svg';
+      static SUPPORTED_SVG_ELEMENT_TAGS = new Set(['g', 'path', 'text']);
 
       static buildElement(serializedJsonNode, svgElementTagName) {
         const svgElement = document.createElementNS(
@@ -790,18 +790,18 @@
               );
               svgElement.appendChild(nestedChildElement);
             });
-          } else if (nodePropertyKey === "#text") {
+          } else if (nodePropertyKey === '#text') {
             const svgTextNode = document.createTextNode(nodePropertyValue);
             svgElement.appendChild(svgTextNode);
           } else if (
-            typeof nodePropertyValue === "string" ||
-            typeof nodePropertyValue === "number"
+            typeof nodePropertyValue === 'string' ||
+            typeof nodePropertyValue === 'number'
           ) {
             const normalizedPropertyKey = nodePropertyKey.toLowerCase().trim();
             const isPotentiallyMaliciousAttribute =
-              normalizedPropertyKey.startsWith("on") ||
-              (typeof nodePropertyValue === "string" &&
-                nodePropertyValue.toLowerCase().startsWith("javascript:"));
+              normalizedPropertyKey.startsWith('on') ||
+              (typeof nodePropertyValue === 'string' &&
+                nodePropertyValue.toLowerCase().startsWith('javascript:'));
 
             if (!isPotentiallyMaliciousAttribute) {
               svgElement.setAttribute(nodePropertyKey, nodePropertyValue);
@@ -809,7 +809,7 @@
           }
         }
 
-        if (svgElementTagName === "path") {
+        if (svgElementTagName === 'path') {
           this.setupPathAnimation(svgElement);
         }
 
@@ -817,7 +817,7 @@
       }
 
       static setupPathAnimation(svgPathElement) {
-        svgPathElement.classList.add("kanji-stroke");
+        svgPathElement.classList.add('kanji-stroke');
         const absoluteStrokeLength = svgPathElement.getTotalLength();
         svgPathElement.dataset.strokeLength = absoluteStrokeLength;
         svgPathElement.style.strokeDasharray = absoluteStrokeLength;
@@ -861,16 +861,16 @@
         this.#initializeCanvas();
 
         this.cachedPathElements = Array.from(
-          this.strokePathsRoot.querySelectorAll("path"),
+          this.strokePathsRoot.querySelectorAll('path'),
         );
         this.cachedPathElements.sort((pathElementA, pathElementB) => {
-          const indexA = parseInt(pathElementA.id.split("-s")[1]) || 0;
-          const indexB = parseInt(pathElementB.id.split("-s")[1]) || 0;
+          const indexA = parseInt(pathElementA.id.split('-s')[1]) || 0;
+          const indexB = parseInt(pathElementB.id.split('-s')[1]) || 0;
           return indexA - indexB;
         });
 
         this.cachedTextElements = Array.from(
-          this.strokeNumbersRoot.querySelectorAll("text"),
+          this.strokeNumbersRoot.querySelectorAll('text'),
         );
         this.cachedTextElements.sort((textElementA, textElementB) => {
           const numberA = parseInt(textElementA.textContent) || 0;
@@ -879,15 +879,15 @@
         });
 
         this.cachedPathElements.forEach((pathElement, elementIndex) => {
-          pathElement.style.setProperty("--stroke-index", elementIndex + 1);
+          pathElement.style.setProperty('--stroke-index', elementIndex + 1);
         });
         this.strokePathsRoot.style.setProperty(
-          "--total-strokes",
+          '--total-strokes',
           this.cachedPathElements.length,
         );
 
         this.cachedTextElements.forEach((textElement, elementIndex) => {
-          textElement.style.setProperty("--stroke-index", elementIndex + 1);
+          textElement.style.setProperty('--stroke-index', elementIndex + 1);
         });
 
         this.updateCurrentStrokeCount(this.cachedPathElements.length);
@@ -896,14 +896,14 @@
       updateCurrentStrokeCount(count) {
         this.cachedTextElements.forEach((textElement, elementIndex) => {
           const isDrawn = elementIndex + 1 <= count;
-          textElement.classList.toggle("is-drawn", isDrawn);
+          textElement.classList.toggle('is-drawn', isDrawn);
         });
       }
 
       #initializeCanvas() {
         if (!this.strokePathsRoot || !this.svgData) {
           console.warn(
-            "KanjiSvgController: Required DOM elements or SVG data is missing.",
+            'KanjiSvgController: Required DOM elements or SVG data is missing.',
           );
           return;
         }
@@ -917,10 +917,10 @@
         if (
           !pathsGroupNode ||
           !pathsGroupNode.id ||
-          !pathsGroupNode.id.startsWith("kvg:StrokePaths_")
+          !pathsGroupNode.id.startsWith('kvg:StrokePaths_')
         ) {
           const traverseToFindPaths = (node) => {
-            if (node && node.id && node.id.startsWith("kvg:StrokePaths_")) {
+            if (node && node.id && node.id.startsWith('kvg:StrokePaths_')) {
               return node;
             }
             if (node && node.g) {
@@ -941,7 +941,7 @@
         if (pathsGroupNode) {
           const domPathsGroup = KanjiSvgDOMBuilder.buildElement(
             pathsGroupNode,
-            "g",
+            'g',
           );
           this.strokePathsRoot.appendChild(domPathsGroup);
         }
@@ -950,10 +950,10 @@
         if (
           !numbersGroupNode ||
           !numbersGroupNode.id ||
-          !numbersGroupNode.id.startsWith("kvg:StrokeNumbers_")
+          !numbersGroupNode.id.startsWith('kvg:StrokeNumbers_')
         ) {
           const traverseToFindNumbers = (node) => {
-            if (node && node.id && node.id.startsWith("kvg:StrokeNumbers_")) {
+            if (node && node.id && node.id.startsWith('kvg:StrokeNumbers_')) {
               return node;
             }
             if (node && node.g) {
@@ -974,7 +974,7 @@
         if (this.strokeNumbersRoot && numbersGroupNode) {
           const domNumbersGroup = KanjiSvgDOMBuilder.buildElement(
             numbersGroupNode,
-            "g",
+            'g',
           );
           this.strokeNumbersRoot.appendChild(domNumbersGroup);
         }
@@ -1028,7 +1028,7 @@
           const resolvedValue =
             parameterValue !== null && parameterValue !== undefined
               ? String(parameterValue).trim()
-              : "Unknown";
+              : 'Unknown';
 
           urlParametersBuilder.append(parameterKey, resolvedValue);
         }
@@ -1041,7 +1041,7 @@
         this.targetLinkElement.href = finalizedUrlString;
 
         if (openInNewTabFlag) {
-          this.targetLinkElement.target = "_blank";
+          this.targetLinkElement.target = '_blank';
         }
       }
     }
@@ -1063,7 +1063,7 @@
       constructor(sigilSelector, sigilType, dockSelector, clickCallback) {
         this.sigilElement = document.querySelector(sigilSelector);
         this.dockElement = document.querySelector(
-          dockSelector || "#sigil-dock",
+          dockSelector || '#sigil-dock',
         );
         this.sigilType = sigilType;
         this.clickCallback = clickCallback || null;
@@ -1071,59 +1071,59 @@
       }
 
       getActiveVocabEntry() {
-        return document.querySelector(".vocab-entry.active-reveal");
+        return document.querySelector('.vocab-entry.active-reveal');
       }
 
       resetVocabLedgerToHidden() {
-        const allVocabEntries = document.querySelectorAll(".vocab-entry");
+        const allVocabEntries = document.querySelectorAll('.vocab-entry');
         allVocabEntries.forEach((vocabEntry) => {
-          vocabEntry.classList.remove("active-reveal");
+          vocabEntry.classList.remove('active-reveal');
 
-          const furiganaElements = vocabEntry.querySelectorAll(".furigana");
+          const furiganaElements = vocabEntry.querySelectorAll('.furigana');
           furiganaElements.forEach((furigana) =>
-            furigana.classList.add("is-hidden"),
+            furigana.classList.add('is-hidden'),
           );
 
-          const englishElement = vocabEntry.querySelector(".vocab-english");
+          const englishElement = vocabEntry.querySelector('.vocab-english');
           if (englishElement) {
-            englishElement.classList.add("is-hidden");
+            englishElement.classList.add('is-hidden');
           }
         });
 
-        const vocabLedger = document.querySelector("#vocab-ledger");
+        const vocabLedger = document.querySelector('#vocab-ledger');
         if (vocabLedger) {
-          vocabLedger.scrollTo({ top: 0, behavior: "smooth" });
+          vocabLedger.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }
 
       revealNextVocabSegment() {
-        const allVocabEntries = document.querySelectorAll(".vocab-entry");
+        const allVocabEntries = document.querySelectorAll('.vocab-entry');
         if (allVocabEntries.length === 0) return;
 
         for (const vocabEntry of allVocabEntries) {
           const hiddenFurigana = vocabEntry.querySelector(
-            ".furigana.is-hidden",
+            '.furigana.is-hidden',
           );
           if (hiddenFurigana) {
             allVocabEntries.forEach((entry) =>
-              entry.classList.remove("active-reveal"),
+              entry.classList.remove('active-reveal'),
             );
-            hiddenFurigana.classList.remove("is-hidden");
-            vocabEntry.classList.add("active-reveal");
-            vocabEntry.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            hiddenFurigana.classList.remove('is-hidden');
+            vocabEntry.classList.add('active-reveal');
+            vocabEntry.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             return;
           }
 
           const hiddenEnglish = vocabEntry.querySelector(
-            ".vocab-english.is-hidden",
+            '.vocab-english.is-hidden',
           );
           if (hiddenEnglish) {
             allVocabEntries.forEach((entry) =>
-              entry.classList.remove("active-reveal"),
+              entry.classList.remove('active-reveal'),
             );
-            hiddenEnglish.classList.remove("is-hidden");
-            vocabEntry.classList.add("active-reveal");
-            vocabEntry.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            hiddenEnglish.classList.remove('is-hidden');
+            vocabEntry.classList.add('active-reveal');
+            vocabEntry.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             return;
           }
         }
@@ -1136,7 +1136,7 @@
       }
 
       dockSigil() {
-        const workspaceElement = document.querySelector(".deck-workspace");
+        const workspaceElement = document.querySelector('.deck-workspace');
         const dockRectangle = this.dockElement.getBoundingClientRect();
         const workspaceRectangle = workspaceElement.getBoundingClientRect();
 
@@ -1154,22 +1154,22 @@
         this.currentTranslationX = targetX;
         this.currentTranslationY = targetY;
 
-        this.sigilElement.classList.add("is-animating");
+        this.sigilElement.classList.add('is-animating');
         this.applyTransform(targetX, targetY);
 
         setTimeout(() => {
-          this.sigilElement.classList.add("hidden-in-dock");
+          this.sigilElement.classList.add('hidden-in-dock');
           if (this.dockElement) {
-            this.dockElement.classList.add("is-docked");
+            this.dockElement.classList.add('is-docked');
           }
         }, 400);
 
-        localStorage.setItem(`${this.sigilType}-sigil-docked`, "true");
+        localStorage.setItem(`${this.sigilType}-sigil-docked`, 'true');
       }
 
       dockSigilInstant() {
-        this.sigilElement.classList.remove("is-animating");
-        const workspaceElement = document.querySelector(".deck-workspace");
+        this.sigilElement.classList.remove('is-animating');
+        const workspaceElement = document.querySelector('.deck-workspace');
         const dockRectangle = this.dockElement.getBoundingClientRect();
         const workspaceRectangle = workspaceElement.getBoundingClientRect();
 
@@ -1188,23 +1188,23 @@
         this.currentTranslationY = targetY;
         this.applyTransform(targetX, targetY);
 
-        this.sigilElement.classList.add("hidden-in-dock");
+        this.sigilElement.classList.add('hidden-in-dock');
         if (this.dockElement) {
-          this.dockElement.classList.add("is-docked");
+          this.dockElement.classList.add('is-docked');
         }
       }
 
       undockSigil() {
-        const workspaceElement = document.querySelector(".deck-workspace");
+        const workspaceElement = document.querySelector('.deck-workspace');
         const dockRectangle = this.dockElement.getBoundingClientRect();
         const workspaceRectangle = workspaceElement.getBoundingClientRect();
 
         if (this.dockElement) {
-          this.dockElement.classList.remove("is-docked");
+          this.dockElement.classList.remove('is-docked');
         }
 
-        this.sigilElement.classList.remove("hidden-in-dock");
-        this.sigilElement.classList.add("is-animating");
+        this.sigilElement.classList.remove('hidden-in-dock');
+        this.sigilElement.classList.add('is-animating');
 
         const startX =
           dockRectangle.left -
@@ -1227,10 +1227,10 @@
 
         localStorage.setItem(`${this.sigilType}-sigil-x-offset`, targetX);
         localStorage.setItem(`${this.sigilType}-sigil-y-offset`, targetY);
-        localStorage.setItem(`${this.sigilType}-sigil-docked`, "false");
+        localStorage.setItem(`${this.sigilType}-sigil-docked`, 'false');
 
         setTimeout(() => {
-          this.sigilElement.classList.remove("is-animating");
+          this.sigilElement.classList.remove('is-animating');
         }, 400);
       }
 
@@ -1241,7 +1241,7 @@
         const storedY = localStorage.getItem(
           `${this.sigilType}-sigil-y-offset`,
         );
-        const workspaceElement = document.querySelector(".deck-workspace");
+        const workspaceElement = document.querySelector('.deck-workspace');
 
         if (storedX !== null && storedY !== null && workspaceElement) {
           const workspaceRectangle = workspaceElement.getBoundingClientRect();
@@ -1284,10 +1284,10 @@
       }
 
       setupListeners() {
-        const workspaceElement = document.querySelector(".deck-workspace");
+        const workspaceElement = document.querySelector('.deck-workspace');
 
         let isInitialResize = true;
-        if (workspaceElement && typeof ResizeObserver !== "undefined") {
+        if (workspaceElement && typeof ResizeObserver !== 'undefined') {
           this.resizeObserver = new ResizeObserver(() => {
             if (isInitialResize) {
               isInitialResize = false;
@@ -1298,18 +1298,18 @@
           this.resizeObserver.observe(workspaceElement);
         }
 
-        this.dockElement.addEventListener("click", (pointerEvent) => {
+        this.dockElement.addEventListener('click', (pointerEvent) => {
           pointerEvent.stopPropagation();
 
-          if (this.sigilElement.classList.contains("hidden-in-dock")) {
+          if (this.sigilElement.classList.contains('hidden-in-dock')) {
             this.undockSigil();
           } else {
             this.dockSigil();
           }
         });
 
-        this.sigilElement.addEventListener("pointerdown", (pointerEvent) => {
-          this.sigilElement.classList.remove("is-animating");
+        this.sigilElement.addEventListener('pointerdown', (pointerEvent) => {
+          this.sigilElement.classList.remove('is-animating');
           this.isDragging = true;
           this.hasMoved = false;
           this.startPointerX = pointerEvent.clientX;
@@ -1380,7 +1380,7 @@
 
             if (this.isDragging) {
               this.isDragging = false;
-              this.sigilElement.classList.add("is-animating");
+              this.sigilElement.classList.add('is-animating');
               if (isOverDock) {
                 this.dockSigil();
               } else {
@@ -1392,23 +1392,23 @@
                   `${this.sigilType}-sigil-y-offset`,
                   this.currentTranslationY,
                 );
-                localStorage.setItem(`${this.sigilType}-sigil-docked`, "false");
+                localStorage.setItem(`${this.sigilType}-sigil-docked`, 'false');
               }
             }
-            window.removeEventListener("pointermove", onPointerMove);
-            window.removeEventListener("pointerup", onPointerUp);
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
           };
 
-          window.addEventListener("pointermove", onPointerMove);
-          window.addEventListener("pointerup", onPointerUp);
+          window.addEventListener('pointermove', onPointerMove);
+          window.addEventListener('pointerup', onPointerUp);
         });
 
-        this.sigilElement.addEventListener("click", () => {
+        this.sigilElement.addEventListener('click', () => {
           if (this.hasMoved) return;
 
-          if (typeof this.clickCallback === "function") {
+          if (typeof this.clickCallback === 'function') {
             this.clickCallback();
-          } else if (this.sigilType === "vocab") {
+          } else if (this.sigilType === 'vocab') {
             this.revealNextVocabSegment();
           }
         });
@@ -1416,12 +1416,12 @@
 
       restoreState() {
         const isUndocked =
-          localStorage.getItem(`${this.sigilType}-sigil-docked`) === "false";
+          localStorage.getItem(`${this.sigilType}-sigil-docked`) === 'false';
 
         if (isUndocked) {
-          this.sigilElement.classList.remove("hidden-in-dock");
+          this.sigilElement.classList.remove('hidden-in-dock');
           if (this.dockElement) {
-            this.dockElement.classList.remove("is-docked");
+            this.dockElement.classList.remove('is-docked');
           }
           this.loadPosition();
           this.checkBoundaryAndDockIfNeeded();
@@ -1431,11 +1431,11 @@
       }
 
       checkBoundaryAndDockIfNeeded() {
-        if (this.sigilElement.classList.contains("hidden-in-dock")) {
+        if (this.sigilElement.classList.contains('hidden-in-dock')) {
           return;
         }
 
-        const workspaceElement = document.querySelector(".deck-workspace");
+        const workspaceElement = document.querySelector('.deck-workspace');
         if (!workspaceElement) return;
 
         const workspaceRectangle = workspaceElement.getBoundingClientRect();
@@ -1458,12 +1458,12 @@
       }
 
       init() {
-        this.sigilElement.style.position = "absolute";
-        this.sigilElement.style.left = "0";
-        this.sigilElement.style.top = "0";
-        this.sigilElement.style.right = "auto";
-        this.sigilElement.style.bottom = "auto";
-        this.sigilElement.classList.add("is-animating");
+        this.sigilElement.style.position = 'absolute';
+        this.sigilElement.style.left = '0';
+        this.sigilElement.style.top = '0';
+        this.sigilElement.style.right = 'auto';
+        this.sigilElement.style.bottom = 'auto';
+        this.sigilElement.classList.add('is-animating');
         this.restoreState();
         this.setupListeners();
       }
@@ -1473,14 +1473,14 @@
       constructor(config) {
         this.meaningElement = document.querySelector(config.meaningSelector);
         this.meanings = config.meanings || [];
-        this.kanji = config.kanji || "";
+        this.kanji = config.kanji || '';
 
         if (!this.meaningElement || this.meanings.length === 0) {
           return;
         }
 
         this.customMeaningKey = `kanji-custom-meaning-${this.kanji}`;
-        this.workspaceElement = document.querySelector(".deck-workspace");
+        this.workspaceElement = document.querySelector('.deck-workspace');
 
         this.init();
       }
@@ -1499,59 +1499,59 @@
 
         this.meaningElement.replaceChildren();
 
-        const primaryPill = document.createElement("span");
-        primaryPill.classList.add("meaning-pill", "primary-pill");
+        const primaryPill = document.createElement('span');
+        primaryPill.classList.add('meaning-pill', 'primary-pill');
         primaryPill.textContent = this.workingMeanings[0];
         this.meaningElement.appendChild(primaryPill);
 
         if (this.workingMeanings.length > 1) {
           let drawerBackdrop = document.querySelector(
-            ".meanings-drawer-backdrop",
+            '.meanings-drawer-backdrop',
           );
           if (!drawerBackdrop && this.workspaceElement) {
-            drawerBackdrop = document.createElement("div");
+            drawerBackdrop = document.createElement('div');
             drawerBackdrop.classList.add(
-              "meanings-drawer-backdrop",
-              "is-hidden",
+              'meanings-drawer-backdrop',
+              'is-hidden',
             );
 
-            const drawerSheet = document.createElement("div");
-            drawerSheet.classList.add("meanings-drawer-sheet");
+            const drawerSheet = document.createElement('div');
+            drawerSheet.classList.add('meanings-drawer-sheet');
 
-            const drawerTitle = document.createElement("div");
-            drawerTitle.classList.add("meanings-drawer-title");
-            drawerTitle.textContent = "Alternative Meanings";
+            const drawerTitle = document.createElement('div');
+            drawerTitle.classList.add('meanings-drawer-title');
+            drawerTitle.textContent = 'Alternative Meanings';
 
-            const drawerPillsContainer = document.createElement("div");
-            drawerPillsContainer.classList.add("meanings-drawer-pills");
+            const drawerPillsContainer = document.createElement('div');
+            drawerPillsContainer.classList.add('meanings-drawer-pills');
 
             drawerSheet.appendChild(drawerTitle);
             drawerSheet.appendChild(drawerPillsContainer);
             drawerBackdrop.appendChild(drawerSheet);
             this.workspaceElement.appendChild(drawerBackdrop);
 
-            drawerBackdrop.addEventListener("click", (clickEvent) => {
+            drawerBackdrop.addEventListener('click', (clickEvent) => {
               if (clickEvent.target === drawerBackdrop) {
-                drawerBackdrop.classList.add("is-hidden");
+                drawerBackdrop.classList.add('is-hidden');
               }
             });
           }
 
           const drawerPillsContainer = drawerBackdrop
-            ? drawerBackdrop.querySelector(".meanings-drawer-pills")
+            ? drawerBackdrop.querySelector('.meanings-drawer-pills')
             : null;
           if (drawerPillsContainer) {
             drawerPillsContainer.replaceChildren();
 
             this.workingMeanings.slice(1).forEach((meaning) => {
-              const secondaryPill = document.createElement("span");
-              secondaryPill.classList.add("meaning-pill", "secondary-pill");
+              const secondaryPill = document.createElement('span');
+              secondaryPill.classList.add('meaning-pill', 'secondary-pill');
               secondaryPill.textContent = meaning;
 
-              secondaryPill.addEventListener("click", (clickEvent) => {
+              secondaryPill.addEventListener('click', (clickEvent) => {
                 clickEvent.stopPropagation();
                 localStorage.setItem(this.customMeaningKey, meaning);
-                drawerBackdrop.classList.add("is-hidden");
+                drawerBackdrop.classList.add('is-hidden');
                 this.init();
               });
 
@@ -1559,15 +1559,15 @@
             });
           }
 
-          const meaningExpandButton = document.createElement("button");
-          meaningExpandButton.classList.add("meaning-expand-button");
+          const meaningExpandButton = document.createElement('button');
+          meaningExpandButton.classList.add('meaning-expand-button');
           meaningExpandButton.textContent =
-            "+" + (this.workingMeanings.length - 1);
+            '+' + (this.workingMeanings.length - 1);
 
-          meaningExpandButton.addEventListener("click", (clickEvent) => {
+          meaningExpandButton.addEventListener('click', (clickEvent) => {
             clickEvent.stopPropagation();
             if (drawerBackdrop) {
-              drawerBackdrop.classList.remove("is-hidden");
+              drawerBackdrop.classList.remove('is-hidden');
             }
           });
 
@@ -1627,43 +1627,43 @@
         this.buildReadingsSpans(
           this.kunyomiData,
           this.kunDisplayElement,
-          "No Kunyomi",
+          'No Kunyomi',
         );
         this.buildReadingsSpans(
           this.onyomiData,
           this.onDisplayElement,
-          "No Onyomi",
+          'No Onyomi',
         );
 
-        const allReadingButtons = document.querySelectorAll(".reading-button");
-        const vocabLedger = document.querySelector("#vocab-ledger");
+        const allReadingButtons = document.querySelectorAll('.reading-button');
+        const vocabLedger = document.querySelector('#vocab-ledger');
 
         allReadingButtons.forEach((buttonElement) => {
-          buttonElement.addEventListener("click", (event) => {
+          buttonElement.addEventListener('click', (event) => {
             event.stopPropagation();
 
             const isCurrentlyActive =
-              buttonElement.classList.contains("active");
+              buttonElement.classList.contains('active');
 
             allReadingButtons.forEach((otherButton) =>
-              otherButton.classList.remove("active"),
+              otherButton.classList.remove('active'),
             );
             if (this.kunDisplayWrapperElement)
-              this.kunDisplayWrapperElement.classList.remove("active");
+              this.kunDisplayWrapperElement.classList.remove('active');
             if (this.onDisplayWrapperElement)
-              this.onDisplayWrapperElement.classList.remove("active");
+              this.onDisplayWrapperElement.classList.remove('active');
 
             if (isCurrentlyActive) {
-              vocabLedger.removeAttribute("data-active-filter");
+              vocabLedger.removeAttribute('data-active-filter');
             } else {
-              buttonElement.classList.add("active");
+              buttonElement.classList.add('active');
               const readingType = buttonElement.dataset.type;
-              vocabLedger.setAttribute("data-active-filter", readingType);
+              vocabLedger.setAttribute('data-active-filter', readingType);
 
-              if (readingType === "kun" && this.kunDisplayWrapperElement) {
-                this.kunDisplayWrapperElement.classList.add("active");
-              } else if (readingType === "on" && this.onDisplayWrapperElement) {
-                this.onDisplayWrapperElement.classList.add("active");
+              if (readingType === 'kun' && this.kunDisplayWrapperElement) {
+                this.kunDisplayWrapperElement.classList.add('active');
+              } else if (readingType === 'on' && this.onDisplayWrapperElement) {
+                this.onDisplayWrapperElement.classList.add('active');
               }
             }
           });
@@ -1674,16 +1674,16 @@
         displayElement.replaceChildren();
 
         if (readingsArray.length === 0) {
-          const fallbackBadge = document.createElement("span");
-          fallbackBadge.classList.add("readings-badge", "fallback-badge");
+          const fallbackBadge = document.createElement('span');
+          fallbackBadge.classList.add('readings-badge', 'fallback-badge');
           fallbackBadge.textContent = fallbackText;
           displayElement.append(fallbackBadge);
           return;
         }
 
         readingsArray.forEach((reading) => {
-          const badge = document.createElement("span");
-          badge.classList.add("readings-badge");
+          const badge = document.createElement('span');
+          badge.classList.add('readings-badge');
           badge.textContent = reading;
           displayElement.append(badge);
         });
@@ -1692,49 +1692,49 @@
       handleToggle(event, clickedButtonElement, otherButtonElement) {
         event.stopPropagation();
 
-        const kanjiHouse = document.querySelector(".kanji-house");
-        const isHotSwap = otherButtonElement.classList.contains("active");
+        const kanjiHouse = document.querySelector('.kanji-house');
+        const isHotSwap = otherButtonElement.classList.contains('active');
         if (isHotSwap) {
-          kanjiHouse.classList.add("is-switching");
+          kanjiHouse.classList.add('is-switching');
         } else {
-          kanjiHouse.classList.remove("is-switching");
+          kanjiHouse.classList.remove('is-switching');
         }
 
-        const vocabLedger = document.querySelector("#vocab-ledger");
+        const vocabLedger = document.querySelector('#vocab-ledger');
 
         if (clickedButtonElement === this.onyomiButtonElement) {
-          if (clickedButtonElement.classList.contains("active")) {
-            clickedButtonElement.classList.remove("active");
-            this.onDisplayWrapperElement.classList.remove("active");
-            vocabLedger.removeAttribute("data-active-filter");
+          if (clickedButtonElement.classList.contains('active')) {
+            clickedButtonElement.classList.remove('active');
+            this.onDisplayWrapperElement.classList.remove('active');
+            vocabLedger.removeAttribute('data-active-filter');
           } else {
-            clickedButtonElement.classList.add("active");
-            otherButtonElement.classList.remove("active");
-            this.onDisplayWrapperElement.classList.add("active");
-            this.kunDisplayWrapperElement.classList.remove("active");
+            clickedButtonElement.classList.add('active');
+            otherButtonElement.classList.remove('active');
+            this.onDisplayWrapperElement.classList.add('active');
+            this.kunDisplayWrapperElement.classList.remove('active');
 
             const targetKanjiReadingType = clickedButtonElement.dataset.type;
             vocabLedger.setAttribute(
-              "data-active-filter",
+              'data-active-filter',
               targetKanjiReadingType,
             );
           }
         }
 
         if (clickedButtonElement === this.kunyomiButtonElement) {
-          if (clickedButtonElement.classList.contains("active")) {
-            clickedButtonElement.classList.remove("active");
-            this.kunDisplayWrapperElement.classList.remove("active");
-            vocabLedger.removeAttribute("data-active-filter");
+          if (clickedButtonElement.classList.contains('active')) {
+            clickedButtonElement.classList.remove('active');
+            this.kunDisplayWrapperElement.classList.remove('active');
+            vocabLedger.removeAttribute('data-active-filter');
           } else {
-            clickedButtonElement.classList.add("active");
-            otherButtonElement.classList.remove("active");
-            this.kunDisplayWrapperElement.classList.add("active");
-            this.onDisplayWrapperElement.classList.remove("active");
+            clickedButtonElement.classList.add('active');
+            otherButtonElement.classList.remove('active');
+            this.kunDisplayWrapperElement.classList.add('active');
+            this.onDisplayWrapperElement.classList.remove('active');
 
             const targetKanjiReadingType = clickedButtonElement.dataset.type;
             vocabLedger.setAttribute(
-              "data-active-filter",
+              'data-active-filter',
               targetKanjiReadingType,
             );
           }
@@ -1747,8 +1747,8 @@
         this.toggleButton = document.querySelector(config.buttonSelector);
         this.strokePathsRoot = document.querySelector(config.pathsSelector);
         this.container =
-          document.querySelector(".card-container") || this.strokePathsRoot;
-        this.storageKey = config.storageKey || "kanji-radical-highlight-active";
+          document.querySelector('.card-container') || this.strokePathsRoot;
+        this.storageKey = config.storageKey || 'kanji-radical-highlight-active';
 
         if (!this.toggleButton || !this.strokePathsRoot) {
           return;
@@ -1759,48 +1759,48 @@
 
       init() {
         const isHighlightActive =
-          localStorage.getItem(this.storageKey) === "true";
+          localStorage.getItem(this.storageKey) === 'true';
 
         const radicalGroup =
           this.strokePathsRoot.querySelector('[kvg\\:radical="general"]') ||
           this.strokePathsRoot.querySelector('[kvg\\:radical="tradit"]');
         const radicalCharacter = radicalGroup
-          ? radicalGroup.getAttribute("kvg:element") || "🏮"
-          : "🏮";
+          ? radicalGroup.getAttribute('kvg:element') || '🏮'
+          : '🏮';
 
         if (isHighlightActive) {
-          this.toggleButton.classList.add("active");
-          this.container.classList.add("highlight-radical");
+          this.toggleButton.classList.add('active');
+          this.container.classList.add('highlight-radical');
           this.toggleButton.style.setProperty(
-            "--radical-content",
+            '--radical-content',
             `"${radicalCharacter}"`,
           );
         } else {
-          this.container.classList.remove("highlight-radical");
-          this.toggleButton.style.setProperty("--radical-content", '"🏮"');
+          this.container.classList.remove('highlight-radical');
+          this.toggleButton.style.setProperty('--radical-content', '"🏮"');
         }
 
-        this.toggleButton.addEventListener("click", (clickEvent) => {
+        this.toggleButton.addEventListener('click', (clickEvent) => {
           clickEvent.stopPropagation();
           const wasActive =
-            this.container.classList.contains("highlight-radical");
+            this.container.classList.contains('highlight-radical');
           const shouldBeActive = !wasActive;
 
-          this.container.classList.toggle("highlight-radical", shouldBeActive);
-          this.toggleButton.classList.toggle("active", shouldBeActive);
+          this.container.classList.toggle('highlight-radical', shouldBeActive);
+          this.toggleButton.classList.toggle('active', shouldBeActive);
 
           if (shouldBeActive) {
             this.toggleButton.style.setProperty(
-              "--radical-content",
+              '--radical-content',
               `"${radicalCharacter}"`,
             );
           } else {
-            this.toggleButton.style.setProperty("--radical-content", '"🏮"');
+            this.toggleButton.style.setProperty('--radical-content', '"🏮"');
           }
 
           localStorage.setItem(
             this.storageKey,
-            shouldBeActive ? "true" : "false",
+            shouldBeActive ? 'true' : 'false',
           );
         });
       }
@@ -1810,7 +1810,7 @@
       constructor(config) {
         this.toggleButton = document.querySelector(config.buttonSelector);
         this.strokeNumbersRoot = document.querySelector(config.numbersSelector);
-        this.storageKey = config.storageKey || "kanji-stroke-numbers-active";
+        this.storageKey = config.storageKey || 'kanji-stroke-numbers-active';
 
         if (!this.toggleButton || !this.strokeNumbersRoot) {
           return;
@@ -1821,52 +1821,52 @@
 
       init() {
         const isNumbersActive =
-          localStorage.getItem(this.storageKey) === "true";
+          localStorage.getItem(this.storageKey) === 'true';
 
-        const pathsRoot = document.querySelector("#stroke-paths-root");
+        const pathsRoot = document.querySelector('#stroke-paths-root');
         const totalStrokes = pathsRoot
-          ? pathsRoot.querySelectorAll("path").length
+          ? pathsRoot.querySelectorAll('path').length
           : 0;
 
         if (isNumbersActive) {
-          this.toggleButton.classList.add("active");
-          this.strokeNumbersRoot.classList.add("show-drawn-numbers");
+          this.toggleButton.classList.add('active');
+          this.strokeNumbersRoot.classList.add('show-drawn-numbers');
           this.toggleButton.style.setProperty(
-            "--stroke-count-content",
+            '--stroke-count-content',
             `"${totalStrokes}"`,
           );
         } else {
-          this.strokeNumbersRoot.classList.remove("show-drawn-numbers");
-          this.toggleButton.style.setProperty("--stroke-count-content", '"🔢"');
+          this.strokeNumbersRoot.classList.remove('show-drawn-numbers');
+          this.toggleButton.style.setProperty('--stroke-count-content', '"🔢"');
         }
 
-        this.toggleButton.addEventListener("click", (clickEvent) => {
+        this.toggleButton.addEventListener('click', (clickEvent) => {
           clickEvent.stopPropagation();
           const wasActive =
-            this.strokeNumbersRoot.classList.contains("show-drawn-numbers");
+            this.strokeNumbersRoot.classList.contains('show-drawn-numbers');
           const shouldBeActive = !wasActive;
 
           this.strokeNumbersRoot.classList.toggle(
-            "show-drawn-numbers",
+            'show-drawn-numbers',
             shouldBeActive,
           );
-          this.toggleButton.classList.toggle("active", shouldBeActive);
+          this.toggleButton.classList.toggle('active', shouldBeActive);
 
           if (shouldBeActive) {
             this.toggleButton.style.setProperty(
-              "--stroke-count-content",
+              '--stroke-count-content',
               `"${totalStrokes}"`,
             );
           } else {
             this.toggleButton.style.setProperty(
-              "--stroke-count-content",
+              '--stroke-count-content',
               '"🔢"',
             );
           }
 
           localStorage.setItem(
             this.storageKey,
-            shouldBeActive ? "true" : "false",
+            shouldBeActive ? 'true' : 'false',
           );
         });
       }
@@ -1892,18 +1892,18 @@
       }
 
       writeToClipboard(text) {
-        const textareaElement = document.createElement("textarea");
+        const textareaElement = document.createElement('textarea');
         textareaElement.value = text;
-        textareaElement.style.position = "absolute";
-        textareaElement.style.left = "-9999px";
-        textareaElement.style.top = "0";
+        textareaElement.style.position = 'absolute';
+        textareaElement.style.left = '-9999px';
+        textareaElement.style.top = '0';
         document.body.appendChild(textareaElement);
 
         textareaElement.focus();
         textareaElement.select();
 
         try {
-          document.execCommand("copy");
+          document.execCommand('copy');
         } catch (fallbackError) {
           console.error(fallbackError);
         }
@@ -1916,18 +1916,18 @@
           return;
         }
         const previewDisplay = this.activeSelectionEntry.querySelector(
-          ".action-preview-display",
+          '.action-preview-display',
         );
         if (previewDisplay) {
           previewDisplay.textContent = this.selectedData
             .map((item) => item.character)
-            .join("");
+            .join('');
         }
         const copyButton = this.activeSelectionEntry.querySelector(
-          ".action-copy-button",
+          '.action-copy-button',
         );
         if (copyButton) {
-          copyButton.classList.remove("copied");
+          copyButton.classList.remove('copied');
         }
       }
 
@@ -1944,16 +1944,16 @@
         if (!this.activeSelectionEntry) {
           return;
         }
-        this.activeSelectionEntry.classList.remove("selection-mode-active");
+        this.activeSelectionEntry.classList.remove('selection-mode-active');
         const selectButton = this.activeSelectionEntry.querySelector(
-          ".vocab-select-button",
+          '.vocab-select-button',
         );
         if (selectButton) {
-          selectButton.classList.remove("active");
+          selectButton.classList.remove('active');
         }
         const tiles =
-          this.activeSelectionEntry.querySelectorAll(".character-tile");
-        tiles.forEach((tile) => tile.classList.remove("selected"));
+          this.activeSelectionEntry.querySelectorAll('.character-tile');
+        tiles.forEach((tile) => tile.classList.remove('selected'));
 
         this.activeSelectionEntry = null;
         this.selectedData = [];
@@ -1962,18 +1962,18 @@
 
       activateSelectionMode(entryElement) {
         this.activeSelectionEntry = entryElement;
-        this.activeSelectionEntry.classList.add("selection-mode-active");
+        this.activeSelectionEntry.classList.add('selection-mode-active');
         const selectButton = this.activeSelectionEntry.querySelector(
-          ".vocab-select-button",
+          '.vocab-select-button',
         );
         if (selectButton) {
-          selectButton.classList.add("active");
+          selectButton.classList.add('active');
         }
 
         const tiles =
-          this.activeSelectionEntry.querySelectorAll(".character-tile");
+          this.activeSelectionEntry.querySelectorAll('.character-tile');
         tiles.forEach((tile) => {
-          tile.classList.add("selected");
+          tile.classList.add('selected');
           const character = tile.textContent;
           const indexValue = parseInt(tile.dataset.index, 10);
           this.selectedData.push({
@@ -1989,13 +1989,13 @@
 
       getProcessedVocabData() {
         const vocabularySettings = this.settingsManager.getVocabularySettings();
-        const sortCriterion = vocabularySettings.sortCriterion || "spoken";
+        const sortCriterion = vocabularySettings.sortCriterion || 'spoken';
         const limit =
           vocabularySettings.maximumWordCount ?? this.rawVocabData.length;
 
         let sortedVocabularyEntries = [...this.rawVocabData];
 
-        if (sortCriterion === "literary") {
+        if (sortCriterion === 'literary') {
           const wordsWithLiteraryFrequency = [];
           const wordsWithoutLiteraryFrequency = [];
 
@@ -2023,7 +2023,7 @@
           sortedVocabularyEntries = wordsWithLiteraryFrequency.concat(
             wordsWithoutLiteraryFrequency,
           );
-        } else if (sortCriterion === "spoken") {
+        } else if (sortCriterion === 'spoken') {
           const wordsWithSpokenFrequency = [];
           const wordsWithoutSpokenFrequency = [];
 
@@ -2047,7 +2047,7 @@
           sortedVocabularyEntries = wordsWithSpokenFrequency.concat(
             wordsWithoutSpokenFrequency,
           );
-        } else if (sortCriterion === "tubelex") {
+        } else if (sortCriterion === 'tubelex') {
           const wordsWithTubelex = [];
           const wordsWithoutTubelex = [];
 
@@ -2084,71 +2084,71 @@
         const vocabDataToDisplay = this.getProcessedVocabData();
 
         const vocabularySettings = this.settingsManager.getVocabularySettings();
-        const sortCriterion = vocabularySettings.sortCriterion || "literary";
+        const sortCriterion = vocabularySettings.sortCriterion || 'literary';
 
         const metadataPropertiesConfiguration = [
-          { key: "literaryFrequency", label: "📚 Lit", criterion: "literary" },
-          { key: "spokenFrequency", label: "🗣️ Spk", criterion: "spoken" },
+          { key: 'literaryFrequency', label: '📚 Lit', criterion: 'literary' },
+          { key: 'spokenFrequency', label: '🗣️ Spk', criterion: 'spoken' },
           {
-            key: "tubelexOccurrenceCount",
-            label: "📺 YT",
-            criterion: "tubelex",
+            key: 'tubelexOccurrenceCount',
+            label: '📺 YT',
+            criterion: 'tubelex',
           },
         ];
 
         vocabDataToDisplay.forEach((vocabularyEntry) => {
-          const vocabEntryElement = document.createElement("div");
-          vocabEntryElement.classList.add("vocab-entry");
+          const vocabEntryElement = document.createElement('div');
+          vocabEntryElement.classList.add('vocab-entry');
 
           const targetKanjiReadingTypes = Array.isArray(
             vocabularyEntry.targetKanjiReadingType,
           )
-            ? vocabularyEntry.targetKanjiReadingType.join(" ")
-            : "neither";
+            ? vocabularyEntry.targetKanjiReadingType.join(' ')
+            : 'neither';
           vocabEntryElement.dataset.targetKanjiReadingType =
             targetKanjiReadingTypes;
 
-          const selectButtonElement = document.createElement("button");
-          selectButtonElement.classList.add("vocab-select-button");
-          selectButtonElement.textContent = "🔮";
+          const selectButtonElement = document.createElement('button');
+          selectButtonElement.classList.add('vocab-select-button');
+          selectButtonElement.textContent = '🔮';
           selectButtonElement.setAttribute(
-            "aria-label",
-            "Toggle Selection Mode",
+            'aria-label',
+            'Toggle Selection Mode',
           );
 
-          const actionOverlayElement = document.createElement("div");
-          actionOverlayElement.classList.add("vocab-action-overlay");
+          const actionOverlayElement = document.createElement('div');
+          actionOverlayElement.classList.add('vocab-action-overlay');
 
-          const topRowElement = document.createElement("div");
-          topRowElement.classList.add("vocab-action-top-row");
+          const topRowElement = document.createElement('div');
+          topRowElement.classList.add('vocab-action-top-row');
 
-          const previewDisplayElement = document.createElement("div");
-          previewDisplayElement.classList.add("action-preview-display");
+          const previewDisplayElement = document.createElement('div');
+          previewDisplayElement.classList.add('action-preview-display');
           previewDisplayElement.textContent = vocabularyEntry.writtenForm;
           topRowElement.appendChild(previewDisplayElement);
 
-          const bottomRowElement = document.createElement("div");
-          bottomRowElement.classList.add("vocab-action-bottom-row");
+          const bottomRowElement = document.createElement('div');
+          bottomRowElement.classList.add('vocab-action-bottom-row');
 
-          const copyButtonElement = document.createElement("button");
+          const copyButtonElement = document.createElement('button');
           copyButtonElement.classList.add(
-            "action-button",
-            "action-copy-button",
+            'action-button',
+            'action-copy-button',
           );
-          copyButtonElement.textContent = "Copy";
+          copyButtonElement.textContent = 'Copy';
 
-          const searchButtonElement = document.createElement("button");
+          const searchButtonElement = document.createElement('button');
           searchButtonElement.classList.add(
-            "action-button",
-            "action-search-button",
+            'action-button',
+            'action-search-button',
           );
-          searchButtonElement.textContent = "Search";
+          searchButtonElement.textContent = 'Search';
 
           bottomRowElement.append(copyButtonElement, searchButtonElement);
           actionOverlayElement.append(topRowElement, bottomRowElement);
 
-          const selectionVeilElement = document.createElement("div");
-          selectionVeilElement.classList.add("selection-veil");
+          const selectionVeilElement = document.createElement('div');
+          selectionVeilElement.classList.add('selection-veil');
 
           const gridRows = 20;
           const gridColumns = 60;
@@ -2157,21 +2157,21 @@
           for (let row = 1; row <= gridRows; row++) {
             for (let column = 1; column <= gridColumns; column++) {
               if (Math.random() < fillProbability) {
-                const circleElement = document.createElement("div");
-                circleElement.classList.add("veil-circle");
+                const circleElement = document.createElement('div');
+                circleElement.classList.add('veil-circle');
 
                 circleElement.style.gridRow = row;
                 circleElement.style.gridColumn = column;
 
-                const sizeValue = 2 + Math.floor(Math.random() * 5) + "px";
+                const sizeValue = 2 + Math.floor(Math.random() * 5) + 'px';
                 circleElement.style.width = sizeValue;
                 circleElement.style.height = sizeValue;
 
-                const delayValue = (Math.random() * 3).toFixed(2) + "s";
+                const delayValue = (Math.random() * 3).toFixed(2) + 's';
                 circleElement.style.animationDelay = delayValue;
 
                 const durationValue =
-                  (2.0 + Math.random() * 2.5).toFixed(2) + "s";
+                  (2.0 + Math.random() * 2.5).toFixed(2) + 's';
                 circleElement.style.animationDuration = durationValue;
 
                 selectionVeilElement.appendChild(circleElement);
@@ -2179,23 +2179,24 @@
             }
           }
 
-          const vocabElement = document.createElement("div");
-          vocabElement.classList.add("vocab");
+          const vocabElement = document.createElement('div');
+          vocabElement.classList.add('vocab', 'tappable');
 
-          const vocabJapaneseElement = document.createElement("div");
-          vocabJapaneseElement.classList.add("vocab-japanese");
+          const vocabJapaneseElement = document.createElement('div');
+          vocabJapaneseElement.classList.add('vocab-japanese', 'tappable');
 
-          const rubyElement = document.createElement("ruby");
-          rubyElement.style.cursor = "pointer";
+          const rubyElement = document.createElement('ruby');
+          rubyElement.classList.add('tappable');
+          rubyElement.style.cursor = 'pointer';
 
-          const writtenForm = vocabularyEntry.writtenForm || "";
+          const writtenForm = vocabularyEntry.writtenForm || '';
           for (
             let characterIndex = 0;
             characterIndex < writtenForm.length;
             characterIndex++
           ) {
-            const characterElement = document.createElement("span");
-            characterElement.classList.add("character-tile");
+            const characterElement = document.createElement('span');
+            characterElement.classList.add('character-tile');
             characterElement.dataset.index = characterIndex;
             characterElement.textContent = writtenForm[characterIndex];
             rubyElement.appendChild(characterElement);
@@ -2204,30 +2205,30 @@
           const primaryReading =
             vocabularyEntry.readings && vocabularyEntry.readings[0]
               ? vocabularyEntry.readings[0]
-              : "";
+              : '';
           if (primaryReading) {
-            const rubyTextElement = document.createElement("rt");
-            rubyTextElement.classList.add("furigana", "is-hidden");
+            const rubyTextElement = document.createElement('rt');
+            rubyTextElement.classList.add('furigana', 'is-hidden');
             rubyTextElement.textContent = primaryReading;
             rubyElement.append(rubyTextElement);
           }
 
           vocabJapaneseElement.appendChild(rubyElement);
 
-          vocabJapaneseElement.addEventListener("click", (event) => {
+          vocabJapaneseElement.addEventListener('click', (event) => {
             event.stopPropagation();
-            const targetRubyText = rubyElement.querySelector("rt");
+            const targetRubyText = rubyElement.querySelector('rt');
             if (targetRubyText) {
-              targetRubyText.classList.toggle("is-hidden");
+              targetRubyText.classList.toggle('is-hidden');
             }
           });
 
           const characterTiles =
-            vocabJapaneseElement.querySelectorAll(".character-tile");
+            vocabJapaneseElement.querySelectorAll('.character-tile');
           characterTiles.forEach((tile) => {
-            tile.addEventListener("click", (event) => {
+            tile.addEventListener('click', (event) => {
               if (
-                !vocabEntryElement.classList.contains("selection-mode-active")
+                !vocabEntryElement.classList.contains('selection-mode-active')
               ) {
                 return;
               }
@@ -2238,7 +2239,7 @@
 
               if (this.isFirstTap) {
                 this.isFirstTap = false;
-                characterTiles.forEach((t) => t.classList.remove("selected"));
+                characterTiles.forEach((t) => t.classList.remove('selected'));
                 this.selectedData = [];
 
                 this.selectedData.push({
@@ -2246,114 +2247,114 @@
                   character: character,
                   index: indexValue,
                 });
-                tile.classList.add("selected");
+                tile.classList.add('selected');
               } else {
                 const existingIndex = this.selectedData.findIndex(
                   (item) => item.index === indexValue,
                 );
                 if (existingIndex !== -1) {
                   this.selectedData.splice(existingIndex, 1);
-                  tile.classList.remove("selected");
+                  tile.classList.remove('selected');
                 } else {
                   this.selectedData.push({
                     element: tile,
                     character: character,
                     index: indexValue,
                   });
-                  tile.classList.add("selected");
+                  tile.classList.add('selected');
                 }
               }
               this.updateActiveSelection();
             });
           });
 
-          const vocabEnglishElement = document.createElement("div");
-          vocabEnglishElement.classList.add("vocab-english", "is-hidden");
+          const vocabEnglishElement = document.createElement('div');
+          vocabEnglishElement.classList.add('vocab-english', 'is-hidden');
 
-          const primaryGlossSpan = document.createElement("span");
-          primaryGlossSpan.classList.add("vocab-gloss-primary");
-          primaryGlossSpan.textContent = vocabularyEntry.glosses[0] || "";
+          const primaryGlossSpan = document.createElement('span');
+          primaryGlossSpan.classList.add('vocab-gloss-primary');
+          primaryGlossSpan.textContent = vocabularyEntry.glosses[0] || '';
           vocabEnglishElement.appendChild(primaryGlossSpan);
 
           if (vocabularyEntry.glosses.length > 1) {
-            const extraGlossesSpan = document.createElement("span");
-            extraGlossesSpan.classList.add("vocab-gloss-extra", "is-hidden");
+            const extraGlossesSpan = document.createElement('span');
+            extraGlossesSpan.classList.add('vocab-gloss-extra', 'is-hidden');
             extraGlossesSpan.textContent =
-              ", " + vocabularyEntry.glosses.slice(1).join(", ");
+              ', ' + vocabularyEntry.glosses.slice(1).join(', ');
 
-            const vocabGlossExpandButton = document.createElement("button");
-            vocabGlossExpandButton.classList.add("vocab-gloss-expand-button");
+            const vocabGlossExpandButton = document.createElement('button');
+            vocabGlossExpandButton.classList.add('vocab-gloss-expand-button');
             vocabGlossExpandButton.textContent =
-              "+" + (vocabularyEntry.glosses.length - 1);
+              '+' + (vocabularyEntry.glosses.length - 1);
 
-            vocabGlossExpandButton.addEventListener("click", (clickEvent) => {
+            vocabGlossExpandButton.addEventListener('click', (clickEvent) => {
               clickEvent.stopPropagation();
-              extraGlossesSpan.classList.remove("is-hidden");
-              vocabGlossExpandButton.classList.add("is-hidden");
+              extraGlossesSpan.classList.remove('is-hidden');
+              vocabGlossExpandButton.classList.add('is-hidden');
             });
 
             vocabEnglishElement.appendChild(extraGlossesSpan);
             vocabEnglishElement.appendChild(vocabGlossExpandButton);
           }
 
-          selectButtonElement.addEventListener("click", (event) => {
+          selectButtonElement.addEventListener('click', (event) => {
             event.stopPropagation();
             this.toggleSelectionMode(vocabEntryElement);
           });
 
-          copyButtonElement.addEventListener("click", (event) => {
+          copyButtonElement.addEventListener('click', (event) => {
             event.stopPropagation();
             if (this.selectedData.length === 0) {
               return;
             }
             const compiledString = this.selectedData
               .map((item) => item.character)
-              .join("");
+              .join('');
             this.writeToClipboard(compiledString);
-            copyButtonElement.classList.add("copied");
+            copyButtonElement.classList.add('copied');
           });
 
-          searchButtonElement.addEventListener("click", (clickEvent) => {
+          searchButtonElement.addEventListener('click', (clickEvent) => {
             clickEvent.stopPropagation();
             if (this.selectedData.length === 0) {
               return;
             }
             const compiledString = this.selectedData
               .map((characterItem) => characterItem.character)
-              .join("");
+              .join('');
             const encodedQuery = encodeURIComponent(compiledString);
 
             const vocabularySettings =
               this.settingsManager.getVocabularySettings();
             const targetDictionary =
-              vocabularySettings.searchDictionary || "jisho";
+              vocabularySettings.searchDictionary || 'jisho';
 
-            let finalizedUrlString = "";
+            let finalizedUrlString = '';
 
-            if (targetDictionary === "jisho") {
+            if (targetDictionary === 'jisho') {
               finalizedUrlString = `https://jisho.org/search/${encodedQuery}`;
-            } else if (targetDictionary === "mazii") {
+            } else if (targetDictionary === 'mazii') {
               finalizedUrlString = `https://mazii.net/en-US/search/word/ja/${encodedQuery}`;
-            } else if (targetDictionary === "weblio") {
+            } else if (targetDictionary === 'weblio') {
               finalizedUrlString = `https://ejje.weblio.jp/content/${encodedQuery}`;
-            } else if (targetDictionary === "kotobank") {
+            } else if (targetDictionary === 'kotobank') {
               finalizedUrlString = `https://kotobank.jp/word/${encodedQuery}`;
             }
 
             if (finalizedUrlString) {
-              const temporaryAnchor = document.createElement("a");
+              const temporaryAnchor = document.createElement('a');
               temporaryAnchor.href = finalizedUrlString;
-              temporaryAnchor.target = "_blank";
+              temporaryAnchor.target = '_blank';
               document.body.appendChild(temporaryAnchor);
               temporaryAnchor.click();
               document.body.removeChild(temporaryAnchor);
             }
           });
 
-          vocabElement.addEventListener("click", () => {
+          vocabElement.addEventListener('click', () => {
             const textSelection = window.getSelection().toString();
             if (!textSelection) {
-              vocabEnglishElement.classList.toggle("is-hidden");
+              vocabEnglishElement.classList.toggle('is-hidden');
             }
           });
 
@@ -2394,47 +2395,47 @@
           config.totalAvailableDisplaySelector,
         );
 
-        this.infoButton = document.querySelector("#sort-priority-info-button");
-        this.infoPopup = document.querySelector("#sort-priority-info-popup");
+        this.infoButton = document.querySelector('#sort-priority-info-button');
+        this.infoPopup = document.querySelector('#sort-priority-info-popup');
         this.infoCloseButton = document.querySelector(
-          "#close-sort-priority-info-button",
+          '#close-sort-priority-info-button',
         );
 
         this.plainModeButton = document.querySelector(
-          "#settings-vocab-plain-mode-button",
+          '#settings-vocab-plain-mode-button',
         );
         this.plainOptionsButton = document.querySelector(
-          "#open-plain-options-button",
+          '#open-plain-options-button',
         );
         this.plainOptionsPopup = document.querySelector(
-          "#plain-mode-options-popup",
+          '#plain-mode-options-popup',
         );
         this.plainOptionsCloseButton = document.querySelector(
-          "#close-plain-options-button",
+          '#close-plain-options-button',
         );
 
         this.readingFiltersButton = document.querySelector(
-          "#settings-vocab-reading-filters-button",
+          '#settings-vocab-reading-filters-button',
         );
 
         this.dictionarySelectElement = document.querySelector(
-          "#settings-vocab-dictionary",
+          '#settings-vocab-dictionary',
         );
         this.dictionaryInfoButton = document.querySelector(
-          "#dictionary-info-button",
+          '#dictionary-info-button',
         );
         this.dictionaryInfoPopup = document.querySelector(
-          "#dictionary-info-popup",
+          '#dictionary-info-popup',
         );
         this.dictionaryInfoCloseButton = document.querySelector(
-          "#close-dictionary-info-button",
+          '#close-dictionary-info-button',
         );
 
         this.fontScaleInput = document.querySelector(
-          "#settings-vocab-font-size",
+          '#settings-vocab-font-size',
         );
         this.fontScaleDisplay = document.querySelector(
-          "#settings-vocab-font-size-value",
+          '#settings-vocab-font-size-value',
         );
 
         if (
@@ -2449,54 +2450,54 @@
       }
 
       init() {
-        this.openButton.addEventListener("click", (event) => {
+        this.openButton.addEventListener('click', (event) => {
           event.stopPropagation();
           this.syncControlsFromSettings();
-          this.backdropElement.classList.remove("is-hidden");
+          this.backdropElement.classList.remove('is-hidden');
         });
 
         if (this.closeButton) {
-          this.closeButton.addEventListener("click", (event) => {
+          this.closeButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.backdropElement.classList.add("is-hidden");
+            this.backdropElement.classList.add('is-hidden');
           });
         }
 
-        this.backdropElement.addEventListener("click", (event) => {
+        this.backdropElement.addEventListener('click', (event) => {
           if (event.target === this.backdropElement) {
-            this.backdropElement.classList.add("is-hidden");
+            this.backdropElement.classList.add('is-hidden');
           }
         });
 
         if (this.infoButton && this.infoPopup) {
-          this.infoButton.addEventListener("click", (event) => {
+          this.infoButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.infoPopup.classList.remove("is-hidden");
+            this.infoPopup.classList.remove('is-hidden');
           });
         }
 
         if (this.infoCloseButton && this.infoPopup) {
-          this.infoCloseButton.addEventListener("click", (event) => {
+          this.infoCloseButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.infoPopup.classList.add("is-hidden");
+            this.infoPopup.classList.add('is-hidden');
           });
         }
 
         if (this.infoPopup) {
-          this.infoPopup.addEventListener("click", (event) => {
+          this.infoPopup.addEventListener('click', (event) => {
             if (event.target === this.infoPopup) {
-              this.infoPopup.classList.add("is-hidden");
+              this.infoPopup.classList.add('is-hidden');
             }
           });
         }
 
         if (this.plainModeButton) {
-          this.plainModeButton.addEventListener("click", (event) => {
+          this.plainModeButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            const wasActive = this.plainModeButton.classList.contains("active");
+            const wasActive = this.plainModeButton.classList.contains('active');
             const shouldBeActive = !wasActive;
 
-            this.plainModeButton.classList.toggle("active", shouldBeActive);
+            this.plainModeButton.classList.toggle('active', shouldBeActive);
             this.settingsManager.updateVocabularySettings({
               isPlainModeActive: shouldBeActive,
             });
@@ -2504,42 +2505,42 @@
         }
 
         if (this.plainOptionsButton && this.plainOptionsPopup) {
-          this.plainOptionsButton.addEventListener("click", (event) => {
+          this.plainOptionsButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.plainOptionsPopup.classList.remove("is-hidden");
+            this.plainOptionsPopup.classList.remove('is-hidden');
           });
         }
 
         if (this.plainOptionsCloseButton && this.plainOptionsPopup) {
-          this.plainOptionsCloseButton.addEventListener("click", (event) => {
+          this.plainOptionsCloseButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.plainOptionsPopup.classList.add("is-hidden");
+            this.plainOptionsPopup.classList.add('is-hidden');
           });
         }
 
         if (this.plainOptionsPopup) {
-          this.plainOptionsPopup.addEventListener("click", (event) => {
+          this.plainOptionsPopup.addEventListener('click', (event) => {
             if (event.target === this.plainOptionsPopup) {
-              this.plainOptionsPopup.classList.add("is-hidden");
+              this.plainOptionsPopup.classList.add('is-hidden');
             }
           });
         }
 
         const checkboxIds = [
-          { id: "plain-option-tools", key: "hideKanjiTools" },
-          { id: "plain-option-stroke-dock", key: "hideStrokeDock" },
-          { id: "plain-option-vocab-dock", key: "hideVocabDock" },
-          { id: "plain-option-meaning-expand", key: "hideMeaningExpand" },
-          { id: "plain-option-gloss-expand", key: "hideGlossExpand" },
-          { id: "plain-option-stroke-sigil", key: "simplifyStrokeSigil" },
-          { id: "plain-option-vocab-sigil", key: "simplifyVocabSigil" },
-          { id: "plain-option-vocab-select", key: "hideVocabSelect" },
+          { id: 'plain-option-tools', key: 'hideKanjiTools' },
+          { id: 'plain-option-stroke-dock', key: 'hideStrokeDock' },
+          { id: 'plain-option-vocab-dock', key: 'hideVocabDock' },
+          { id: 'plain-option-meaning-expand', key: 'hideMeaningExpand' },
+          { id: 'plain-option-gloss-expand', key: 'hideGlossExpand' },
+          { id: 'plain-option-stroke-sigil', key: 'simplifyStrokeSigil' },
+          { id: 'plain-option-vocab-sigil', key: 'simplifyVocabSigil' },
+          { id: 'plain-option-vocab-select', key: 'hideVocabSelect' },
         ];
 
         checkboxIds.forEach((option) => {
           const checkboxElement = document.getElementById(option.id);
           if (checkboxElement) {
-            checkboxElement.addEventListener("change", (event) => {
+            checkboxElement.addEventListener('change', (event) => {
               const vocabularySettings =
                 this.settingsManager.getVocabularySettings();
               const plainConfig = vocabularySettings.plainModeConfig || {};
@@ -2553,14 +2554,14 @@
         });
 
         if (this.readingFiltersButton) {
-          this.readingFiltersButton.addEventListener("click", (event) => {
+          this.readingFiltersButton.addEventListener('click', (event) => {
             event.stopPropagation();
             const wasActive =
-              this.readingFiltersButton.classList.contains("active");
+              this.readingFiltersButton.classList.contains('active');
             const shouldBeActive = !wasActive;
 
             this.readingFiltersButton.classList.toggle(
-              "active",
+              'active',
               shouldBeActive,
             );
             this.settingsManager.updateVocabularySettings({
@@ -2570,7 +2571,7 @@
         }
 
         if (this.sortSelectElement) {
-          this.sortSelectElement.addEventListener("change", (event) => {
+          this.sortSelectElement.addEventListener('change', (event) => {
             this.settingsManager.updateVocabularySettings({
               sortCriterion: event.target.value,
             });
@@ -2581,7 +2582,7 @@
         }
 
         if (this.maxCountInput) {
-          this.maxCountInput.addEventListener("input", (event) => {
+          this.maxCountInput.addEventListener('input', (event) => {
             const newCount = parseInt(event.target.value, 10) || 10;
             if (this.maxCountDisplay) {
               this.maxCountDisplay.textContent = newCount;
@@ -2596,7 +2597,7 @@
         }
 
         if (this.dictionarySelectElement) {
-          this.dictionarySelectElement.addEventListener("change", (event) => {
+          this.dictionarySelectElement.addEventListener('change', (event) => {
             this.settingsManager.updateVocabularySettings({
               searchDictionary: event.target.value,
             });
@@ -2604,32 +2605,32 @@
         }
 
         if (this.dictionaryInfoButton && this.dictionaryInfoPopup) {
-          this.dictionaryInfoButton.addEventListener("click", (event) => {
+          this.dictionaryInfoButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.dictionaryInfoPopup.classList.remove("is-hidden");
+            this.dictionaryInfoPopup.classList.remove('is-hidden');
           });
         }
 
         if (this.dictionaryInfoCloseButton && this.dictionaryInfoPopup) {
-          this.dictionaryInfoCloseButton.addEventListener("click", (event) => {
+          this.dictionaryInfoCloseButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.dictionaryInfoPopup.classList.add("is-hidden");
+            this.dictionaryInfoPopup.classList.add('is-hidden');
           });
         }
 
         if (this.dictionaryInfoPopup) {
-          this.dictionaryInfoPopup.addEventListener("click", (event) => {
+          this.dictionaryInfoPopup.addEventListener('click', (event) => {
             if (event.target === this.dictionaryInfoPopup) {
-              this.dictionaryInfoPopup.classList.add("is-hidden");
+              this.dictionaryInfoPopup.classList.add('is-hidden');
             }
           });
         }
 
         if (this.fontScaleInput) {
-          this.fontScaleInput.addEventListener("input", (event) => {
+          this.fontScaleInput.addEventListener('input', (event) => {
             const newScale = parseInt(event.target.value, 10) || 100;
             if (this.fontScaleDisplay) {
-              this.fontScaleDisplay.textContent = newScale + "%";
+              this.fontScaleDisplay.textContent = newScale + '%';
             }
             this.settingsManager.updateVocabularySettings({
               fontScale: newScale,
@@ -2642,11 +2643,11 @@
         const vocabularySettings = this.settingsManager.getVocabularySettings();
         const savedCount = vocabularySettings.maximumWordCount || 10;
         const savedSortCriterion =
-          vocabularySettings.sortCriterion || "literary";
+          vocabularySettings.sortCriterion || 'literary';
         const savedPlainMode = vocabularySettings.isPlainModeActive || false;
         const savedReadingFilters =
           vocabularySettings.isReadingFiltersActive || false;
-        const savedDictionary = vocabularySettings.searchDictionary || "jisho";
+        const savedDictionary = vocabularySettings.searchDictionary || 'jisho';
         if (this.dictionarySelectElement) {
           this.dictionarySelectElement.value = savedDictionary;
         }
@@ -2665,12 +2666,12 @@
         }
 
         if (this.plainModeButton) {
-          this.plainModeButton.classList.toggle("active", savedPlainMode);
+          this.plainModeButton.classList.toggle('active', savedPlainMode);
         }
 
         if (this.readingFiltersButton) {
           this.readingFiltersButton.classList.toggle(
-            "active",
+            'active',
             savedReadingFilters,
           );
         }
@@ -2684,40 +2685,40 @@
         const plainConfig = vocabularySettings.plainModeConfig || {};
 
         const checkboxConfigs = [
-          { id: "plain-option-tools", key: "hideKanjiTools", defaultVal: true },
+          { id: 'plain-option-tools', key: 'hideKanjiTools', defaultVal: true },
           {
-            id: "plain-option-stroke-dock",
-            key: "hideStrokeDock",
+            id: 'plain-option-stroke-dock',
+            key: 'hideStrokeDock',
             defaultVal: true,
           },
           {
-            id: "plain-option-vocab-dock",
-            key: "hideVocabDock",
+            id: 'plain-option-vocab-dock',
+            key: 'hideVocabDock',
             defaultVal: true,
           },
           {
-            id: "plain-option-meaning-expand",
-            key: "hideMeaningExpand",
+            id: 'plain-option-meaning-expand',
+            key: 'hideMeaningExpand',
             defaultVal: true,
           },
           {
-            id: "plain-option-gloss-expand",
-            key: "hideGlossExpand",
+            id: 'plain-option-gloss-expand',
+            key: 'hideGlossExpand',
             defaultVal: true,
           },
           {
-            id: "plain-option-stroke-sigil",
-            key: "simplifyStrokeSigil",
+            id: 'plain-option-stroke-sigil',
+            key: 'simplifyStrokeSigil',
             defaultVal: true,
           },
           {
-            id: "plain-option-vocab-sigil",
-            key: "simplifyVocabSigil",
+            id: 'plain-option-vocab-sigil',
+            key: 'simplifyVocabSigil',
             defaultVal: true,
           },
           {
-            id: "plain-option-vocab-select",
-            key: "hideVocabSelect",
+            id: 'plain-option-vocab-select',
+            key: 'hideVocabSelect',
             defaultVal: false,
           },
         ];
@@ -2735,7 +2736,7 @@
           this.fontScaleInput.value = savedFontScale;
         }
         if (this.fontScaleDisplay) {
-          this.fontScaleDisplay.textContent = savedFontScale + "%";
+          this.fontScaleDisplay.textContent = savedFontScale + '%';
         }
       }
     }
@@ -2757,7 +2758,7 @@
           return;
         }
 
-        this.canvasContext = this.canvasElement.getContext("2d");
+        this.canvasContext = this.canvasElement.getContext('2d');
         this.isCurrentlyDrawing = false;
         this.strokeHistoryStack = [];
 
@@ -2765,31 +2766,31 @@
       }
 
       initialize() {
-        this.openButton.addEventListener("click", (event) => {
+        this.openButton.addEventListener('click', (event) => {
           event.stopPropagation();
           const isDrawerHidden =
-            this.backdropElement.classList.contains("is-hidden");
+            this.backdropElement.classList.contains('is-hidden');
           if (isDrawerHidden) {
-            this.backdropElement.classList.remove("is-hidden");
-            this.openButton.classList.add("active");
+            this.backdropElement.classList.remove('is-hidden');
+            this.openButton.classList.add('active');
             this.configureCanvasResolution();
           } else {
-            this.backdropElement.classList.add("is-hidden");
-            this.openButton.classList.remove("active");
+            this.backdropElement.classList.add('is-hidden');
+            this.openButton.classList.remove('active');
           }
         });
 
         if (this.closeButton) {
-          this.closeButton.addEventListener("click", (event) => {
+          this.closeButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.backdropElement.classList.add("is-hidden");
-            this.openButton.classList.remove("active");
+            this.backdropElement.classList.add('is-hidden');
+            this.openButton.classList.remove('active');
           });
         }
 
         this.configureCanvasResolution();
 
-        if (typeof ResizeObserver !== "undefined") {
+        if (typeof ResizeObserver !== 'undefined') {
           this.resizeObserver = new ResizeObserver(() =>
             this.configureCanvasResolution(),
           );
@@ -2797,39 +2798,39 @@
         }
 
         this.canvasElement.addEventListener(
-          "touchstart",
+          'touchstart',
           (touchEvent) => touchEvent.preventDefault(),
           { passive: false },
         );
 
         this.canvasElement.addEventListener(
-          "touchmove",
+          'touchmove',
           (touchEvent) => touchEvent.preventDefault(),
           { passive: false },
         );
 
-        this.canvasElement.addEventListener("pointerdown", (pointerEvent) =>
+        this.canvasElement.addEventListener('pointerdown', (pointerEvent) =>
           this.startDrawingSequence(pointerEvent),
         );
-        this.canvasElement.addEventListener("pointermove", (pointerEvent) =>
+        this.canvasElement.addEventListener('pointermove', (pointerEvent) =>
           this.drawStrokeSegment(pointerEvent),
         );
-        this.canvasElement.addEventListener("pointerup", () =>
+        this.canvasElement.addEventListener('pointerup', () =>
           this.terminateDrawingSequence(),
         );
-        this.canvasElement.addEventListener("pointerleave", () =>
+        this.canvasElement.addEventListener('pointerleave', () =>
           this.terminateDrawingSequence(),
         );
 
         if (this.clearButtonElement) {
-          this.clearButtonElement.addEventListener("click", (clickEvent) => {
+          this.clearButtonElement.addEventListener('click', (clickEvent) => {
             clickEvent.stopPropagation();
             this.clearCanvas();
           });
         }
 
         if (this.undoButtonElement) {
-          this.undoButtonElement.addEventListener("click", (clickEvent) => {
+          this.undoButtonElement.addEventListener('click', (clickEvent) => {
             clickEvent.stopPropagation();
             this.undoLastStroke();
           });
@@ -2894,11 +2895,11 @@
         const pointerCoordinates = this.getPointerCoordinates(pointerEvent);
         const rootStyleContext = getComputedStyle(document.documentElement);
         const activeInkColor =
-          rootStyleContext.getPropertyValue("--ink-color").trim() || "#2d3436";
+          rootStyleContext.getPropertyValue('--ink-color').trim() || '#2d3436';
 
         this.canvasContext.lineWidth = 4;
-        this.canvasContext.lineCap = "round";
-        this.canvasContext.lineJoin = "round";
+        this.canvasContext.lineCap = 'round';
+        this.canvasContext.lineJoin = 'round';
         this.canvasContext.strokeStyle = activeInkColor;
 
         this.canvasContext.lineTo(
@@ -2959,8 +2960,8 @@
         this.dataProvider = new KanjiDataProvider(loader.data);
 
         this.kanjiSvgController = new KanjiSvgController({
-          pathsSelector: "#stroke-paths-root",
-          numbersSelector: "#stroke-numbers-root",
+          pathsSelector: '#stroke-paths-root',
+          numbersSelector: '#stroke-numbers-root',
           svgData: this.dataProvider.getSvgData(),
         });
 
@@ -2968,7 +2969,7 @@
           this.kanjiSvgController.cachedPathElements.length,
         );
 
-        this.kanjiTappableArea = document.querySelector(".kanji-house");
+        this.kanjiTappableArea = document.querySelector('.kanji-house');
 
         this.init();
       }
@@ -2982,89 +2983,89 @@
 
         this.vocabLedgerService = new VocabLedgerService({
           vocabData: this.dataProvider.getAssociatedWords(),
-          ledgerContainerElement: "#vocab-ledger",
+          ledgerContainerElement: '#vocab-ledger',
           settingsManager: this.settingsManager,
         });
 
         new PracticeDrawerController({
-          backdropSelector: "#practice-drawer-backdrop",
-          openButtonSelector: "#draw-toggle-button",
-          closeButtonSelector: "#close-practice-button",
-          canvasSelector: "#practice-drawing-canvas",
-          clearButtonSelector: "#practice-clear-button",
-          undoButtonSelector: "#practice-undo-button",
+          backdropSelector: '#practice-drawer-backdrop',
+          openButtonSelector: '#draw-toggle-button',
+          closeButtonSelector: '#close-practice-button',
+          canvasSelector: '#practice-drawing-canvas',
+          clearButtonSelector: '#practice-clear-button',
+          undoButtonSelector: '#practice-undo-button',
         });
 
         new SettingsDrawerController({
-          openButtonSelector: "#open-settings-button",
-          closeButtonSelector: "#close-settings-button",
-          backdropSelector: "#settings-drawer-backdrop",
-          sortSelectSelector: "#settings-vocab-sort-criterion",
-          maxCountInputSelector: "#settings-vocab-max-count",
-          maxCountDisplaySelector: "#settings-vocab-max-count-value",
+          openButtonSelector: '#open-settings-button',
+          closeButtonSelector: '#close-settings-button',
+          backdropSelector: '#settings-drawer-backdrop',
+          sortSelectSelector: '#settings-vocab-sort-criterion',
+          maxCountInputSelector: '#settings-vocab-max-count',
+          maxCountDisplaySelector: '#settings-vocab-max-count-value',
           totalAvailableDisplaySelector:
-            "#settings-vocab-total-available-value",
+            '#settings-vocab-total-available-value',
           settingsManager: this.settingsManager,
           vocabLedgerService: this.vocabLedgerService,
         });
 
         new KanjiMeaningController({
-          meaningSelector: "#kanji-meaning",
+          meaningSelector: '#kanji-meaning',
           meanings: this.dataProvider.getMeanings(),
           kanji: this.dataProvider.getKanji(),
         });
 
         new ReadingDisplayController({
-          kunyomiButtonSelector: "#kunyomi-button",
-          onyomiButtonSelector: "#onyomi-button",
-          onDisplaySelector: "#readings-display-on",
-          kunDisplaySelector: "#readings-display-kun",
-          onDisplayWrapperSelector: "#readings-display-wrapper-on",
-          kunDisplayWrapperSelector: "#readings-display-wrapper-kun",
+          kunyomiButtonSelector: '#kunyomi-button',
+          onyomiButtonSelector: '#onyomi-button',
+          onDisplaySelector: '#readings-display-on',
+          kunDisplaySelector: '#readings-display-kun',
+          onDisplayWrapperSelector: '#readings-display-wrapper-on',
+          kunDisplayWrapperSelector: '#readings-display-wrapper-kun',
           kunyomiData: this.dataProvider.getKunReadings(),
           onyomiData: this.dataProvider.getOnReadings(),
         });
 
         new LinkInstallationService({
-          linkSelector: "#report-issue-link",
+          linkSelector: '#report-issue-link',
           baseUrl:
-            "https://docs.google.com/forms/d/e/1FAIpQLSeji75MTbdugBk8IiQYl4_JQyIoiYMMwil0bMiCjl1r1pjZUg/viewform",
+            'https://docs.google.com/forms/d/e/1FAIpQLSeji75MTbdugBk8IiQYl4_JQyIoiYMMwil0bMiCjl1r1pjZUg/viewform',
           openInNewTab: true,
           params: {
-            usp: "pp_url",
-            "entry.196764883": this.dataProvider.getKanji(),
-            "entry.870807372": this.dataProvider.getSortingGroup(),
+            usp: 'pp_url',
+            'entry.196764883': this.dataProvider.getKanji(),
+            'entry.870807372': this.dataProvider.getSortingGroup(),
           },
         });
 
         new LinkInstallationService({
-          linkSelector: "#rate-deck-link",
-          baseUrl: "https://ankiweb.net/shared/decks",
+          linkSelector: '#rate-deck-link',
+          baseUrl: 'https://ankiweb.net/shared/decks',
           openInNewTab: true,
         });
 
         new RadicalColorToggleController({
-          buttonSelector: "#toggle-radical-button",
-          pathsSelector: "#stroke-paths-root",
-          storageKey: "kanji-radical-highlight-active",
+          buttonSelector: '#toggle-radical-button',
+          pathsSelector: '#stroke-paths-root',
+          storageKey: 'kanji-radical-highlight-active',
         });
 
         new StrokeNumbersToggleController({
-          buttonSelector: "#toggle-stroke-numbers-button",
-          numbersSelector: "#stroke-numbers-root",
-          storageKey: "kanji-stroke-numbers-active",
+          buttonSelector: '#toggle-stroke-numbers-button',
+          numbersSelector: '#stroke-numbers-root',
+          storageKey: 'kanji-stroke-numbers-active',
         });
 
         new SigilController(
-          "#vocab-sigil",
-          "vocab",
-          "#vocab-ledger-sigil-dock",
+          '#vocab-sigil',
+          'vocab',
+          '#vocab-ledger-sigil-dock',
         );
 
         new SigilController(
-          "#stroke-sigil",
-          "stroke",
-          "#stroke-sigil-dock",
+          '#stroke-sigil',
+          'stroke',
+          '#stroke-sigil-dock',
           () => {
             this.advanceKanjiStroke();
           },
@@ -3076,7 +3077,7 @@
           return;
         }
 
-        this.kanjiTappableArea.addEventListener("click", (event) =>
+        this.kanjiTappableArea.addEventListener('click', (event) =>
           this.handleKanjiTap(event),
         );
       }
@@ -3099,7 +3100,7 @@
           event &&
           event.target &&
           event.target.closest &&
-          event.target.closest(".readings-display-wrapper")
+          event.target.closest('.readings-display-wrapper')
         ) {
           return;
         }
@@ -3107,7 +3108,7 @@
       }
 
       setupThemeToggle() {
-        this.themeButton = document.querySelector("#toggle-theme-button");
+        this.themeButton = document.querySelector('#toggle-theme-button');
         if (!this.themeButton) {
           return;
         }
@@ -3115,29 +3116,29 @@
         const rootElement = document.documentElement;
 
         const applyThemeUpdate = (isDark) => {
-          rootElement.classList.toggle("user-night-mode", isDark);
-          rootElement.classList.toggle("user-day-mode", !isDark);
+          rootElement.classList.toggle('user-night-mode', isDark);
+          rootElement.classList.toggle('user-day-mode', !isDark);
 
           this.themeButton.setAttribute(
-            "data-theme",
-            isDark ? "dark" : "light",
+            'data-theme',
+            isDark ? 'dark' : 'light',
           );
-          localStorage.setItem("kanji-wizard-theme", isDark ? "dark" : "light");
+          localStorage.setItem('kanji-wizard-theme', isDark ? 'dark' : 'light');
         };
 
-        const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
+        const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
         const userSystemSetAsDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
+          '(prefers-color-scheme: dark)',
         ).matches;
         const isNightModeActive = locallySavedTheme
-          ? locallySavedTheme === "dark"
+          ? locallySavedTheme === 'dark'
           : userSystemSetAsDark;
 
         applyThemeUpdate(isNightModeActive);
 
-        this.themeButton.addEventListener("click", (clickEvent) => {
+        this.themeButton.addEventListener('click', (clickEvent) => {
           clickEvent.stopPropagation();
-          const willBeDark = rootElement.classList.contains("user-day-mode");
+          const willBeDark = rootElement.classList.contains('user-day-mode');
 
           if (document.startViewTransition) {
             document.startViewTransition(() => {
@@ -3152,10 +3153,10 @@
 
     new BackCardApp();
 
-    const workspaceElement = document.querySelector(".deck-workspace");
+    const workspaceElement = document.querySelector('.deck-workspace');
     if (workspaceElement) {
       setTimeout(() => {
-        workspaceElement.classList.remove("preload");
+        workspaceElement.classList.remove('preload');
       }, 100);
     }
   })();

@@ -1,9 +1,9 @@
 :root,
 :root.user-day-mode {
   --font-primary:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
-  --font-specialized: "Cinzel", Georgia, serif;
+  --font-specialized: 'Cinzel', Georgia, serif;
   --bg: #e6ecf4;
   --bg-card: #ffffff;
   --bg-kanji-house: #f1f5f9;
@@ -380,7 +380,7 @@ html {
 }
 
 .highlight-radical
-  :is([kvg\:radical="general"], [kvg\:radical="tradit"])
+  :is([kvg\:radical='general'], [kvg\:radical='tradit'])
   .kanji-stroke {
   stroke: var(--n1-color);
   --active-color: var(--n1-color);
@@ -441,7 +441,7 @@ html {
 }
 
 #kanji-meaning:has(.meaning-expand-button)::before {
-  content: "";
+  content: '';
   width: 38px;
   display: block;
   flex-shrink: 0;
@@ -665,7 +665,7 @@ html {
 }
 
 .meaning-pill.secondary-pill::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 6px;
   top: 25%;
@@ -754,7 +754,7 @@ div.vocabulary-top-bar button.reading-button {
 }
 
 div.vocabulary-top-bar button.reading-button::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 10px;
   top: 25%;
@@ -766,7 +766,7 @@ div.vocabulary-top-bar button.reading-button::before {
 }
 
 div.vocabulary-top-bar button.reading-button::after {
-  content: "●";
+  content: '●';
   position: absolute;
   right: 12px;
   font-size: 0.45rem;
@@ -827,7 +827,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .kanji-house:has(.readings-display-wrapper.active)::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background-color: #000000;
@@ -939,7 +939,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .readings-badge::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1035,7 +1035,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .vocab-entry.active-reveal::before {
-  content: "◈";
+  content: '◈';
   position: absolute;
   left: -16px;
   color: var(--vocab-active-marker);
@@ -1060,14 +1060,14 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .reading-filters-active
-  #vocab-ledger[data-active-filter="kun"]
-  .vocab-entry[data-target-kanji-reading-type~="kun"],
+  #vocab-ledger[data-active-filter='kun']
+  .vocab-entry[data-target-kanji-reading-type~='kun'],
 .reading-filters-active
-  #vocab-ledger[data-active-filter="on"]
-  .vocab-entry[data-target-kanji-reading-type~="on"],
+  #vocab-ledger[data-active-filter='on']
+  .vocab-entry[data-target-kanji-reading-type~='on'],
 .reading-filters-active
-  #vocab-ledger[data-active-filter="jukujikun"]
-  .vocab-entry[data-target-kanji-reading-type~="jukujikun"] {
+  #vocab-ledger[data-active-filter='jukujikun']
+  .vocab-entry[data-target-kanji-reading-type~='jukujikun'] {
   opacity: 1;
   transform: scale(1.01);
 }
@@ -1118,7 +1118,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .vocab-gloss-expand-button::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 4px;
   top: 25%;
@@ -1317,7 +1317,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .sigil::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -6px;
   border-radius: 50%;
@@ -1328,7 +1328,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .sigil::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 4px;
   border-radius: 50%;
@@ -1392,7 +1392,7 @@ div.vocabulary-top-bar button.reading-button:hover {
 }
 
 .sigil-dock::after {
-  content: "";
+  content: '';
   width: 6px;
   height: 6px;
   background: var(--dock-border);
@@ -1586,7 +1586,7 @@ button.utility-icon-button,
 }
 
 .drawing-controls button.kanji-tool-button::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 8px;
   top: 25%;
@@ -1625,14 +1625,14 @@ button.utility-icon-button,
 }
 
 .settings-drawer-header::before {
-  content: "";
+  content: '';
   width: 28px;
   display: block;
   flex-shrink: 0;
 }
 
 .settings-drawer-header::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 0;
   left: 8%;
@@ -1767,6 +1767,7 @@ p.settings-value-indicator {
   accent-color: var(--accent-color);
   cursor: pointer;
   width: 100%;
+  touch-action: none;
 }
 
 .settings-available-indicator {
@@ -1841,14 +1842,14 @@ p.settings-value-indicator {
 }
 
 .sliding-toggle-button.active,
-.sliding-toggle-button[data-theme="dark"] {
+.sliding-toggle-button[data-theme='dark'] {
   background: var(--toggle-active-background);
   border-color: var(--toggle-active-border);
   box-shadow: var(--toggle-active-shadow);
 }
 
 .sliding-toggle-button.active::after,
-.sliding-toggle-button[data-theme="dark"]::after {
+.sliding-toggle-button[data-theme='dark']::after {
   content: var(--toggle-knob-active-content, var(--toggle-knob-content));
   transform: translateX(24px) rotate(360deg);
   background: var(--toggle-knob-active-background);
@@ -1869,7 +1870,7 @@ p.settings-value-indicator {
 }
 
 .sliding-toggle-button.active:hover,
-.sliding-toggle-button[data-theme="dark"]:hover {
+.sliding-toggle-button[data-theme='dark']:hover {
   background: var(
     --toggle-active-hover-background,
     var(--toggle-active-background)
@@ -1878,7 +1879,7 @@ p.settings-value-indicator {
 }
 
 .sliding-toggle-button.active:hover::after,
-.sliding-toggle-button[data-theme="dark"]:hover::after {
+.sliding-toggle-button[data-theme='dark']:hover::after {
   background: var(
     --toggle-knob-active-hover-background,
     var(--toggle-knob-active-background)
@@ -1891,7 +1892,7 @@ p.settings-value-indicator {
   --toggle-background: linear-gradient(135deg, #ffecb3, #ffd54f);
   --toggle-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 10px rgba(255, 213, 79, 0.2);
-  --toggle-knob-content: "🕶️";
+  --toggle-knob-content: '🕶️';
   --toggle-knob-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -1921,7 +1922,7 @@ p.settings-value-indicator {
   --toggle-background: linear-gradient(135deg, #1a0b2e, #311b92);
   --toggle-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 12px rgba(103, 58, 183, 0.4);
-  --toggle-knob-content: "🦉";
+  --toggle-knob-content: '🦉';
   --toggle-knob-background: radial-gradient(
     circle at 30% 30%,
     #e0f7fa,
@@ -1950,7 +1951,7 @@ p.settings-value-indicator {
   --toggle-border: #cbd5e1;
   --toggle-background: #f1f5f9;
   --toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  --toggle-knob-content: "🏮";
+  --toggle-knob-content: '🏮';
   --toggle-knob-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -1961,7 +1962,7 @@ p.settings-value-indicator {
   --toggle-active-background: linear-gradient(135deg, #e11d48, #9f1239);
   --toggle-active-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(220, 38, 38, 0.4);
-  --toggle-knob-active-content: var(--radical-content, "🏮");
+  --toggle-knob-active-content: var(--radical-content, '🏮');
   --toggle-knob-active-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -2005,7 +2006,7 @@ p.settings-value-indicator {
   --toggle-border: #cbd5e1;
   --toggle-background: #f1f5f9;
   --toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  --toggle-knob-content: "🔢";
+  --toggle-knob-content: '🔢';
   --toggle-knob-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -2016,7 +2017,7 @@ p.settings-value-indicator {
   --toggle-active-background: linear-gradient(135deg, #0ea5e9, #0369a1);
   --toggle-active-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(2, 132, 199, 0.4);
-  --toggle-knob-active-content: var(--stroke-count-content, "🔢");
+  --toggle-knob-active-content: var(--stroke-count-content, '🔢');
   --toggle-knob-active-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -2058,7 +2059,7 @@ p.settings-value-indicator {
   --toggle-border: #cbd5e1;
   --toggle-background: #f1f5f9;
   --toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  --toggle-knob-content: "👁️";
+  --toggle-knob-content: '👁️';
   --toggle-knob-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -2069,7 +2070,7 @@ p.settings-value-indicator {
   --toggle-active-background: linear-gradient(135deg, #0ea5e9, #0369a1);
   --toggle-active-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(2, 132, 199, 0.4);
-  --toggle-knob-active-content: "🍃";
+  --toggle-knob-active-content: '🍃';
   --toggle-knob-active-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -2111,7 +2112,7 @@ p.settings-value-indicator {
   --toggle-border: #cbd5e1;
   --toggle-background: #f1f5f9;
   --toggle-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  --toggle-knob-content: "📖";
+  --toggle-knob-content: '📖';
   --toggle-knob-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -2122,7 +2123,7 @@ p.settings-value-indicator {
   --toggle-active-border: var(--wizard-color-6);
   --toggle-active-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(109, 40, 217, 0.4);
-  --toggle-knob-active-content: "⛩️";
+  --toggle-knob-active-content: '⛩️';
   --toggle-knob-active-background: radial-gradient(
     circle at 30% 30%,
     #ffffff,
@@ -2381,7 +2382,7 @@ button.vocab-select-button.active {
 }
 
 .action-copy-button.copied::after {
-  content: "✓";
+  content: '✓';
   position: absolute;
   top: -4px;
   right: -4px;
@@ -2462,7 +2463,7 @@ button.action-button:hover {
   flex-shrink: 0;
 }
 
-.settings-label-row input[type="checkbox"] {
+.settings-label-row input[type='checkbox'] {
   margin-right: 10px;
 }
 

@@ -1,34 +1,34 @@
 <script>
   (() => {
     const rootElement = document.documentElement;
-    rootElement.classList.add("preload");
+    rootElement.classList.add('preload');
 
-    const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
+    const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
     const systemPrefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
+      '(prefers-color-scheme: dark)',
     ).matches;
     const isNightModeActive = locallySavedTheme
-      ? locallySavedTheme === "dark"
+      ? locallySavedTheme === 'dark'
       : systemPrefersDark;
-    rootElement.classList.toggle("user-night-mode", isNightModeActive);
-    rootElement.classList.toggle("user-day-mode", !isNightModeActive);
+    rootElement.classList.toggle('user-night-mode', isNightModeActive);
+    rootElement.classList.toggle('user-day-mode', !isNightModeActive);
 
     const storedSettingsString = localStorage.getItem(
-      "kanji-wizard-global-settings",
+      'kanji-wizard-global-settings',
     );
     if (storedSettingsString) {
       try {
         const parsedSettings = JSON.parse(storedSettingsString);
         const fontScale = parsedSettings.vocabulary?.fontScale || 100;
-        rootElement.style.fontSize = fontScale + "%";
+        rootElement.style.fontSize = fontScale + '%';
       } catch (parsingError) {
-        rootElement.style.fontSize = "100%";
+        rootElement.style.fontSize = '100%';
       }
     }
   })();
 </script>
 
-<div class="deck-workspace preload">
+<div class="deck-workspace preload tappable">
   <div class="card-container card-container-front">
     <div class="front-main-content">
       <div class="front-card-prompt-hint">
@@ -82,7 +82,7 @@
 <script>
   (() => {
     class DataLoader {
-      constructor(elementId = "json-container") {
+      constructor(elementId = 'json-container') {
         this.elementId = elementId;
         this.data = this.#init();
       }
@@ -110,7 +110,7 @@
       }
 
       getKanji() {
-        return this.data.kanji || "";
+        return this.data.kanji || '';
       }
 
       getJlptLevel() {
@@ -152,7 +152,7 @@
           const resolvedValue =
             parameterValue !== null && parameterValue !== undefined
               ? String(parameterValue).trim()
-              : "Unknown";
+              : 'Unknown';
 
           urlParametersBuilder.append(parameterKey, resolvedValue);
         }
@@ -165,7 +165,7 @@
         this.targetLinkElement.href = finalizedUrlString;
 
         if (openInNewTabFlag) {
-          this.targetLinkElement.target = "_blank";
+          this.targetLinkElement.target = '_blank';
         }
       }
     }
@@ -184,7 +184,7 @@
           return;
         }
 
-        this.canvasContext = this.canvasElement.getContext("2d");
+        this.canvasContext = this.canvasElement.getContext('2d');
         this.isCurrentlyDrawing = false;
         this.strokeHistoryStack = [];
 
@@ -194,7 +194,7 @@
       initialize() {
         this.configureCanvasResolution();
 
-        if (typeof ResizeObserver !== "undefined") {
+        if (typeof ResizeObserver !== 'undefined') {
           this.resizeObserver = new ResizeObserver(() =>
             this.configureCanvasResolution(),
           );
@@ -202,39 +202,39 @@
         }
 
         this.canvasElement.addEventListener(
-          "touchstart",
+          'touchstart',
           (touchEvent) => touchEvent.preventDefault(),
           { passive: false },
         );
 
         this.canvasElement.addEventListener(
-          "touchmove",
+          'touchmove',
           (touchEvent) => touchEvent.preventDefault(),
           { passive: false },
         );
 
-        this.canvasElement.addEventListener("pointerdown", (pointerEvent) =>
+        this.canvasElement.addEventListener('pointerdown', (pointerEvent) =>
           this.startDrawingSequence(pointerEvent),
         );
-        this.canvasElement.addEventListener("pointermove", (pointerEvent) =>
+        this.canvasElement.addEventListener('pointermove', (pointerEvent) =>
           this.drawStrokeSegment(pointerEvent),
         );
-        this.canvasElement.addEventListener("pointerup", () =>
+        this.canvasElement.addEventListener('pointerup', () =>
           this.terminateDrawingSequence(),
         );
-        this.canvasElement.addEventListener("pointerleave", () =>
+        this.canvasElement.addEventListener('pointerleave', () =>
           this.terminateDrawingSequence(),
         );
 
         if (this.clearButtonElement) {
-          this.clearButtonElement.addEventListener("click", (clickEvent) => {
+          this.clearButtonElement.addEventListener('click', (clickEvent) => {
             clickEvent.stopPropagation();
             this.clearCanvas();
           });
         }
 
         if (this.undoButtonElement) {
-          this.undoButtonElement.addEventListener("click", (clickEvent) => {
+          this.undoButtonElement.addEventListener('click', (clickEvent) => {
             clickEvent.stopPropagation();
             this.undoLastStroke();
           });
@@ -296,11 +296,11 @@
         const pointerCoordinates = this.getPointerCoordinates(pointerEvent);
         const rootStyleContext = getComputedStyle(document.documentElement);
         const activeInkColor =
-          rootStyleContext.getPropertyValue("--ink-color").trim() || "#2d3436";
+          rootStyleContext.getPropertyValue('--ink-color').trim() || '#2d3436';
 
         this.canvasContext.lineWidth = 4;
-        this.canvasContext.lineCap = "round";
-        this.canvasContext.lineJoin = "round";
+        this.canvasContext.lineCap = 'round';
+        this.canvasContext.lineJoin = 'round';
         this.canvasContext.strokeStyle = activeInkColor;
 
         this.canvasContext.lineTo(
@@ -349,7 +349,7 @@
 
     class FrontCardApp {
       constructor() {
-        const dataLoader = new DataLoader("json-container");
+        const dataLoader = new DataLoader('json-container');
         if (!dataLoader.isValid()) {
           return;
         }
@@ -363,26 +363,26 @@
         this.setupThemeToggle();
 
         new DrawingPadController({
-          canvasSelector: "#drawing-canvas",
-          clearButtonSelector: "#clear-drawing-button",
-          undoButtonSelector: "#undo-drawing-button",
+          canvasSelector: '#drawing-canvas',
+          clearButtonSelector: '#clear-drawing-button',
+          undoButtonSelector: '#undo-drawing-button',
         });
 
         new LinkInstallationService({
-          linkSelector: "#report-issue-link",
+          linkSelector: '#report-issue-link',
           baseUrl:
-            "https://docs.google.com/forms/d/e/1FAIpQLSeji75MTbdugBk8IiQYl4_JQyIoiYMMwil0bMiCjl1r1pjZUg/viewform",
+            'https://docs.google.com/forms/d/e/1FAIpQLSeji75MTbdugBk8IiQYl4_JQyIoiYMMwil0bMiCjl1r1pjZUg/viewform',
           openInNewTab: true,
           params: {
-            usp: "pp_url",
-            "entry.196764883": this.dataProvider.getKanji(),
-            "entry.870807372": this.dataProvider.getJlptLevel(),
+            usp: 'pp_url',
+            'entry.196764883': this.dataProvider.getKanji(),
+            'entry.870807372': this.dataProvider.getJlptLevel(),
           },
         });
 
         new LinkInstallationService({
-          linkSelector: "#rate-deck-link",
-          baseUrl: "https://ankiweb.net/shared/decks",
+          linkSelector: '#rate-deck-link',
+          baseUrl: 'https://ankiweb.net/shared/decks',
           openInNewTab: true,
         });
       }
@@ -390,16 +390,16 @@
       setupMeaning() {
         const targetKanjiCharacter = this.dataProvider.getKanji();
         const customMeaningStorageKey =
-          "kanji-custom-meaning-" + targetKanjiCharacter;
+          'kanji-custom-meaning-' + targetKanjiCharacter;
         const savedCustomMeaning = localStorage.getItem(
           customMeaningStorageKey,
         );
         const kanjiMeaningsList = this.dataProvider.getMeanings();
         const activeKanjiMeaning =
-          savedCustomMeaning || kanjiMeaningsList[0] || "Placeholder Meaning";
+          savedCustomMeaning || kanjiMeaningsList[0] || 'Placeholder Meaning';
 
         const meaningPillElement = document.querySelector(
-          "#kanji-meaning .meaning-pill",
+          '#kanji-meaning .meaning-pill',
         );
         if (meaningPillElement) {
           meaningPillElement.textContent = activeKanjiMeaning;
@@ -407,7 +407,7 @@
       }
 
       setupThemeToggle() {
-        this.themeButton = document.querySelector("#toggle-theme-button");
+        this.themeButton = document.querySelector('#toggle-theme-button');
         if (!this.themeButton) {
           return;
         }
@@ -415,32 +415,32 @@
         const root = document.documentElement;
 
         const updateState = (isNightModeActive) => {
-          root.classList.toggle("user-night-mode", isNightModeActive);
-          root.classList.toggle("user-day-mode", !isNightModeActive);
+          root.classList.toggle('user-night-mode', isNightModeActive);
+          root.classList.toggle('user-day-mode', !isNightModeActive);
 
           this.themeButton.setAttribute(
-            "data-theme",
-            isNightModeActive ? "dark" : "light",
+            'data-theme',
+            isNightModeActive ? 'dark' : 'light',
           );
           localStorage.setItem(
-            "kanji-wizard-theme",
-            isNightModeActive ? "dark" : "light",
+            'kanji-wizard-theme',
+            isNightModeActive ? 'dark' : 'light',
           );
         };
 
-        const locallySavedTheme = localStorage.getItem("kanji-wizard-theme");
+        const locallySavedTheme = localStorage.getItem('kanji-wizard-theme');
         const userSystemSetAsDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
+          '(prefers-color-scheme: dark)',
         ).matches;
         updateState(
           locallySavedTheme
-            ? locallySavedTheme === "dark"
+            ? locallySavedTheme === 'dark'
             : userSystemSetAsDark,
         );
 
-        this.themeButton.addEventListener("click", (clickEvent) => {
+        this.themeButton.addEventListener('click', (clickEvent) => {
           clickEvent.stopPropagation();
-          const switchedToDarkMode = root.classList.contains("user-day-mode");
+          const switchedToDarkMode = root.classList.contains('user-day-mode');
           updateState(switchedToDarkMode);
         });
       }
@@ -448,10 +448,10 @@
 
     new FrontCardApp();
 
-    const workspaceElement = document.querySelector(".deck-workspace");
+    const workspaceElement = document.querySelector('.deck-workspace');
     if (workspaceElement) {
       setTimeout(() => {
-        workspaceElement.classList.remove("preload");
+        workspaceElement.classList.remove('preload');
       }, 100);
     }
   })();
