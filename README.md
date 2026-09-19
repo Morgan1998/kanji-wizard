@@ -51,9 +51,9 @@ The TUBELEX dataset and its associated code are distributed under the **BSD 3-Cl
 
 #### 6. Spoken Frequencies
 
-- **Direct Source**: forsakeninfinity/CEJC_yomichan_freq_dict (Yomitan frequency dictionary format)
+- **Direct Source**: [forsakeninfinity/CEJC_yomichan_freq_dict](https://github.com/forsakeninfinity/CEJC_yomichan_freq_dict)
 - **Upstream Creator**: NINJAL (National Institute for Japanese Language and Linguistics)
-- **License/Terms**: Data derived from NINJAL’s publicly available lexical frequency tables and word counts. This deck contains only open statistical rankings (word-to-number mappings) and does not redistribute the restricted text transcripts, audio, video, or sensitive personal data governed by the primary CEJC End-User License Agreement (EULA).
+- **License/Terms**: Data derived from NINJAL’s publicly available lexical frequency tables and word counts. This metadata is distributed non-commercially in compliance with the Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported (CC BY-NC-ND 3.0) license governing the upstream frequency datasets. This deck contains only open statistical rankings (word-to-number mappings) and does not redistribute the restricted text transcripts, audio, video, or sensitive personal data governed by the primary CEJC conversation EULA.
 
 #### 7. Stroke Order & Vector Graphics Dataset
 
